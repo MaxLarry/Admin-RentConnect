@@ -2,6 +2,8 @@ import React from "react";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import RentLogo from "../img/rentconff1.svg";
 import RentLogoWhite from "../img/rentconff1_white.svg";
+import Notification from "./Notification";
+import ProfileDropdown from "./ProfileDropdown";
 
 const Header = ({ toggleSidebar }) => {
   return (
@@ -10,9 +12,7 @@ const Header = ({ toggleSidebar }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-start rtl:justify-end">
             <button
-              className="inline-flex items-center mx-2
-text-sm text-gray-500 rounded-sm sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus: ring-gray-200
-dark:text-gray-400 dark:hover:bg-gray-70 dark: focus:ring-sky-900"
+              className="inline-flex items-center mx-2 text-sm text-gray-500 rounded-sm sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-sky-900"
               onClick={toggleSidebar}
             >
               <HiOutlineMenuAlt2 className="text-2xl" />
@@ -29,6 +29,11 @@ dark:text-gray-400 dark:hover:bg-gray-70 dark: focus:ring-sky-900"
                 className="mx-auto h-9 w-auto hidden dark:block"
               />
             </a>
+          </div>
+          <div className="flex items-center">
+            {/* Profile Dropdown */}
+            <Notification />
+            <ProfileDropdown />
           </div>
         </div>
       </div>
