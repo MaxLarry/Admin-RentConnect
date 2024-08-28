@@ -3,108 +3,114 @@ import RentLogo from "../img/LJA_icon.svg";
 
 const Login = () => {
   return (
-    <div class="flex items-center justify-center min-h-screen bg-background">
-      <div class="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-md">
-        <div class="flex justify-center">
-          <img
-            aria-hidden="true"
-            alt="logo"
-            src="https://openui.fly.dev/openui/24x24.svg?text=🔒"
-            class="w-12 h-12"
-          />
-        </div>
-        <h2 class="text-2xl font-semibold text-center text-foreground">
-          Sign in to your account
-        </h2>
-        <form class="space-y-4">
-          <div>
-            <label
-              for="email"
-              class="block text-sm font-medium text-muted-foreground"
-            >
-              Email address
-            </label>
-            <input
-              type="email"
-              id="email"
-              required
-              class="block w-full p-2 border border-border rounded-md focus:outline-none focus:ring focus:ring-ring"
-              placeholder="you@example.com"
-            />
+<div className="flex min-h-screen bg-background">
+          <div className="flex-1 flex items-center justify-center bg-gradient-to-r from-pink-500 to-red-500">
+            <div className="text-white text-4xl font-bold">
+              Build like a team
+              <br />
+              of hundreds_
+            </div>
           </div>
-          <div>
-            <label
-              for="password"
-              class="block text-sm font-medium text-muted-foreground"
-            >
-              Password
-            </label>
-            <div class="relative">
-              <input
-                type="password"
-                id="password"
-                required
-                class="block w-full p-2 border border-border rounded-md focus:outline-none focus:ring focus:ring-ring"
-                placeholder="••••••••"
-              />
-              <button
-                type="button"
-                id="togglePassword"
-                class="absolute inset-y-0 right-0 flex items-center pr-2 text-muted-foreground"
+          <div className="w-full max-w-md p-8 space-y-6 lg-card rounded-lg shadow-md z-10">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <img
+            alt="Rent-Connect"
+            src={RentLogo}
+            className="mx-auto h-auto w-auto"
+          />
+          <h2 className=" text-center text-3xl font-extrabold leading-9 tracking-tight text-gray-900">
+            Admin Login
+          </h2>
+        </div>
+
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <form action="#" method="POST" className="space-y-4">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium leading-6 text-gray-900"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                Email address
+              </label>
+              <div className="mt-2">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  Password
+                </label>
+              </div>
+              <div className="relative mt-2">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  autoComplete="current-password"
+                  placeholder="•••••••••••"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3"
+                >
+                  {showPassword ? (
+                    <FaEye className="h-5 w-5 text-black" />
+                  ) : (
+                    <FaEyeSlash className="h-5 w-5 text-black" />
+                  )}
+                </button>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="remember"
+                    className="h-4 w-4 text-primary border rounded"
                   />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12a3 3 0 116 0 3 3 0 01-6 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                  <label
+                    htmlFor="remember"
+                    className="ml-2 text-sm text-muted-foreground"
+                  >
+                    Remember me
+                  </label>
+                </div>
+                <a href="#" className="text-sm text-primary hover:underline">
+                  Forgot password?
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Log in
               </button>
             </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <input
-                type="checkbox"
-                id="remember"
-                class="h-4 w-4 text-primary border-border rounded focus:ring focus:ring-ring"
-              />
-              <label for="remember" class="ml-2 text-sm text-muted-foreground">
-                Remember me
-              </label>
-            </div>
-            <a href="#" class="text-sm text-primary hover:underline">
-              Forgot password?
-            </a>
-          </div>
-          <button
-            type="submit"
-            class="w-full bg-primary text-primary-foreground hover:bg-primary/80 p-2 rounded-md"
-          >
-            Sign in
-          </button>
-        </form>
+          </form>
+
+          <p className="mt-10 text-center text-sm text-gray-500">
+            {/* Add any additional content here */}
+          </p>
+        </div>
       </div>
-    </div>
+        </div>
   );
 };
 

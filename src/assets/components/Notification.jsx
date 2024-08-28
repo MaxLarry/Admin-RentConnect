@@ -1,21 +1,34 @@
-import React, { useState } from 'react';
-import { FiBell, FiX } from 'react-icons/fi'; // Bell icon for notifications
-import { MdNotificationsNone } from 'react-icons/md'; // pili lang sa icon
+import React, { useState, useEffect, useRef } from 'react';
+import { IoIosNotifications } from "react-icons/io";
 
 const Notification = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const toggleNotifications = () => {
     setIsOpen(!isOpen);
   };
 
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="relative inline-block text-left">
+    <div className="relative inline-block text-left" ref={dropdownRef}>
       <button
-        className="flex items-center space-x-2 px-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white focus:outline-none"
+        className="flex items-center space-x-2 px-3 text-zinc-900 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white focus:outline-none"
         onClick={toggleNotifications}
       >
-        <FiBell className="text-2xl" />
+        <IoIosNotifications className="text-2xl" />
         {/* Optional: Add badge or notification count here */}
       </button>
 
@@ -24,12 +37,6 @@ const Notification = () => {
         <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden z-50">
           <div className="p-2 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
             <h4 className="text-gray-700 dark:text-white">Notifications</h4>
-            <button
-              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
-              onClick={() => setIsOpen(false)}
-            >
-              <FiX className="text-xl" />
-            </button>
           </div>
           <ul className="py-2">
             {/* Example notification items */}

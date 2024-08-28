@@ -4,7 +4,7 @@ import LinkItem from "./LinkItem";
 import { RiMoonFill } from "react-icons/ri";
 
 const Sidebar = ({ isSidebarOpen, darkMode, toggleDarkMode }) => {
-  const [activeLink, setActiveLink] = useState("");
+  const [activeLink, setActiveLink] = useState("Dashboard");
 
   return (
     <aside
