@@ -89,3 +89,9 @@ body {
     background-size: cover;
     background-position: center;
   }
+
+.log-img{
+  background-image: url('assets/img/rent.png');
+  background-size: cover;
+  background-position: center;
+}

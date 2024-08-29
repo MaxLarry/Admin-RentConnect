@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import RentLogo from "../img/rentconff1.svg";
+import RentLogo from "../img/rentconff1_white.svg";
+import RentImg from "../img/rent.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
 const Login = () => {
@@ -11,30 +12,31 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen text-slate-100">
-      <div className="flex-1 flex py-20 bg-gradient-to-r from-pink-500 to-red-500">
+      <div className="hidden lg:flex flex-1 py-20 bg-gradient-to-r log-img">
         <div className="px-16">
-        <img
-              alt="Rent-Connect"
-              src={RentLogo}
-              className="mx-auto h-11 w-auto"
-            />
+          <img
+            alt="Rent-Connect"
+            src={RentLogo}
+            className="mx-auto h-11 w-auto"
+          />
         </div>
       </div>
       <div className="flex-1 flex-col flex p-5 items-center justify-center bg-zinc-900">
         <div className="w-full max-w-md space-y-6">
           <div className="mb-9">
-
-            <h2 className="text-2xl font-bold">
-              Admin Login
-            </h2>
+          <div className="px-16">
+          <img
+            alt="Rent-Connect"
+            src={RentLogo}
+            className="mx-auto h-11 w-auto mb-10 lg:hidden"
+          />
+        </div>
+            <h2 className="text-2xl font-bold">Admin Login</h2>
           </div>
 
           <form action="#" method="POST" className="space-y-6">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium"
-              >
+              <label htmlFor="email" className="block text-sm font-medium">
                 Email address<span className="text-rose-600">*</span>
               </label>
               <div className="mt-1">
@@ -66,7 +68,7 @@ const Login = () => {
                   required
                   autoComplete="current-password"
                   placeholder="•••••••••••"
-                  className="block w-full rounded-md  bg-zinc-800 border-zinc-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md bg-zinc-800 border-zinc-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
                 <button
                   type="button"
@@ -89,14 +91,11 @@ const Login = () => {
                   id="remember"
                   className="h-4 w-4  border-gray-300 rounded"
                 />
-                <label
-                  htmlFor="remember"
-                  className="ml-2 text-sm"
-                >
+                <label htmlFor="remember" className="ml-2 text-sm">
                   Remember me
                 </label>
               </div>
-              <a href="#" className="text-sm  hover:underline">
+              <a href="#" className="text-sm hover:underline">
                 Forgot password?
               </a>
             </div>
