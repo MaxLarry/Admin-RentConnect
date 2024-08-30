@@ -18,12 +18,12 @@ function App() {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (<>
- <Login/>
- {/*
+{/* <Login/>*/}
+ 
     <div className="h-full bg-slate-100 dark:bg-zinc-950">
       <Header toggleSidebar={toggleSidebar} />
       <Sidebar isSidebarOpen={isSidebarOpen} toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
-    </div>*/}
+    </div>
     </>
   );
 }
