@@ -1,13 +1,28 @@
 import React, { useState } from "react";
+import axios from "axios";
 import RentLogo from "../img/rentconff1_white.svg";
-import RentImg from "../img/rent.png";
-import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:5000/auth/login', { email, password }, { withCredentials: true });
+      navigate('/dashboard');
+    } catch (error) {
+      setError("Invalid email or password");
+    }
   };
 
   return (
@@ -24,17 +39,23 @@ const Login = () => {
       <div className="flex-1 flex-col flex p-5 items-center justify-center bg-zinc-900">
         <div className="w-full max-w-md space-y-6">
           <div className="mb-9">
-          <div className="px-16">
-          <img
-            alt="Rent-Connect"
-            src={RentLogo}
-            className="mx-auto h-11 w-auto mb-10 lg:hidden"
-          />
-        </div>
+            <div className="px-16">
+              <img
+                alt="Rent-Connect"
+                src={RentLogo}
+                className="mx-auto h-11 w-auto mb-10 lg:hidden"
+              />
+            </div>
             <h2 className="text-2xl font-bold">Admin Login</h2>
           </div>
 
-          <form action="#" method="POST" className="space-y-6">
+          {error && (
+            <div className="mb-4 text-red-600">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium">
                 Email address<span className="text-rose-600">*</span>
@@ -46,6 +67,8 @@ const Login = () => {
                   type="email"
                   required
                   autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="block w-full rounded-md bg-zinc-800 border-zinc-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
@@ -68,6 +91,8 @@ const Login = () => {
                   required
                   autoComplete="current-password"
                   placeholder="•••••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="block w-full rounded-md bg-zinc-800 border-zinc-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
                 <button
@@ -89,7 +114,7 @@ const Login = () => {
                 <input
                   type="checkbox"
                   id="remember"
-                  className="h-4 w-4  border-gray-300 rounded"
+                  className="h-4 w-4 border-gray-300 rounded"
                 />
                 <label htmlFor="remember" className="ml-2 text-sm">
                   Remember me
