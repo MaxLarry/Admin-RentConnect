@@ -27,35 +27,35 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find the user by email
-    console.log("anuna");
     const user = await Admin.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.log('User not found with email:', email);
+      return res.status(400).json({ message: 'Invalid credentialsssss' });
     }
 
-    // Compare the given password with the hashed password stored in the database
+    console.log('Password received:', password);
+    console.log('Password hash stored:', user.password_hash);
+
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.log('Password mismatch');
+      return res.status(400).json({ message: 'Invalid credentialws' });
     }
 
-    // Generate a JWT token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // Set the token as a cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-      sameSite: 'strict', // CSRF protection
+      secure: false,
+      sameSite: 'strict',
     });
 
-    // Return success response
     res.status(200).json({ message: 'Logged in successfully' });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 module.exports = { registerUser, loginUser };

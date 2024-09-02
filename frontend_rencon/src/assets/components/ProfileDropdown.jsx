@@ -4,6 +4,7 @@ import { MdManageAccounts } from "react-icons/md";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiLogout } from "react-icons/hi";
 import { TiUser } from "react-icons/ti";
+import logout from './auth/useauth';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -69,6 +70,7 @@ const ProfileDropdown = () => {
             <a
               href="#"
               className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
+              onClick={logout}
             >
               <HiLogout className="mr-2" /> Logout
             </a>

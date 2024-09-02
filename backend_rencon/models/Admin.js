@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require('bcrypt');
 
 // Define the schema with the timestamps option
-const adminSchema = new mongoose.Schema({
+const AdminSchema = new mongoose.Schema({
   first_name: { type: String, required: true },
   last_name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -14,12 +14,12 @@ const adminSchema = new mongoose.Schema({
 }, { timestamps: true }); // Automatically add created_at and updated_at fields
 
 // Method to compare passwords
-adminSchema.methods.comparePassword = async function (password) {
+AdminSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password_hash);
 };
 
 // Pre-save middleware to hash passwords
-adminSchema.pre("save", async function (next) {
+AdminSchema.pre("save", async function (next) {
   if (this.isModified("password_hash")) {
     const salt = await bcrypt.genSalt(10);
     this.password_hash = await bcrypt.hash(this.password_hash, salt);
@@ -27,5 +27,5 @@ adminSchema.pre("save", async function (next) {
   next();
 });
 
-const Admin = mongoose.model("rentcon_admins", adminSchema);
+const Admin = mongoose.model("rentcon_admins", AdminSchema);
 module.exports = Admin;

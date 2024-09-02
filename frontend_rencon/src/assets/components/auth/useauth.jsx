@@ -21,7 +21,17 @@ const useAuth = () => {
     checkAuth();
   }, []);
 
-  return { isAuthenticated, loading };
+  const logout = async () => {
+    try {
+      await axios.post('/logout', {}, { withCredentials: true });
+      setIsAuthenticated(false); // Reset authentication state
+      window.location.href = '/'; // Redirect to login or home page after logout
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
+  return { isAuthenticated, loading, logout };
 };
 
 export default useAuth;
