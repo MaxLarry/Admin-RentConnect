@@ -11,14 +11,17 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Update this to your frontend's origin
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+}));
 app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.use('/auth', authRoutes); 
+app.use(authRoutes); 
 
-const PORT = process.env.PORT; // Default to 5000 if PORT is not defined
+const PORT = process.env.PORT || 5000; // Default to 5000 if PORT is not defined
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 

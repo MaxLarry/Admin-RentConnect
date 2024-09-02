@@ -17,8 +17,9 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      await axios.post('http://localhost:5000/auth/login', { email, password }, { withCredentials: true });
+    try {console.log("momomomomomo");
+      await axios.post('http://localhost:5000/login', { email, password }, { withCredentials: true });
+      console.log("memeeammama");
       navigate('/dashboard');
     } catch (error) {
       setError("Invalid email or password");
