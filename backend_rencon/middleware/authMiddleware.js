@@ -4,7 +4,7 @@ const Admin = require('../models/Admin');
 const protect = async (req, res, next) => {
   let token;
   if (!req.cookies.token) {
-    return res.status(401).json({ message: "Token not found in cookies" });
+    return res.json({ isAuthenticated: false, message: "Token not found in cookies" });
   }
   
   if (req.cookies && req.cookies.token) {

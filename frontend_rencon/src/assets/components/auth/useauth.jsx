@@ -13,7 +13,7 @@ const useAuth = () => {
         setIsAuthenticated(response.data.isAuthenticated);
         //console.log(response.data.isAuthenticated);
       } catch (error) {
-        console.error('Error during checkAuth:', error);
+        //console.error('Error during checkAuth:', error);
         setIsAuthenticated(false);
       }finally {
         setLoading(false);
