@@ -1,5 +1,5 @@
 // auth/useAuth.jsx
-import { useState, useEffect } from 'react';
+import React,{ useState, useEffect } from 'react';
 import axios from 'axios';
 
 const useAuth = () => {
@@ -9,11 +9,13 @@ const useAuth = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('/checkAuth', { withCredentials: true });
+        const response = await axios.get('/checkAuth');
         setIsAuthenticated(response.data.isAuthenticated);
+        //console.log(response.data.isAuthenticated);
       } catch (error) {
+        console.error('Error during checkAuth:', error);
         setIsAuthenticated(false);
-      } finally {
+      }finally {
         setLoading(false);
       }
     };

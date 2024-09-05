@@ -4,7 +4,7 @@ import { MdManageAccounts } from "react-icons/md";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiLogout } from "react-icons/hi";
 import { TiUser } from "react-icons/ti";
-import logout from './auth/useauth';
+import logout from './auth/useAuth';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);

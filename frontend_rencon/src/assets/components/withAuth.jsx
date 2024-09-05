@@ -1,11 +1,12 @@
 // withAuth.jsx
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import useAuth from './auth/useauth';
+import useAuth from './auth/useAuth';
+
 
 const withAuth = (Component) => {
   return (props) => {
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, loading} = useAuth();
 
     if (loading) {
       return <div>Loading...</div>; // Optionally, show a loading indicator

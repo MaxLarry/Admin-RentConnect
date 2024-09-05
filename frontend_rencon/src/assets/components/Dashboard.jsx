@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Login from './Login';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
@@ -18,8 +17,6 @@ function App() {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (<>
-{/* <Login/>*/}
- 
     <div className="h-full bg-slate-100 dark:bg-zinc-950">
       <Header toggleSidebar={toggleSidebar} />
       <Sidebar isSidebarOpen={isSidebarOpen} toggleDarkMode={toggleDarkMode} darkMode={darkMode} />

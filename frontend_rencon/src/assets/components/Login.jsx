@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import axios from "axios";
 import RentLogo from "../img/rentconff1_white.svg";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
@@ -17,10 +17,11 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {console.log("momomomomomo");
-      await axios.post('http://localhost:5000/login', { email, password }, { withCredentials: true });
-      console.log("memeeammama");
-      navigate('/dashboard');
+    try {
+      //console.log("momomomomomo");
+      await axios.post("/login", { email, password });
+      //console.log("memeeammama");
+      navigate("/dashboard");
     } catch (error) {
       setError("Invalid email or password");
     }
@@ -50,11 +51,7 @@ const Login = () => {
             <h2 className="text-2xl font-bold">Admin Login</h2>
           </div>
 
-          {error && (
-            <div className="mb-4 text-red-600">
-              {error}
-            </div>
-          )}
+          {error && <div className="mb-4 text-red-600">{error}</div>}
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
@@ -77,10 +74,7 @@ const Login = () => {
 
             <div>
               <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium"
-                >
+                <label htmlFor="password" className="block text-sm font-medium">
                   Password<span className="text-rose-600">*</span>
                 </label>
               </div>

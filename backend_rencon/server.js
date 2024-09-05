@@ -9,17 +9,17 @@ dotenv.config();
 connectDB();
 
 const app = express();
-
-// Middleware
-app.use(cors({
-  origin: 'http://localhost:5173', // Update this to your frontend's origin
-  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-}));
 app.use(express.json());
 app.use(cookieParser());
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+}));
 
 // Routes
-app.use(authRoutes); 
+app.use(authRoutes);
 
 const PORT = process.env.PORT || 5000; // Default to 5000 if PORT is not defined
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
