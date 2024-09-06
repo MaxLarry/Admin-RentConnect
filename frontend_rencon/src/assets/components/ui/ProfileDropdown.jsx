@@ -1,10 +1,11 @@
+//ProfileDropdown.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { MdManageAccounts } from "react-icons/md";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiLogout } from "react-icons/hi";
 import { TiUser } from "react-icons/ti";
-import logout from './auth/useAuth';
+import logout from '../auth/useAuth';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);

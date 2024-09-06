@@ -2,48 +2,53 @@ import { MdSpaceDashboard, MdHomeWork, MdPeople, MdSecurity, MdMail, MdHistory }
 import { GrCompliance } from "react-icons/gr";
 import { RiSettings3Fill } from "react-icons/ri";
 import { IoHelpCircle } from "react-icons/io5";
+import withAuth from '../../assets/components/auth/withAuth';
+import ListingManagement from '../../assets/components/routes/listmanagement/listingManagement';
+
+const ProtectedListManage = withAuth(ListingManagement);
 
 export const links = [
     {
-        href: "#",
+        to: "/dashboard",
         icon: MdSpaceDashboard,
         text: "Dashboard"
     },
     {
-        href: "#",
+        to: "/listing_management",
         icon: MdHomeWork,
         text: "Listing Management"
     },
     {
-        href: "#",
+        to: "/user_management",
         icon: MdPeople,
         text: "User Management"
     },
     {
-        href: "#",
+        to: "/compliance_safety",
         icon: GrCompliance,
         text: "Compliance & Safety"
     },
     {
-        href: "#",
+        to: "/inbox",
         icon: MdMail,
         text: "Inbox"
     },
     {
-        href: "#",
+        to: "/log_activity",
         icon: MdHistory,
         text: "Log Activity"
     },
 ];
 
+
 export const support = [
     {
-        href: "#",
+        to: "#",
         icon: RiSettings3Fill,
         text: "Setting"
     },
     {
-        href: "#",
+        to: "#",
         icon: IoHelpCircle,
         text: "Help"
     },

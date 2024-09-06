@@ -2,7 +2,7 @@ import React from "react";
 import { MdOutlinePendingActions } from "react-icons/md";
 import { FiCheckSquare, FiTrash2 } from "react-icons/fi";
 
-function TabsButton() {
+function TabsButton({ activeTab, setActiveTab }) {
   const tabs = [
     {
       name: "Pending",
@@ -18,12 +18,21 @@ function TabsButton() {
     },
   ];
 
+  const handleClick = (tabName) => {
+    setActiveTab(tabName);
+  };
+
   return (
     <div className="flex justify-center items-center py-5">
       {tabs.map((tab, index) => (
         <button
           key={index}
-          className="flex flex-col items-center p-2 rounded-lg bg-background hover:bg-secondary  px-28"
+          onClick={() => handleClick(tab.name)}
+          className={`flex flex-col items-center p-2 rounded-lg px-28 text-gray-700 dark:text-gray-200 ${
+            activeTab === tab.name
+              ? "bg-blue-500 text-white"
+              : "bg-background hover:bg-secondary"
+          }`}
         >
           {tab.icon}
           <span>{tab.name}</span>

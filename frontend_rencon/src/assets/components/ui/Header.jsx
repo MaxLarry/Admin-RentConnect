@@ -1,7 +1,8 @@
+//Header.jsx
 import React from "react";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
-import RentLogo from "../img/rentconff1.svg";
-import RentLogoWhite from "../img/rentconff1_white.svg";
+import RentLogo from "../../img/rentconff1.svg";
+import RentLogoWhite from "../../img/rentconff1_white.svg";
 import Notification from "./Notification";
 import ProfileDropdown from "./ProfileDropdown";
 

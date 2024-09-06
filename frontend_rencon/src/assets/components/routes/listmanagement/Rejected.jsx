@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Table_list() {
+function Rejected() {
   const listingRequests = [
     { id: 1, name: 'John Doe', status: 'Pending', date: '2024-09-05' },
     { id: 2, name: 'Jane Smith', status: 'Approved', date: '2024-09-04' },
@@ -86,4 +86,4 @@ function Table_list() {
   );
 }
 
-export default Table_list;
+export default Rejected;

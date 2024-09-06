@@ -9,7 +9,7 @@ const useAuth = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('/checkAuth');
+        const response = await axios.get('/auth/checkAuth');
         setIsAuthenticated(response.data.isAuthenticated);
         //console.log(response.data.isAuthenticated);
       } catch (error) {

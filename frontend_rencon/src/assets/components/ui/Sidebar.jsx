@@ -1,12 +1,42 @@
-import React, { useState } from "react";
-import { links, support } from "../constants";
+//Sidebar.jsx
+import React, { useEffect, useState } from "react";
+import { links, support } from "../../constants";
 import LinkItem from "./LinkItem";
 import { RiMoonFill } from "react-icons/ri";
 
 const Sidebar = ({ isSidebarOpen, darkMode, toggleDarkMode }) => {
-  const [activeLink, setActiveLink] = useState("Dashboard");
+  const [activeLink, setActiveLink] = useState('');
 
-  return (
+  useEffect(() => {
+    const path = location.pathname;
+    
+    switch (path) {
+      case "/dashboard":
+        setActiveLink("Dashboard");
+        break;
+      case "/listing_management":
+        setActiveLink("Listing Management");
+        break;
+      case "/user_management":
+        setActiveLink("User Management");
+        break;
+      case "/compliance_safety":
+        setActiveLink("Compliance & Safety");
+        break;
+      case "/inbox":
+        setActiveLink("Inbox");
+        break;
+      case "/log_activity":
+        setActiveLink("Log Activity");
+        break;
+      default:
+        setActiveLink(""); // Reset if no match
+        break;
+    }
+  }, [location]);
+  
+
+   return (
     <aside
       className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-zinc-800 dark:border-gray-700 shadow-lg transition-transform ${
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -20,7 +50,7 @@ const Sidebar = ({ isSidebarOpen, darkMode, toggleDarkMode }) => {
               key={index}
               {...item}
               isActive={activeLink === item.text}
-              onClick={() => setActiveLink(item.text)}
+              onClick={() => setActiveLink(item.text)} // Optionally handle clicking on links
             />
           ))}
         </ul>

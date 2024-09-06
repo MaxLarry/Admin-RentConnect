@@ -1,7 +1,7 @@
 // withAuth.jsx
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import useAuth from './auth/useAuth';
+import useAuth from './useAuth';
 
 
 const withAuth = (Component) => {

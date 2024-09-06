@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import RentLogo from "../img/rentconff1_white.svg";
+import RentLogo from "../../img/rentconff1_white.svg";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
@@ -19,7 +19,7 @@ const Login = () => {
     e.preventDefault();
     try {
       //console.log("momomomomomo");
-      await axios.post("/login", { email, password });
+      await axios.post("/auth/login", { email, password });
       //console.log("memeeammama");
       navigate("/dashboard");
     } catch (error) {

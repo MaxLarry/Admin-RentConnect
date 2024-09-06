@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
+const listingRequestRoutes = require('./routes/listingRequestRoutes');
 
 dotenv.config();
 connectDB();
@@ -19,7 +20,9 @@ app.use(cors({
 }));
 
 // Routes
-app.use(authRoutes);
+app.use('/auth', authRoutes);
+app.use('/requests', listingRequestRoutes);
+
 
 const PORT = process.env.PORT || 5000; // Default to 5000 if PORT is not defined
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
