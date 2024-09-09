@@ -2,12 +2,12 @@ import React from 'react';
 
 function Pending() {
   const listingRequests = [
-    { id: 1, name: 'John Doe', status: 'Pending', date: '2024-09-05' },
-    { id: 2, name: 'Jane Smith', status: 'Approved', date: '2024-09-04' },
-    { id: 3, name: 'Michael Johnson', status: 'Rejected', date: '2024-09-03' },
-    { id: 34, name: 'Michael Johnson', status: 'Rejected', date: '2024-09-03' },
-    { id: 23, name: 'Michael Johnson', status: 'Rejected', date: '2024-09-03' },
-    { id: 34, name: 'Michael Johnson', status: 'Rejected', date: '2024-09-03' },
+    { id: 1, name: 'John Doe', status: '', date: '2024-09-05' },
+    { id: 2, name: 'Jane Smith', status: '', date: '2024-09-04' },
+    { id: 3, name: 'Michael Johnson', status: '', date: '2024-09-03' },
+    { id: 34, name: 'Michael Johnson', status: '', date: '2024-09-03' },
+    { id: 23, name: 'Michael Johnson', status: '', date: '2024-09-03' },
+    { id: 34, name: 'Michael Johnson', status: '', date: '2024-09-03' },
     // Add more listing requests here
   ];
 

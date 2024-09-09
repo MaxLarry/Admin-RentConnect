@@ -30,8 +30,8 @@ const protect = async (req, res, next) => {
 
       next();
     } catch (error) {
-      console.error('Token verification failed:', error); // Log the error for debugging
-      return res.status(401).json({ isAuthenticated: false, message: 'Not authorized, token failed' });
+      //console.error('Token verification failed:', error); // Log the error for debugging
+      return res.json({ isAuthenticated: false, message: 'Not authorized, token failed' });
     }
   } else {
     console.log('Request Cookies:', req.cookies); // Log cookies
