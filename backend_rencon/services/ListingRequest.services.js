@@ -8,7 +8,7 @@ const getAllPendingRequestsWithProfiles = async () => {
     const result = await PendingRequest.aggregate([
       {
         $lookup: {
-          from: "pending_request_profile",// "profiles" just a trial and error
+          from: "pending_request_profile", // "profiles" just a trial and error
           localField: "userId",
           foreignField: "userId",
           as: "profile",
@@ -17,7 +17,7 @@ const getAllPendingRequestsWithProfiles = async () => {
       {
         $unwind: {
           path: "$profile",
-          preserveNullAndEmptyArrays: true // Preserve documents with no matching profile
+          preserveNullAndEmptyArrays: true, // Preserve documents with no matching profile
         },
       },
       {
@@ -31,7 +31,7 @@ const getAllPendingRequestsWithProfiles = async () => {
       {
         $unwind: {
           path: "$user",
-          preserveNullAndEmptyArrays: true // Preserve documents with no matching user
+          preserveNullAndEmptyArrays: true, // Preserve documents with no matching user
         },
       },
       {
@@ -39,9 +39,12 @@ const getAllPendingRequestsWithProfiles = async () => {
           _id: 1,
           description: 1,
           status: 1,
+          created_at: 1,
           profile: {
             email: "$user.email",
-            fullName: "$profile.fullName", // Assuming `fullName` exists in `profile`
+            fullName: {
+              $concat: ["$profile.firstName", " ", "$profile.lastName"], // concat fname and lname
+            },
             contactDetails: "$profile.contactDetails",
           },
         },

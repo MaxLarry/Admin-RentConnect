@@ -1,143 +1,23 @@
-import React, { useState } from "react";
-import { IoCopy } from "react-icons/io5";
+// src/components/Pending.js
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { format } from "date-fns";
 import Pagination from "../../ui/Pagination";
 import CopyableText from "../../ui/CopyableText";
+import ReviewModal from "./modals/ReviewModal"; // Import the Modal component
 
 function Pending({ searchQuery }) {
-  const listingRequests = [
-    {
-      id: "12345678901234567890",
-      name: "Alice Johnson",
-      status: "",
-      date: "2024-09-05",
-    },
-    {
-      id: "09876543210987oio654321",
-      name: "Bob Smith",
-      status: "",
-      date: "2024-09-04",
-    },
-    {
-      id: "0987d6543210987654321",
-      name: "Fred Murphy",
-      status: "",
-      date: "2024-09-05",
-    },
-    {
-      id: "0987ds6543210987654321",
-      name: "Gina Bell",
-      status: "",
-      date: "2024-09-04",
-    },
-    {
-      id: "09876w543210987654321",
-      name: "Henry Collins",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "098765j43210987654321",
-      name: "Isabella Cooper",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "098765r43210987654321",
-      name: "Jacob Foster",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "09876543210987k654321",
-      name: "Katherine Turner",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "09876543210f987654321",
-      name: "Leo Parker",
-      status: "",
-      date: "2024-09-05",
-    },
-    {
-      id: "0987654x3210987654321",
-      name: "Megan Brooks",
-      status: "",
-      date: "2024-09-04",
-    },
-    {
-      id: "0987654321v0987654321",
-      name: "Nathan Wood",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "0987654cv3210987654321",
-      name: "Olivia Reed",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "09876543210987654321",
-      name: "Patrick Bell",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "0vc9876543210987654321",
-      name: "Quincy Ward",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "098765432109876vc54321",
-      name: "Ruby Brooks",
-      status: "",
-      date: "2024-09-05",
-    },
-    {
-      id: "09876vc543210987654321",
-      name: "Samuel Cook",
-      status: "",
-      date: "2024-09-04",
-    },
-    {
-      id: "098vc76543210987654321",
-      name: "Tessa Rogers",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "098765432109dh87654321",
-      name: "Ulysses Campbell",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "09876543210h987654321",
-      name: "Vivian Powell",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "09876543210d987654321",
-      name: "Walter Edwards",
-      status: "",
-      date: "2024-09-03",
-    },
-    {
-      id: "09876543210o987654321",
-      name: "Xenia Simmons",
-      status: "",
-      date: "2024-09-05",
-    },
-    {
-      id: "09876543210u987654321",
-      name: "Yvonne Jenkins",
-      status: "",
-      date: "2024-09-04",
-    },
-  ];
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [copiedId, setCopiedId] = useState(null);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+
+  const itemsPerPage = 20;
+
   const req_column = [
     "ID",
     "Requester Name",
@@ -146,48 +26,87 @@ function Pending({ searchQuery }) {
     "Action",
   ];
 
-  const handleReview = (id) => {
-    console.log(`Review request with ID: ${id}`);
+  useEffect(() => {
+    axios
+      .get("/requests/pending-requests")
+      .then((response) => {
+        setPendingRequests(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the pending requests!", error);
+        setError("Failed to fetch pending requests");
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (pendingRequests.length === 0) {
+    return <div>No data available</div>;
+  }
+
+  const handleReview = (request) => {
+    setSelectedRequest(request);
+    setShowReviewModal(true);
   };
 
   const handleApprove = (id) => {
     console.log(`Approve request with ID: ${id}`);
   };
 
-  const handleDecline = (id) => {
-    console.log(`Decline request with ID: ${id}`);
+  const handleDecline = async (id) => {
+    setSelectedRequest(id);
+    setShowConfirmPopup(true);
   };
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const confirmDecline = async () => {
+    try {
+      await axios.post(`/requests/${selectedRequest}/reject`, {
+        status: "Rejected",
+      });
 
-  const [copiedId, setCopiedId] = useState(null);
+      setPendingRequests((prevRequests) =>
+        prevRequests.filter((request) => request._id !== selectedRequest)
+      );
 
-  const handleCopy = (id) => {
-    navigator.clipboard.writeText(id).then(() => {
-      setCopiedId(id);
-      setTimeout(() => {
-        setCopiedId(null);
-      }, 3000);
-    });
+      setShowConfirmPopup(false);
+      setSelectedRequest(null);
+      console.log(`Request with ID: ${selectedRequest} has been moved to rejected collection`);
+    } catch (error) {
+      console.error(`Error rejecting request with ID: ${selectedRequest}`, error);
+    }
   };
 
-  const filteredRequests = listingRequests.filter((request) => {
+  const cancelDecline = () => {
+    setShowConfirmPopup(false);
+    setSelectedRequest(null);
+  };
+
+  const filteredRequests = pendingRequests.filter((request) => {
     const lowerCaseQuery = searchQuery.toLowerCase();
+    const requestId = request._id ? request._id.toLowerCase() : "";
+    const fullName = request.profile?.fullName ? request.profile.fullName.toLowerCase() : "";
+    const status = request.status ? request.status.toLowerCase() : "";
+    const createdAt = request.created_at ? format(new Date(request.created_at), "yyyy-MM-dd HH:mm").toLowerCase() : "";
+
     return (
-      request.id.toLowerCase().includes(lowerCaseQuery) ||
-      request.name.toLowerCase().includes(lowerCaseQuery) ||
-      request.status.toLowerCase().includes(lowerCaseQuery) ||
-      request.date.toLowerCase().includes(lowerCaseQuery)
+      requestId.includes(lowerCaseQuery) ||
+      fullName.includes(lowerCaseQuery) ||
+      status.includes(lowerCaseQuery) ||
+      createdAt.includes(lowerCaseQuery)
     );
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredRequests.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentItems = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <div className="container mx-auto px-4">
@@ -209,7 +128,7 @@ function Pending({ searchQuery }) {
             {currentItems.length > 0 ? (
               currentItems.map((request, index) => (
                 <tr
-                  key={request.id}
+                  key={request._id}
                   className={`${
                     index % 2 === 0
                       ? "bg-gray-100 dark:bg-zinc-700"
@@ -217,10 +136,13 @@ function Pending({ searchQuery }) {
                   }`}
                 >
                   <td className="px-6 py-2 text-gray-700 dark:text-gray-200 relative">
-                    <CopyableText text={request.id} />
+                    <CopyableText text={request._id} />
+                    {copiedId === request._id && (
+                      <span className="text-green-500">Copied!</span>
+                    )}
                   </td>
                   <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {request.name}
+                    {request.profile.fullName}
                   </td>
                   <td
                     className={`px-6 py-2 font-medium ${
@@ -234,30 +156,26 @@ function Pending({ searchQuery }) {
                     {request.status}
                   </td>
                   <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {request.date}
+                    {format(new Date(request.created_at), "yyyy-MM-dd HH:mm")}
                   </td>
                   <td className="px-6 py-2">
                     <div className="flex justify-center space-x-2">
                       <span
-                        onClick={() => handleReview(request.id)}
+                        onClick={() => handleReview(request)}
                         className="cursor-pointer text-blue-500 hover:underline dark:text-blue-400"
                       >
                         Review
                       </span>
-                      <span className="text-gray-400 dark:text-gray-500">
-                        |
-                      </span>
+                      <span className="text-gray-400 dark:text-gray-500">|</span>
                       <span
-                        onClick={() => handleApprove(request.id)}
+                        onClick={() => handleApprove(request._id)}
                         className="cursor-pointer text-green-500 hover:underline dark:text-green-400"
                       >
                         Approve
                       </span>
-                      <span className="text-gray-400 dark:text-gray-500">
-                        |
-                      </span>
+                      <span className="text-gray-400 dark:text-gray-500">|</span>
                       <span
-                        onClick={() => handleDecline(request.id)}
+                        onClick={() => handleDecline(request._id)}
                         className="cursor-pointer text-red-500 hover:underline dark:text-red-400"
                       >
                         Decline
@@ -276,6 +194,47 @@ function Pending({ searchQuery }) {
           </tbody>
         </table>
       </div>
+
+      {/* Confirmation Popup */}
+      {showConfirmPopup && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-zinc-800 text-white p-6 rounded-lg max-w-sm shadow-lg text-center">
+            <h2 className="text-lg font-semibold mb-4">Confirm Decline</h2>
+            <p className="mb-6">Are you sure you want to decline this request?</p>
+            <div className="flex justify-center gap-4">
+              <button
+                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
+                onClick={cancelDecline}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
+                onClick={confirmDecline}
+              >
+                Decline
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review Modal */}
+      {showReviewModal && selectedRequest && (
+        <ReviewModal
+          isOpen={showReviewModal}
+          onClose={() => setShowReviewModal(false)}
+          title={`Review Request - ${selectedRequest._id}`}
+        >
+          <div className="space-y-4">
+            <p><strong>ID:</strong> {selectedRequest._id}</p>
+            <p><strong>Requester Name:</strong> {selectedRequest.profile.fullName}</p>
+            <p><strong>Status:</strong> {selectedRequest.status}</p>
+            <p><strong>Requested Date:</strong> {format(new Date(selectedRequest.created_at), "yyyy-MM-dd HH:mm")}</p>
+            {/* Add more details as needed */}
+          </div>
+        </ReviewModal>
+      )}
 
       <Pagination
         totalItems={filteredRequests.length}

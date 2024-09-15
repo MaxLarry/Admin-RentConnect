@@ -23,7 +23,7 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange }) {
   };
 
   return (
-    <div className="flex justify-center mt-4 space-x-2">
+    <div className="flex justify-center mt-4 space-x-2" >
       <button
         className="disabled:opacity-50"
         disabled={currentPage === 1}
