@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
+import CopyableText from "../../ui/CopyableText";
 
 function Approved() {
   const [listingRequests, setListingRequests] = useState([]);

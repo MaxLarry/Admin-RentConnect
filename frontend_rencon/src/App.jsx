@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './assets/components/ui/Login';
 import Dashboard from './assets/components/routes/dashboard/Dashboard';
 import ListingManagement from './assets/components/routes/listmanagement/listingManagement';
+import ActivityLogs from './assets/components/routes/activitylogs/ActivityLogs';
 import withAuth from './assets/components/auth/withAuth';
 import PublicRoute from './assets/components/auth/publicRoute';
 import Layout from './assets/components/ui/Layout'; // New Layout Component
@@ -32,6 +33,7 @@ function App() {
 
   const ProtectedDashboard = withAuth(Dashboard);
   const ProtectedListingManagement = withAuth(ListingManagement);
+  const ProtectedActivityLogs = withAuth(ActivityLogs);
 
   return (
     <Router>
@@ -42,7 +44,10 @@ function App() {
         {/* Protected routes with Header and Sidebar */}
         <Route path="/" element={<Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode} />}>
           <Route path="/dashboard" element={<ProtectedDashboard />} />
-          <Route path="/listing_management" element={<ProtectedListingManagement />} />
+          <Route path="/listing-management" element={<ProtectedListingManagement />} />
+          <Route path="/activity-logs" element={<ProtectedActivityLogs />} />
+          <Route path="#" element={<ProtectedListingManagement />} />
+          <Route path="#" element={<ProtectedListingManagement />} />
         </Route>
       </Routes>
     </Router>

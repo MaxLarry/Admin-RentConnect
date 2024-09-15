@@ -23,18 +23,18 @@ function ListingManagement() {
   };
 
   return (
-    <div className="p-4 sm:ml-64 h-full block gap-2 flex-col lg:flex-row translate-all duration-300 mt-14">
+    <div className="p-4 sm:ml-64 min-h-screen block gap-2 flex-col lg:flex-row translate-all duration-300 mt-14">
       <div className="flex justify-between items-center">
         <h1 className="font-bold text-2xl p-4 text-gray-700 dark:text-gray-200">
           Listing Management
         </h1>
-        <div className="relative w-96"> {/* Adjust width here */}
+        <div className="relative w-96">
           <input
             type="text"
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border border-gray-300 p-2 pl-10 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-300 p-2 pl-10 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
           />
           <FiSearch className="absolute left-3 top-2.5 text-gray-500" />
         </div>

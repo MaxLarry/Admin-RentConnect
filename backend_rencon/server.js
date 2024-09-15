@@ -5,6 +5,10 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 const listingRequestRoutes = require('./routes/listingRequestRoutes');
+const pendingRequestController = require('./routes/listingRequestRoutes');
+const UserProfileRequestController = require('./routes/userRoutes');
+
+//const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
 connectDB();
@@ -22,6 +26,9 @@ app.use(cors({
 // Routes
 app.use('/auth', authRoutes);
 app.use('/requests', listingRequestRoutes);
+app.use('/requests', pendingRequestController);
+app.use('/requests', UserProfileRequestController);
+//app.use('/user', userRoutes);
 
 
 const PORT = process.env.PORT || 5000; // Default to 5000 if PORT is not defined

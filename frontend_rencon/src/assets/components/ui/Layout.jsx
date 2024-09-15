@@ -17,7 +17,7 @@ function Layout({ darkMode, toggleDarkMode }) {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className="h-full bg-slate-100 dark:bg-zinc-950">
+    <div className="h-auto bg-slate-100 dark:bg-zinc-900">
       <Header toggleSidebar={toggleSidebar} />
       <Sidebar
         isSidebarOpen={isSidebarOpen}

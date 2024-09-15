@@ -4,6 +4,7 @@ import { RiSettings3Fill } from "react-icons/ri";
 import { IoHelpCircle } from "react-icons/io5";
 import withAuth from '../../assets/components/auth/withAuth';
 import ListingManagement from '../../assets/components/routes/listmanagement/listingManagement';
+import ActivityLogs from '../../assets/components/routes/activitylogs/ActivityLogs';
 
 const ProtectedListManage = withAuth(ListingManagement);
 
@@ -14,17 +15,17 @@ export const links = [
         text: "Dashboard"
     },
     {
-        to: "/listing_management",
+        to: "/listing-management",
         icon: MdHomeWork,
         text: "Listing Management"
     },
     {
-        to: "/user_management",
+        to: "/user-management",
         icon: MdPeople,
         text: "User Management"
     },
     {
-        to: "/compliance_safety",
+        to: "/compliance-safety",
         icon: GrCompliance,
         text: "Compliance & Safety"
     },
@@ -34,9 +35,9 @@ export const links = [
         text: "Inbox"
     },
     {
-        to: "/log_activity",
+        to: "/activity-logs",
         icon: MdHistory,
-        text: "Log Activity"
+        text: "Activity Logs"
     },
 ];
 

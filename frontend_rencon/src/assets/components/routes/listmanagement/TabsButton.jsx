@@ -23,19 +23,22 @@ function TabsButton({ activeTab, setActiveTab }) {
   };
 
   return (
-    <div className="flex justify-center items-center py-5">
+    <div className="flex flex-wrap justify-center items-center py-5 lg:gap-40 md:gap-10">
       {tabs.map((tab, index) => (
         <button
           key={index}
           onClick={() => handleClick(tab.name)}
-          className={`flex flex-col items-center p-2 rounded-lg px-28 text-gray-700 dark:text-gray-200 ${
+          className={`flex flex-col items-center p-2 rounded-lg px-4 dark:text-gray-200 relative ${
             activeTab === tab.name
-              ? "bg-blue-500 text-white"
-              : "bg-background hover:bg-secondary"
+              ? "text-blue-700"
+              : "text-gray-500 hover:text-blue-500"
           }`}
         >
           {tab.icon}
-          <span>{tab.name}</span>
+          <span className="mt-1">{tab.name}</span>
+          {activeTab === tab.name && (
+            <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 rounded-b-lg"></span>
+          )}
         </button>
       ))}
     </div>

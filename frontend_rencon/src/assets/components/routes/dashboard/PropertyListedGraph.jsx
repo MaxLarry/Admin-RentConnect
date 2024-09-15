@@ -11,9 +11,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import Layout from "../../ui/Layout";
 
-// Register the scales and elements for the chart
+// Register the scale
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -21,65 +20,31 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend,
+  Legend
 );
 
-
-function GraphV() {
-  const dropdownRef = useRef(null);
+function PropertyListedGraph() {
+  const dropdownRef = useRef(null); // Ref for dropdown container
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("30d");
+  const [selectedValue, setSelectedValue] = useState("30d"); // Default selected option
 
   // Sample data for the chart based on selected time range
   const data = {
-    labels: ["January", "February", "March", "April", "May", "June"],
+    labels: ["January", "February", "March", "April", "May", "June"], // Modify labels based on timeRange if necessary
     datasets: [
       {
-        label: "Request",
-        data: [30, 90, 40, 60, 70, 90],
+        label: "Listed Properties",
+        data: [30, 50, 40, 60, 70, 90], // Adjust data points for the chart
         fill: false,
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         tension: 0.4,
         borderWidth: 2,
-        
       },
     ],
   };
-  // Custom plugin for drawing the vertical line on hover
-  const verticalLinePlugin = {
-    id: 'verticalLinePlugin',
-    afterDraw: (chart) => {
-      const { ctx, tooltip, chartArea } = chart;
-  
-      // Check if the tooltip is active
-      if (tooltip && tooltip.getActiveElements().length > 0) {
-        const activePoint = tooltip.getActiveElements()[0]; // Get the active point
-        const x = activePoint.element.x; // X-coordinate of the active point
-        const topY = chartArea.top;
-        const bottomY = chartArea.bottom;
-  
-        ctx.save(); // Save the canvas state
-        ctx.beginPath();
-  
-        // Create a dashed vertical line
-        ctx.setLineDash([9, 5]); // Define dash pattern (5px dash, 5px space)
-        ctx.moveTo(x, topY);
-        ctx.lineTo(x, bottomY);
-  
-        // Set line properties
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(155, 155, 155, 0.8)';  // Line color
-  
-        // Draw the line
-        ctx.stroke();
-        ctx.restore(); // Restore the canvas state after drawing
-      }
-    },
-  };
 
-ChartJS.register( verticalLinePlugin);
-  // Chart options with the added plugin
+  // Chart options
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -92,7 +57,7 @@ ChartJS.register( verticalLinePlugin);
       y: {
         grid: {
           color: "#e5e7eb",
-        },        
+        },
         border: {
           display: false, // Remove the y-axis border line
         },
@@ -112,17 +77,10 @@ ChartJS.register( verticalLinePlugin);
       legend: {
         display: false,
       },
-      tooltip: {
-        mode: 'index',
-        intersect: false,
-      },
-      verticalLinePlugin: true,  // Enable the plugin in options
     },
   };
-  
-  
 
-  // Available time range options
+  // Available options
   const opt = [
     { value: "24h", label: "24h" },
     { value: "30d", label: "30d" },
@@ -131,40 +89,51 @@ ChartJS.register( verticalLinePlugin);
     { value: "all", label: "All time" },
   ];
 
+  // Handle option click
   const handleOptionClick = (value) => {
     setSelectedValue(value);
-    setIsOpen(false);
+    setIsOpen(false); // Close dropdown after selecting
   };
 
+  // Detect clicks outside the dropdown and close it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
+
+    // Add event listener to detect clicks
     document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup event listener on unmount
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownRef]);
 
   return (
-    <div className="bg-white border border-gray-200  dark:bg-zinc-800 dark:border-zinc-700 px-10 py-5 rounded-md shadow-md block items-center lg:col-start-4 lg:col-end-7 lg:row-start-1 lg:row-end-3 md:col-start-1 md:col-end-3 relative">
+    <div className="bg-white border border-gray-200 dark:bg-zinc-800 dark:border-zinc-700 px-10 py-5 rounded-md shadow-md block items-center lg:col-start-4 lg:col-end-7  md:col-start-1 md:col-end-3 relative">
+      {/* Ensure relative positioning on the parent container */}
       <div className="flex justify-between">
         <div>
-          <div className="text-lg font-bold text-zinc-900  dark:text-white">1230</div>
-          <span className="text-md font-normal text-gray-500  dark:text-gray-200">
-            Listing Requests
+          <div className="text-lg font-bold text-zinc-900 dark:text-white">1230</div>
+          <span className="text-md font-normal text-gray-500 dark:text-gray-200">
+            Listed Properties
           </span>
         </div>
+
+        {/* Dropdown button and menu */}
         <div className="relative inline-block" ref={dropdownRef}>
           <button
-            className="text-sm text-gray-700 dark:text-gray-200 py-2 px-4 cursor-pointer flex justify-between items-center"
-            onClick={() => setIsOpen(!isOpen)}
+            className=" text-sm text-gray-700 dark:text-gray-200 py-2 px-4 cursor-pointer flex justify-between items-center"
+            onClick={() => setIsOpen(!isOpen)} 
           >
-            {opt.find((opt) => opt.value === selectedValue)?.label}
+            {opt.find(opt => opt.value === selectedValue)?.label}
             <IoIosArrowDown className="ml-1" />
           </button>
+
+          {/* Dropdown menu */}
           {isOpen && (
             <div className="absolute mt-2 p-2 w-40 bg-white border border-gray-200 dark:border-zinc-700 dark:bg-zinc-900 shadow-lg rounded-lg z-10 right-0">
               {opt.map((opt) => (
@@ -180,8 +149,10 @@ ChartJS.register( verticalLinePlugin);
           )}
         </div>
       </div>
-      <div className="flex mt-4 ">
-        <div className="h-auto w-full ">
+
+      {/* Chart container */}
+      <div className="flex mt-4">
+        <div className="h-auto w-full">
           <Line className="w-fit" data={data} options={options} />
         </div>
       </div>
@@ -189,4 +160,4 @@ ChartJS.register( verticalLinePlugin);
   );
 }
 
-export default GraphV;
+export default PropertyListedGraph;

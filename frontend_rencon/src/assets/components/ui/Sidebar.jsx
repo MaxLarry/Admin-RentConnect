@@ -14,19 +14,19 @@ const Sidebar = ({ isSidebarOpen, darkMode, toggleDarkMode }) => {
       case "/dashboard":
         setActiveLink("Dashboard");
         break;
-      case "/listing_management":
+      case "/listing-management":
         setActiveLink("Listing Management");
         break;
-      case "/user_management":
+      case "/user-management":
         setActiveLink("User Management");
         break;
-      case "/compliance_safety":
+      case "/compliance-safety":
         setActiveLink("Compliance & Safety");
         break;
       case "/inbox":
         setActiveLink("Inbox");
         break;
-      case "/log_activity":
+      case "/activity-logs":
         setActiveLink("Log Activity");
         break;
       default:
@@ -38,7 +38,7 @@ const Sidebar = ({ isSidebarOpen, darkMode, toggleDarkMode }) => {
 
    return (
     <aside
-      className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-zinc-800 dark:border-gray-700 shadow-lg transition-transform ${
+      className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-zinc-800 dark:border-zinc-700 shadow-lg transition-transform ${
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
