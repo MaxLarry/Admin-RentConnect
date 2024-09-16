@@ -42,9 +42,9 @@ function ReviewModal({
 
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-zinc-800 text-white p-6 rounded-lg w-full max-w-md md:max-w-2xl lg:max-w-4xl  shadow-lg">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <div className="p-4 overflow-y-auto" style={{ maxHeight: "400px" }}>
+      <div className="bg-zinc-800 text-white p-6 rounded-lg w-full max-w-md md:max-w-2xl lg:max-w-4xl shadow-lg">
+        <h2 className="text-lg font-semibold mb-5">{title}</h2>
+        <div className="p-4 overflow-y-auto border-y border-zinc-700" style={{ maxHeight: "500px" }}>
           <div className="text-sm">
             <p>
               <strong>Requester Name: </strong>
@@ -56,7 +56,7 @@ function ReviewModal({
             </p>
           </div>
 
-          <div className="mt-5">
+          <div className="mt-5 border-b border-zinc-700">
             <h2>
               <strong>I. Property Information</strong>
             </h2>
@@ -103,21 +103,25 @@ function ReviewModal({
                 <p>No images available</p>
               )}
             </div>
-            <div className="mb-5 flex items-center space-x-2">
-              <h3 className="font-semibold">Type of Property:</h3>
+            <div className="mb-3 flex items-center space-x-2">
+              <h2 className="font-semibold">Type of Property:</h2>
               <p>{selectedRequest.typeOfProperty}</p>
+            </div>
+            <div className="mb-3 flex items-center space-x-2">
+              <h2 className="font-semibold">Address:</h2>
+              <p>{selectedRequest.address}</p>
             </div>
 
             <div className="mb-5">
-              <h3 className="font-semibold py-2">Description</h3>
+              <h2 className="font-semibold">Description</h2>
               <p>{selectedRequest.description}</p>
             </div>
             {selectedRequest.amenities.length > 0 ? (
               <>
-                <h3 className="font-semibold py-2">Amenities Offer</h3>
-                <ul class>
+                <h2 className="font-semibold">Amenities Offer</h2>
+                <ul className="list-disc list-inside pl-5">
                   {selectedRequest.amenities.map((amenity, index) => (
-                    <li key={index}>
+                    <li key={index} className="flex items-center">
                       <span className="text-teal-500 mr-2">•</span>
                       {amenity}
                     </li>
@@ -129,17 +133,34 @@ function ReviewModal({
             )}
             {/* Room Photos */}
             <div className="mt-5">
-              <h3 className="font-semibold">Room/Unit Available</h3>
+              <h2 className="font-semibold">Room/Unit Available</h2>
               <div className="py-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {selectedRequest.rooms.length > 0 ? (
                   selectedRequest.rooms.map((room, index) => (
                     <div key={index} className="relative">
                       {room.roomPhoto && room.roomPhoto.length > 0 ? (
-                        <img
-                          src={room.roomPhoto[0]} // Display the first photo of the room
-                          alt={`Room ${index + 1}`}
-                          className="w-full h-32 object-cover rounded-lg"
-                        />
+                        <div className="mb-4">
+                          <img
+                            src={room.roomPhoto[0]} // Display the first photo of the room
+                            alt={`Room ${index + 1}`}
+                            className="w-full h-40 object-cover rounded-lg"
+                          />
+                          <p className="mt-2 text-sm">
+                            <strong>Room Number:</strong> {room.roomNumber}
+                          </p>
+                          <p className="mt-1 text-sm">
+                            <strong>Capacity:</strong> {room.capacity}
+                          </p>
+                          <p className="mt-1 text-sm">
+                            <strong>Deposit:</strong> {room.deposit} Month
+                          </p>
+                          <p className="mt-1 text-sm">
+                            <strong>Advance:</strong> {room.advance} Month
+                          </p>
+                          <p className="mt-1 text-sm">
+                            <strong>Price:</strong> ₱{room.price}
+                          </p>
+                        </div>
                       ) : (
                         <p>No room photos available</p>
                       )}
@@ -151,7 +172,26 @@ function ReviewModal({
               </div>
             </div>
           </div>
-
+          <div className="mt-2 py-5 border-b border-zinc-700">
+            <h2 className="mb-3">
+              <strong>II. Geographical Location</strong>
+            </h2>
+            <div className="flex justify-center">
+              <MapComponent
+                location={{ coordinates: selectedRequest.location.coordinates }}
+              />
+            </div>
+          </div>
+          <div className="mt-2">
+            <h2 className="py-5">
+              <strong>III. Legal Documents</strong>
+            </h2>
+            <div className="flex justify-center">
+              <MapComponent
+                location={{ coordinates: selectedRequest.location.coordinates }}
+              />
+            </div>
+          </div>
           {/* Done Review button */}
           <button
             onClick={handleDoneReview}

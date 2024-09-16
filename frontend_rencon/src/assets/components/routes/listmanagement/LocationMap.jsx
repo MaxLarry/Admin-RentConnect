@@ -1,56 +1,38 @@
-import React, { useState } from 'react';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import React from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { FaMapMarkerAlt } from 'react-icons/fa';
+import locationPin from "../../../img/location-pin.png"
 
 // Use a URL or path to an image for the marker icon
-const markerIcon = new L.Icon({
-  iconUrl: 'https://example.com/path-to-your-marker-icon.png', // Replace with the actual path to your marker icon
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-});
+const customIcon = new L.Icon({
+    iconUrl: locationPin,
+    iconSize: [50, 50],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+  
 
-function MapComponent() {
-  const [showMap, setShowMap] = useState(false);
+const MapComponent = ({ location }) => {
+  // Destructure coordinates from the location object
+  const [longitude, latitude] = location.coordinates;
 
   return (
-    <div>
-      {/* Map Display */}
-      {showMap && (
-        <div style={{ position: 'fixed', bottom: '16px', right: '40px', borderRadius: '40px', overflow: 'hidden' }}>
-          <MapContainer
-            center={[9.74006635645179, 118.73764516844255]}
-            zoom={15}
-            style={{ width: '300px', height: '300px', borderRadius: '40px' }}
-          >
-            <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <Marker position={[9.74006635645179, 118.73764516844255]} icon={markerIcon} />
-          </MapContainer>
-        </div>
-      )}
-
-      {/* Floating Action Button */}
-      <button
-        onClick={() => setShowMap(!showMap)}
-        style={{
-          position: 'fixed',
-          backgroundColor: 'white',
-          borderRadius: '50%',
-          width: '60px',
-          height: '60px',
-          border: 'none',
-          cursor: 'pointer',
-          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-          display: 'relative',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <FaMapMarkerAlt size={36} color="black" />
-      </button>
+    <div style={{ height: '500px', width: '80%' }}>
+      <MapContainer center={[latitude, longitude]} zoom={13} style={{ height: '100%', width: '100%' }}>
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        <Marker position={[latitude, longitude]} icon={customIcon}>
+          <Popup>
+            <FaMapMarkerAlt /> Location
+          </Popup>
+        </Marker>
+      </MapContainer>
     </div>
   );
-}
+};
 
 export default MapComponent;

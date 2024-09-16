@@ -60,8 +60,16 @@ const getAllPendingRequestsWithProfiles = async () => {
           status: 1,
           created_at: 1,
           typeOfProperty: 1,
+          location:1,
+          address: {
+            $concat: ["$street", ", ", "$barangay", ", ", "$city"], // Concatenate firstName and lastName
+          },
           amenities: {
-            $cond: { if: { $isArray: "$amenities" }, then: "$amenities", else: [] }, 
+            $cond: {
+              if: { $isArray: "$amenities" },
+              then: "$amenities",
+              else: [],
+            },
           },
           property_photo: {
             $filter: {
@@ -90,6 +98,8 @@ const getAllPendingRequestsWithProfiles = async () => {
             },
             capacity: "$rooms.capacity",
             price: "$rooms.price",
+            deposit:"$rooms.deposit",
+            advance:"$rooms.advance",
             availability: "$rooms.availability",
           },
         },
@@ -100,10 +110,12 @@ const getAllPendingRequestsWithProfiles = async () => {
           description: { $first: "$description" },
           amenities: { $first: "$amenities" },
           status: { $first: "$status" },
+          location:{$first: "$location"},
           created_at: { $first: "$created_at" },
           typeOfProperty: { $first: "$typeOfProperty" },
           property_photo: { $first: "$property_photo" }, // Group property photos
           legal_docs: { $first: "$legal_docs" }, // Group legal document photos
+          address: { $first: "$address" },
           profile: { $first: "$profile" },
           rooms: { $push: "$rooms" }, // Push all rooms into an array
         },

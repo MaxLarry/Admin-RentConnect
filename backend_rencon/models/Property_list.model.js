@@ -23,7 +23,9 @@ const PropertyListSchema = new Schema({
   legalDocPhoto2: { type: String, default: null },
   legalDocPhoto3: { type: String, default: null },
   typeOfProperty: { type: String, required: true },
-  address: { type: String, required: true },
+  street: { type: String, required: true },
+  barangay: { type: String, required: true },
+  city: { type: String, default: "Puerto Princesa City"},
   amenities: { type: [String], default: [] },
   location: {
     type: { type: String, default: "Point" },
