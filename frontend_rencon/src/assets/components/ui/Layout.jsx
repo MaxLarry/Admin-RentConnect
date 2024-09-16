@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom"; // Outlet renders child routes
 import Header from "../ui/Header";
 import Sidebar from "../ui/Sidebar";
 
+
 function Layout({ darkMode, toggleDarkMode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -17,7 +18,7 @@ function Layout({ darkMode, toggleDarkMode }) {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className="h-auto bg-slate-100 dark:bg-zinc-900">
+    <div className=" bg-slate-100 dark:bg-zinc-900" >
       <Header toggleSidebar={toggleSidebar} />
       <Sidebar
         isSidebarOpen={isSidebarOpen}

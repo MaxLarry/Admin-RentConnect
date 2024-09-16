@@ -4,8 +4,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
-const listingRequestRoutes = require('./routes/listingRequestRoutes');
-const pendingRequestController = require('./routes/listingRequestRoutes');
+const listingRequestRoutes = require('./routes/propertyListingRoutes');
+const pendingRequestController = require('./routes/propertyListingRoutes');
 const UserProfileRequestController = require('./routes/userRoutes');
 
 //const userRoutes = require('./routes/userRoutes');

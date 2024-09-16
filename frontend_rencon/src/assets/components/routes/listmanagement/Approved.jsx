@@ -10,7 +10,7 @@ function Approved() {
 
   useEffect(() => {
     // Fetch data from the backend API
-    axios.get('/requests/listing-requests')
+    axios.get('/requests/approved-properties')
       .then(response => {
         setListingRequests(response.data); // Assume the data is an array of requests
         setLoading(false);
@@ -60,7 +60,7 @@ function Approved() {
             {listingRequests.map((request) => (
               <tr key={request._id} className="border-b">
                 <td className="px-6 py-4 text-gray-700">{request._id}</td>
-                <td className="px-6 py-4 text-gray-700">{request.name}</td>
+                <td className="px-6 py-4 text-gray-700">{request.profile.name}</td>
                 <td className="px-6 py-4 text-gray-700">{request.propertyType}</td>
                 <td className="px-6 py-4 text-gray-700">{request.address}</td>
                 <td className="px-6 py-4 text-gray-700">{request.numberOfRooms}</td>

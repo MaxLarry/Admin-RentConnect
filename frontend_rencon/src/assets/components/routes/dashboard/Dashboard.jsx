@@ -10,12 +10,14 @@ import PendingRequestdash from "./PendingRequestdash";
 import PARdataGraph from "./PARdataGraph";
 import ActivityLogs from "./ActivityLogsDash";
 import MostVisited from "./MostVisited"
+import useLocomotiveScroll from "../../ui/useLocomotiveScroll";
 
 function Dashboard() {
+  const scrollRef = useLocomotiveScroll(); // Use the custom hook
   return (
     <>
-      <div
-        className="p-4 sm:ml-64 h-full block gap-2 flex-col lg:flex-row translate-all
+      <div 
+        className=" p-4 sm:ml-64 h-full block gap-2 flex-col lg:flex-row translate-all
     duration-300 mt-14 text-zinc-900 tracking-tighter"
       >
         <h1 className="font-bold text-2xl px-4 text-gray-700 dark:text-gray-200">Dashboard</h1>

@@ -11,7 +11,7 @@ function CopyableText({ text }) {
     });
   };
 
-  const truncateId = (id) => `${id.slice(0, 5)}...`;
+  const truncateId = (id) => `${id.slice(0, 10)}...`;
 
   return (
     <div className="group relative inline-block">

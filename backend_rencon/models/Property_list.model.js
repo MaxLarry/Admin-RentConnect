@@ -12,7 +12,7 @@ const listingRequestSchema = new Schema({
   status: String,
 });
 */
-const pendingRequestSchema = new Schema({
+const PropertyListSchema = new Schema({
   _id: mongoose.Schema.Types.ObjectId,
   userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "users"},
   description: { type: String, required: true },
@@ -39,6 +39,6 @@ const pendingRequestSchema = new Schema({
 });
 
 //const ListingRequest = mongoose.model("ListingRequest", listingRequestSchema);
-const PendingRequest = mongoose.model("PendingRequest", pendingRequestSchema, "pending_request_property");
+const PropertyList = mongoose.model("PropertyList", PropertyListSchema, "listing_properties");
 
-module.exports = { /*ListingRequest, */ PendingRequest };
+module.exports = { /*ListingRequest, */ PropertyList };
