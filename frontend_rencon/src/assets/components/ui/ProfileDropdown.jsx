@@ -5,7 +5,8 @@ import { MdManageAccounts } from "react-icons/md";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiLogout } from "react-icons/hi";
 import { TiUser } from "react-icons/ti";
-import useAuth from '../auth/useAuth';
+import useAuth from "../auth/useAuth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,11 +36,15 @@ const ProfileDropdown = () => {
         className="flex items-center space-x-2 px-3 text-zinc-900 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white focus:outline-none"
         onClick={toggleDropdown}
       >
-        <FaUserCircle className="text-4xl" />
+        <Avatar>
+          <AvatarImage src="https://github.com/shasdcn.png" alt="@shadcn" />
+          <AvatarFallback>
+            <FaUserCircle className="text-4xl" />
+          </AvatarFallback>
+        </Avatar>
+
         <span className="text-zinc-900 dark:text-white flex-1 tracking-s font-medium">
-        
-        {user ? user.name : "Loading..."}
-        
+          {user ? user.name : "Loading..."}
         </span>
         {isOpen ? (
           <FiChevronUp className="text-xl" /> // Up arrow when open

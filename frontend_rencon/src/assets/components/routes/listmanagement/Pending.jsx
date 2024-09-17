@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
-import Pagination from "../../ui/Pagination";
 import CopyableText from "../../ui/CopyableText";
 import ReviewModal from "./modals/ReviewModal"; // Import the Modal component
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 function Pending({ searchQuery }) {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -59,7 +67,6 @@ function Pending({ searchQuery }) {
     return <div>Loading...</div>;
   }
 
-
   const handleReview = async (request) => {
     try {
       // Update status to "Under Review"
@@ -77,7 +84,6 @@ function Pending({ searchQuery }) {
       // Optionally, set an error state here
     }
   };
-
 
   const handleCancelReview = async () => {
     try {
@@ -164,10 +170,9 @@ function Pending({ searchQuery }) {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredRequests.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentItems = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 
   return (
     <div className="container mx-auto px-4">
@@ -233,7 +238,7 @@ function Pending({ searchQuery }) {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="text-center p-4 dark:text-gray-200">
+                <td colSpan="5" className="text-center p-2 dark:text-gray-200">
                   No requests Available.
                 </td>
               </tr>
@@ -260,12 +265,28 @@ function Pending({ searchQuery }) {
         />
       )}
 
-      <Pagination
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        totalItems={filteredRequests.length}
-        onPageChange={setCurrentPage}
-      />
+      <Pagination className="mt-4 cursor-pointer">
+        <PaginationContent>
+          <PaginationPrevious
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          />
+          {Array.from({ length: totalPages }, (_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink
+                isActive={currentPage === index + 1}
+                onClick={() => setCurrentPage(index + 1)}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationNext
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+          />
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }

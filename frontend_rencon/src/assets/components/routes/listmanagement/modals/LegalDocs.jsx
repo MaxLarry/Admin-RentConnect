@@ -25,7 +25,7 @@ function LegalDocuments({ selectedRequest }) {
   };
 
   return (
-    <div className="mt-2 py-5 border-b border-zinc-700">
+    <div className="mt-2 py-5">
       <h2 className="py-5">
         <strong>III. Legal Documents</strong>
       </h2>

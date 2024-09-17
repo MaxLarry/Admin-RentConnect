@@ -4,6 +4,7 @@ import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
 import MapComponent from "../LocationMap";
 import LegalDocuments from "./LegalDocs";
 import { REVIEW_ISSUES } from "../../../../constants";
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 function ReviewModal({
   isOpen,
@@ -57,7 +58,7 @@ function ReviewModal({
     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-zinc-800 text-white p-6 rounded-lg w-full max-w-md md:max-w-2xl lg:max-w-4xl shadow-lg">
         <h2 className="text-lg font-semibold mb-5">{title}</h2>
-        <div
+        <ScrollArea
           className="p-4 overflow-y-auto border-y border-zinc-700"
           style={{ maxHeight: "600px" }}
         >
@@ -214,7 +215,7 @@ function ReviewModal({
               </span>
             </div>
           </div>
-        </div>
+        </ScrollArea>
 
         <div className="flex justify-end mt-4">
           <button

@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
-import Pagination from "../../ui/Pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import CopyableText from "../../ui/CopyableText";
+import ViewPropertyModal from './modals/ViewPropertyModal'; // Import the modal
 
 function Approved({ searchQuery }) {
   const [approvedProperty, setApprovedProperty] = useState([]);
@@ -10,8 +19,8 @@ function Approved({ searchQuery }) {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [copiedId, setCopiedId] = useState(null);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false); // Modal visibility state
+  const [selectedRequest, setSelectedRequest] = useState(null); // Selected property state
 
   const itemsPerPage = 20;
 
@@ -49,6 +58,16 @@ function Approved({ searchQuery }) {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleRowClick = (property) => {
+    setSelectedRequest(property); // Set the selected property
+    setShowViewModal(true); // Open the modal
+  };
+
+  const closeModal = () => {
+    setShowViewModal(false); // Close the modal
+    setSelectedRequest(null); // Clear selected request
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -78,6 +97,8 @@ function Approved({ searchQuery }) {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
 
+  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+
   return (
     <div className="container mx-auto px-4">
       <div className="flex justify-center overflow-x-auto">
@@ -99,11 +120,12 @@ function Approved({ searchQuery }) {
               currentItems.map((property, index) => (
                 <tr
                   key={property._id}
-                  className={`${
+                  className={`cursor-pointer ${
                     index % 2 === 0
                       ? "bg-gray-100 dark:bg-zinc-700"
                       : "bg-white dark:bg-zinc-800"
                   }`}
+                  onClick={() => handleRowClick(property)} // Set the row to be clickable
                 >
                   <td className="px-6 py-2 text-gray-700 dark:text-gray-200 relative">
                     <CopyableText text={property._id} onCopy={() => handleCopy(property._id)} />
@@ -130,7 +152,7 @@ function Approved({ searchQuery }) {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center p-4 dark:text-gray-200">
+                <td colSpan="6" className="text-center p-2 dark:text-gray-200">
                   No properties available.
                 </td>
               </tr>
@@ -139,12 +161,30 @@ function Approved({ searchQuery }) {
         </table>
       </div>
 
-      <Pagination
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        totalItems={filteredRequests.length}
-        onPageChange={setCurrentPage}
-      />
+      <Pagination className="mt-4 cursor-pointer">
+        <PaginationContent>
+          <PaginationPrevious onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} />
+          {Array.from({ length: totalPages }, (_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink
+                isActive={currentPage === index + 1}
+                onClick={() => setCurrentPage(index + 1)}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationNext onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} />
+        </PaginationContent>
+      </Pagination>
+
+      {/* Modal for viewing selected property */}
+      {showViewModal && selectedRequest && (
+        <ViewPropertyModal
+          selectedRequest={selectedRequest}
+          closeModal={closeModal} // Pass function to close the modal
+        />
+      )}
     </div>
   );
 }

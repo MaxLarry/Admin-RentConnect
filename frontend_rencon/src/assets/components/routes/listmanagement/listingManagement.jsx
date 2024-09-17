@@ -34,7 +34,7 @@ function ListingManagement() {
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border border-gray-300 p-2 pl-10 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+            className="border border-gray-300 p-2 pl-10 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 dark:text-zinc-900"
           />
           <FiSearch className="absolute left-3 top-2.5 text-gray-500" />
         </div>

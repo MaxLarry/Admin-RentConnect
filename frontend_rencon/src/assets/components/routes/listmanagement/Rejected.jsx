@@ -21,30 +21,6 @@ function Rejected({ searchQuery }) {
   const [rejectedRequests, setRejectedRequests] = useState([]);
   const itemsPerPage = 20;
 
-useEffect(() => {
-  const fetchRejectedRequests = async () => {
-    setLoading(true); // Start loading
-    try {
-      const response = await axios.get("/requests/rejected-properties");
-      if (response.data && response.data.length > 0) {
-        setRejectedRequests(response.data);
-      } else {
-        setRejectedRequests([]); // No data available
-      }
-    } catch (error) {
-      console.error("There was an error fetching the pending requests!", error);
-      setRejectedRequests([]); // Set to empty array in case of error
-    } finally {
-      setLoading(false); // Stop loading
-    }
-  };
-
-  fetchRejectedRequests();
-}, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   const filteredRequests = rejectedRequests.filter((property) => {
     const lowerCaseQuery = searchQuery.toLowerCase();
@@ -78,16 +54,40 @@ useEffect(() => {
     }
     setSelectAll(!selectAll);
   };
+  useEffect(() => {
+    // Fetch rejected requests only when the component mounts
+    const fetchRejectedRequests = async () => {
+      setLoading(true); // Start loading
+      try {
+        const response = await axios.get("/requests/rejected-properties");
+        if (response.data && response.data.length > 0) {
+          setRejectedRequests(response.data);
+        } else {
+          setRejectedRequests([]); // No data available
+        }
+      } catch (error) {
+        console.error("There was an error fetching the pending requests!", error);
+        setRejectedRequests([]); // Set to empty array in case of error
+      } finally {
+        setLoading(false); // Stop loading
+      }
+    };
+  
+    fetchRejectedRequests();
+  }, []); // Empty dependency array means this runs only once, when the component mounts
 
-  // Update select all checkbox based on individual selections
+  // Separate useEffect for managing the "select all" state
   useEffect(() => {
     if (selectedRequests.length !== currentItems.length) {
       setSelectAll(false);
     } else if (selectedRequests.length === currentItems.length && currentItems.length > 0) {
       setSelectAll(true);
     }
-  }, [selectedRequests, currentItems]);
-
+  }, [selectedRequests, currentItems]); // Runs whenever selectedRequests or currentItems change
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="container mx-auto px-4">
       <div className="flex justify-center overflow-x-auto">
@@ -152,8 +152,8 @@ useEffect(() => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center p-4">
-                  No requests found.
+                <td colSpan="6" className="text-center p-4 dark:text-gray-200">
+                  No rejected properties found.
                 </td>
               </tr>
             )}
