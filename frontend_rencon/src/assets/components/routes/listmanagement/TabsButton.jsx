@@ -30,14 +30,14 @@ function TabsButton({ activeTab, setActiveTab }) {
           onClick={() => handleClick(tab.name)}
           className={`flex flex-col items-center p-2 rounded-lg px-4 dark:text-gray-200 relative ${
             activeTab === tab.name
-              ? "text-blue-700"
-              : "text-gray-500 hover:text-blue-500"
+              ? "text-teal-400"
+              : "text-gray-500 hover:text-teal-400"
           }`}
         >
           {tab.icon}
           <span className="mt-1">{tab.name}</span>
           {activeTab === tab.name && (
-            <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 rounded-b-lg"></span>
+            <span className="absolute bottom-0 left-0 w-full h-1 bg-teal-400 "></span>
           )}
         </button>
       ))}

@@ -7,7 +7,7 @@ async function getAllApprovedListing(req, res) {
     const requests = await PropertyListService.getAllApprovedListing();
 
     if (!requests.length) {
-      return res.status(404).json({ message: "No data available" });
+      return res.json({ message: "No data available" });
     }
 
     res.json(requests);
@@ -24,7 +24,7 @@ async function getAllPendingRequests(req, res) {
     const requests = await PropertyListService.getAllPendingRequestsWithProfiles();
 
     if (!requests.length) {
-      return res.status(404).json({ message: "No data available" });
+      return res.json({ message: "No data available" });
     }
 
     res.json(requests);
@@ -34,7 +34,20 @@ async function getAllPendingRequests(req, res) {
   }
 }
 
+async function getAllRejectedRequest(req, res) {
+  try {
+    const requests = await PropertyListService.getAllRejectedRequest();
 
+    if (!requests.length) {
+      return res.json({ message: "No data available" });
+    }
+
+    res.json(requests);
+  } catch (error) {
+    console.error("Error fetching Rejected requests:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
 
 const updateRequestStatus = async (req, res) => {
   const { id } = req.params;
@@ -56,6 +69,7 @@ const updateRequestStatus = async (req, res) => {
 };
 module.exports = {
   getAllPendingRequests,
-  updateRequestStatus,
   getAllApprovedListing,
+  getAllRejectedRequest,
+  updateRequestStatus
 };

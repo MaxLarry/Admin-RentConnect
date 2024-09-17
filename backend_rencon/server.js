@@ -4,9 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
-const listingRequestRoutes = require('./routes/propertyListingRoutes');
-const pendingRequestController = require('./routes/propertyListingRoutes');
-const UserProfileRequestController = require('./routes/userRoutes');
+const listingPropertyRoutes = require('./routes/propertyListingRoutes');
 
 //const userRoutes = require('./routes/userRoutes');
 
@@ -25,9 +23,7 @@ app.use(cors({
 
 // Routes
 app.use('/auth', authRoutes);
-app.use('/requests', listingRequestRoutes);
-app.use('/requests', pendingRequestController);
-app.use('/requests', UserProfileRequestController);
+app.use('/requests', listingPropertyRoutes);
 //app.use('/user', userRoutes);
 
 

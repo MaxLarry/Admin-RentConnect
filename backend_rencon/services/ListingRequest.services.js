@@ -41,7 +41,7 @@ const getAllPendingRequestsWithProfiles = async () => {
       },
       {
         $lookup: {
-          from: "pending_request_room", // Ensure this collection matches your database
+          from: "rooms", // Ensure this collection matches your database
           localField: "_id", // Use the property ID to look up related rooms
           foreignField: "propertyId",
           as: "rooms",
@@ -60,7 +60,7 @@ const getAllPendingRequestsWithProfiles = async () => {
           status: 1,
           created_at: 1,
           typeOfProperty: 1,
-          location:1,
+          location: 1,
           address: {
             $concat: ["$street", ", ", "$barangay", ", ", "$city"], // Concatenate firstName and lastName
           },
@@ -78,7 +78,13 @@ const getAllPendingRequestsWithProfiles = async () => {
               cond: { $ne: ["$$photo", null] }, // Exclude null photos
             },
           }, // Project property photos
-          legal_docs: ["$legalDocPhoto", "$legalDocPhoto2", "$legalDocPhoto3"], // Project legal document photos
+          legal_docs: {
+            $filter: {
+              input: ["$legalDocPhoto", "$legalDocPhoto2", "$legalDocPhoto3"],
+              as: "legaldocsPhoto",
+              cond: { $ne: ["$$legaldocsPhoto", null] }, // Exclude null room photos
+            }, // Project legal document photos
+          },
           profile: {
             email: "$user.email",
             fullName: {
@@ -98,8 +104,8 @@ const getAllPendingRequestsWithProfiles = async () => {
             },
             capacity: "$rooms.capacity",
             price: "$rooms.price",
-            deposit:"$rooms.deposit",
-            advance:"$rooms.advance",
+            deposit: "$rooms.deposit",
+            advance: "$rooms.advance",
             availability: "$rooms.availability",
           },
         },
@@ -110,7 +116,7 @@ const getAllPendingRequestsWithProfiles = async () => {
           description: { $first: "$description" },
           amenities: { $first: "$amenities" },
           status: { $first: "$status" },
-          location:{$first: "$location"},
+          location: { $first: "$location" },
           created_at: { $first: "$created_at" },
           typeOfProperty: { $first: "$typeOfProperty" },
           property_photo: { $first: "$property_photo" }, // Group property photos
@@ -134,7 +140,150 @@ const getAllApprovedListing = async () => {
     const result = await PropertyList.aggregate([
       {
         $match: {
-          status: "Approved", // Filter for Approved listings
+          status: "Approved",
+        },
+      },
+      {
+        $lookup: {
+          from: "pending_request_profile",
+          localField: "userId",
+          foreignField: "userId",
+          as: "profile",
+        },
+      },
+      {
+        $unwind: {
+          path: "$profile",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "rooms",
+          localField: "_id",
+          foreignField: "propertyId",
+          as: "rooms",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          description: 1,
+          status: 1,
+          created_at: 1,
+          typeOfProperty: 1,
+          location: 1,
+          address: {
+            $concat: ["$street", ", ", "$barangay", ", ", "$city"],
+          },
+          amenities: {
+            $cond: {
+              if: { $isArray: "$amenities" },
+              then: "$amenities",
+              else: [],
+            },
+          },
+          property_photo: {
+            $filter: {
+              input: ["$photo", "$photo2", "$photo3"],
+              as: "photo",
+              cond: { $ne: ["$$photo", null] },
+            },
+          },
+          legal_docs: {
+            $filter: {
+              input: ["$legalDocPhoto", "$legalDocPhoto2", "$legalDocPhoto3"],
+              as: "legaldocsPhoto",
+              cond: { $ne: ["$$legaldocsPhoto", null] },
+            },
+          },
+          profile: {
+            email: "$user.email",
+            fullName: {
+              $concat: ["$profile.firstName", " ", "$profile.lastName"],
+            },
+            contactDetails: "$profile.contactDetails",
+          },
+          rooms: {
+            roomId: "$rooms._id",
+            roomNumber: "$rooms.roomNumber",
+            roomPhoto: {
+              $filter: {
+                input: ["$rooms.photo1", "$rooms.photo2", "$rooms.photo3"],
+                as: "roomPhoto",
+                cond: { $ne: ["$$roomPhoto", null] },
+              },
+            },
+            capacity: "$rooms.capacity",
+            price: "$rooms.price",
+            deposit: "$rooms.deposit",
+            advance: "$rooms.advance",
+            availability: "$rooms.availability",
+          },
+          roomCount: { $size: "$rooms" }, // Count the number of rooms in the array
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          description: { $first: "$description" },
+          amenities: { $first: "$amenities" },
+          status: { $first: "$status" },
+          location: { $first: "$location" },
+          created_at: { $first: "$created_at" },
+          typeOfProperty: { $first: "$typeOfProperty" },
+          property_photo: { $first: "$property_photo" },
+          legal_docs: { $first: "$legal_docs" },
+          address: { $first: "$address" },
+          profile: { $first: "$profile" },
+          rooms: { $push: "$rooms" },
+          roomCount: { $max: "$roomCount" }, // Ensure roomCount is calculated correctly
+        },
+      },
+      {
+        $project: {
+          description: 1,
+          amenities: 1,
+          status: 1,
+          location: 1,
+          created_at: 1,
+          typeOfProperty: 1,
+          property_photo: 1,
+          legal_docs: 1,
+          address: 1,
+          profile: 1,
+          rooms: 1,
+          roomCount: 1,
+        },
+      },
+    ]);
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getAllRejectedRequest = async () => {
+  try {
+    const result = await PropertyList.aggregate([
+      {
+        $match: {
+          status: "Rejected", // Using $in to match multiple status values
         },
       },
       {
@@ -167,7 +316,7 @@ const getAllApprovedListing = async () => {
       },
       {
         $lookup: {
-          from: "pending_request_room", // Ensure this collection matches your database
+          from: "rooms", // Ensure this collection matches your database
           localField: "_id", // Use the property ID to look up related rooms
           foreignField: "propertyId",
           as: "rooms",
@@ -186,6 +335,17 @@ const getAllApprovedListing = async () => {
           status: 1,
           created_at: 1,
           typeOfProperty: 1,
+          location: 1,
+          address: {
+            $concat: ["$street", ", ", "$barangay", ", ", "$city"], // Concatenate firstName and lastName
+          },
+          amenities: {
+            $cond: {
+              if: { $isArray: "$amenities" },
+              then: "$amenities",
+              else: [],
+            },
+          },
           property_photo: {
             $filter: {
               input: ["$photo", "$photo2", "$photo3"],
@@ -193,7 +353,13 @@ const getAllApprovedListing = async () => {
               cond: { $ne: ["$$photo", null] }, // Exclude null photos
             },
           }, // Project property photos
-          legal_docs: ["$legalDocPhoto", "$legalDocPhoto2", "$legalDocPhoto3"], // Project legal document photos
+          legal_docs: {
+            $filter: {
+              input: ["$legalDocPhoto", "$legalDocPhoto2", "$legalDocPhoto3"],
+              as: "legaldocsPhoto",
+              cond: { $ne: ["$$legaldocsPhoto", null] }, // Exclude null room photos
+            }, // Project legal document photos
+          },
           profile: {
             email: "$user.email",
             fullName: {
@@ -213,6 +379,8 @@ const getAllApprovedListing = async () => {
             },
             capacity: "$rooms.capacity",
             price: "$rooms.price",
+            deposit: "$rooms.deposit",
+            advance: "$rooms.advance",
             availability: "$rooms.availability",
           },
         },
@@ -221,11 +389,14 @@ const getAllApprovedListing = async () => {
         $group: {
           _id: "$_id", // Group by property ID to combine rooms into an array
           description: { $first: "$description" },
+          amenities: { $first: "$amenities" },
           status: { $first: "$status" },
+          location: { $first: "$location" },
           created_at: { $first: "$created_at" },
           typeOfProperty: { $first: "$typeOfProperty" },
           property_photo: { $first: "$property_photo" }, // Group property photos
           legal_docs: { $first: "$legal_docs" }, // Group legal document photos
+          address: { $first: "$address" },
           profile: { $first: "$profile" },
           rooms: { $push: "$rooms" }, // Push all rooms into an array
         },
@@ -237,6 +408,7 @@ const getAllApprovedListing = async () => {
     throw error;
   }
 };
+
 
 // Service function to update the status of a request
 const updateRequestStatus = async (id, status) => {
@@ -259,6 +431,7 @@ const updateRequestStatus = async (id, status) => {
 
 module.exports = {
   getAllPendingRequestsWithProfiles,
-  updateRequestStatus,
   getAllApprovedListing,
+  getAllRejectedRequest,
+  updateRequestStatus,
 };

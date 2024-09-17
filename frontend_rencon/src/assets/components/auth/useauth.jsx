@@ -16,7 +16,7 @@ const useAuth = () => {
         if (response.data.isAuthenticated) {
           //console.log(response.data.user.name);
           setUser(response.data.user); // Store all user data
-          console.log(user); //debugging
+         // console.log(user); //debugging
           //console.log(setUser);//debugginngg
         }
       } catch (error) {

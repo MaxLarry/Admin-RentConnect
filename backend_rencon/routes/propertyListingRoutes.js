@@ -1,13 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const ApprovedListingtController = require('../controllers/listingRequestController');
-const PendingRequestController = require('../controllers/listingRequestController');
-const requestController = require('../controllers/listingRequestController');
+const ListingRequestProperty = require('../controllers/listingRequestController');
 
 // Define route for fetching a pending request with the user name
-router.get('/pending-requests', PendingRequestController.getAllPendingRequests);
 //router.get('/listing-requests', ListingRequestController.getAllRequests);
-router.get('/approved-properties', ApprovedListingtController.getAllApprovedListing);
-router.put('/:id', requestController.updateRequestStatus);
+router.get('/approved-properties', ListingRequestProperty.getAllApprovedListing);
+router.get('/pending-requests', ListingRequestProperty.getAllPendingRequests);
+router.get('/rejected-properties', ListingRequestProperty.getAllRejectedRequest);
+router.put('/:id', ListingRequestProperty.updateRequestStatus);
 
 module.exports = router;

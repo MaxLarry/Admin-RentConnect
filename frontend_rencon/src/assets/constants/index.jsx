@@ -54,3 +54,11 @@ export const support = [
         text: "Help"
     },
 ];
+
+export const REVIEW_ISSUES = [
+    'Incomplete Information',
+    'Non-Compliance with Regulations',
+    'Inaccurate Information',
+    'Poor Quality Photos',
+    'Ownership Verification Issues'
+];

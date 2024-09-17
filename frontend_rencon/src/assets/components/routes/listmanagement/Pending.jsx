@@ -11,11 +11,12 @@ function Pending({ searchQuery }) {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [copiedId, setCopiedId] = useState(null);
-  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [showApproveModal, setShowApproveModal] = useState(false); // State for approve modal
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [showActionButtons, setShowActionButtons] = useState(false); // For "Done Review"
+
+  // New states for confirmation popups
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
 
   const itemsPerPage = 20;
 
@@ -28,33 +29,36 @@ function Pending({ searchQuery }) {
   ];
 
   useEffect(() => {
-    axios
-      .get("/requests/pending-requests")
-      .then((response) => {
-        setPendingRequests(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
+    const fetchPendingRequests = async () => {
+      setLoading(true); // Start loading
+
+      try {
+        const response = await axios.get("/requests/pending-requests");
+
+        if (response.data && response.data.length > 0) {
+          setPendingRequests(response.data);
+        } else {
+          setPendingRequests([]); // No data available
+        }
+      } catch (error) {
         console.error(
           "There was an error fetching the pending requests!",
           error
         );
         setError("Failed to fetch pending requests");
-        setLoading(false);
-      });
+        setPendingRequests([]); // Set to empty array in case of error
+      } finally {
+        setLoading(false); // Stop loading
+      }
+    };
+
+    fetchPendingRequests();
   }, []);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  if (pendingRequests.length === 0) {
-    return <div>No data available</div>;
-  }
 
   const handleReview = async (request) => {
     try {
@@ -74,9 +78,6 @@ function Pending({ searchQuery }) {
     }
   };
 
-  const handleDoneReview = () => {
-    setShowActionButtons(true); // Show Approve and Reject buttons
-  };
 
   const handleCancelReview = async () => {
     try {
@@ -88,24 +89,44 @@ function Pending({ searchQuery }) {
     }
   };
 
-  const handleApprove = async () => {
+  const handleApprove = () => {
+    setConfirmAction("approve");
+    setShowConfirmPopup(true);
+  };
+
+  const handleReject = () => {
+    setConfirmAction("decline");
+    setShowConfirmPopup(true);
+  };
+
+  const confirmApprove = async () => {
     try {
       await updateRequestStatus(selectedRequest._id, "Approved");
       setShowReviewModal(false); // Close the modal after approval
       setSelectedRequest(null); // Clear the selected request
+      setShowConfirmPopup(false); // Hide the confirmation popup
     } catch (error) {
       console.error("Error approving request", error);
     }
   };
 
-  const handleDecline = async () => {
+  const confirmDecline = async () => {
     try {
       await updateRequestStatus(selectedRequest._id, "Rejected");
       setShowReviewModal(false); // Close the modal after rejection
       setSelectedRequest(null); // Clear the selected request
+      setShowConfirmPopup(false); // Hide the confirmation popup
     } catch (error) {
       console.error("Error rejecting request", error);
     }
+  };
+
+  const cancelApprove = () => {
+    setShowConfirmPopup(false); // Hide the confirmation popup
+  };
+
+  const cancelDecline = () => {
+    setShowConfirmPopup(false); // Hide the confirmation popup
   };
 
   const updateRequestStatus = async (id, status) => {
@@ -119,7 +140,6 @@ function Pending({ searchQuery }) {
       );
     } catch (error) {
       console.error(`Error updating status for request with ID: ${id}`, error);
-      // Optionally, set an error state here
     }
   };
 
@@ -202,21 +222,19 @@ function Pending({ searchQuery }) {
                     {format(new Date(request.created_at), "yyyy-MM-dd HH:mm")}
                   </td>
                   <td className="px-6 py-2">
-                    <div className="flex justify-center space-x-2">
-                      <span
-                        onClick={() => handleReview(request)}
-                        className="cursor-pointer text-blue-500 hover:underline dark:text-blue-400"
-                      >
-                        Review
-                      </span>
-                    </div>
+                    <span
+                      onClick={() => handleReview(request)}
+                      className="cursor-pointer text-blue-500 hover:underline dark:text-blue-400"
+                    >
+                      Review
+                    </span>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td colSpan="5" className="text-center p-4 dark:text-gray-200">
-                  No requests found.
+                  No requests Available.
                 </td>
               </tr>
             )}
@@ -225,17 +243,20 @@ function Pending({ searchQuery }) {
       </div>
 
       {/* Review Modal */}
-      {/* Review Modal */}
       {showReviewModal && selectedRequest && (
         <ReviewModal
           isOpen={showReviewModal}
           onClose={handleCancelReview}
           title={`Review Request - ${selectedRequest?._id}`}
           selectedRequest={selectedRequest}
-          showActionButtons={showActionButtons}
-          handleDoneReview={handleDoneReview}
           handleApprove={handleApprove}
-          handleDecline={handleDecline}
+          handleReject={handleReject}
+          showConfirmPopup={showConfirmPopup}
+          confirmAction={confirmAction}
+          confirmApprove={confirmApprove}
+          confirmDecline={confirmDecline}
+          cancelApprove={cancelApprove}
+          cancelDecline={cancelDecline}
         />
       )}
 

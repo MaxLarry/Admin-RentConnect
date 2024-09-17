@@ -2,40 +2,53 @@ import React, { useState } from "react";
 import { format } from "date-fns";
 import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
 import MapComponent from "../LocationMap";
+import LegalDocuments from "./LegalDocs";
+import { REVIEW_ISSUES } from "../../../../constants";
 
 function ReviewModal({
   isOpen,
   onClose,
   title,
   selectedRequest,
-  showActionButtons,
-  handleDoneReview,
   handleApprove,
-  handleDecline,
+  handleReject,
+  showConfirmPopup,
+  confirmAction,
+  confirmApprove,
+  confirmDecline,
+  cancelApprove,
+  cancelDecline,
 }) {
+  const [selectedIssues, setSelectedIssues] = useState([]);
+  const [additionalComments, setAdditionalComments] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  if (!isOpen || !selectedRequest) return null;
+  if (!isOpen) return null;
 
-  // Handle next image
-  const handleNext = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === selectedRequest.property_photo.length - 1
-        ? 0
-        : prevIndex + 1
+  const handleCheckboxChange = (issue) => {
+    setSelectedIssues((prev) =>
+      prev.includes(issue)
+        ? prev.filter((item) => item !== issue)
+        : [...prev, issue]
     );
   };
 
-  // Handle previous image
+  const handleCommentsChange = (e) => {
+    setAdditionalComments(e.target.value);
+  };
+
   const handlePrev = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0
-        ? selectedRequest.property_photo.length - 1
-        : prevIndex - 1
+    setCurrentImageIndex((prev) =>
+      prev > 0 ? prev - 1 : selectedRequest.property_photo.length - 1
     );
   };
 
-  // Handle dot click to jump to specific image
+  const handleNext = () => {
+    setCurrentImageIndex((prev) =>
+      prev < selectedRequest.property_photo.length - 1 ? prev + 1 : 0
+    );
+  };
+
   const handleDotClick = (index) => {
     setCurrentImageIndex(index);
   };
@@ -44,7 +57,10 @@ function ReviewModal({
     <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-zinc-800 text-white p-6 rounded-lg w-full max-w-md md:max-w-2xl lg:max-w-4xl shadow-lg">
         <h2 className="text-lg font-semibold mb-5">{title}</h2>
-        <div className="p-4 overflow-y-auto border-y border-zinc-700" style={{ maxHeight: "500px" }}>
+        <div
+          className="p-4 overflow-y-auto border-y border-zinc-700"
+          style={{ maxHeight: "600px" }}
+        >
           <div className="text-sm">
             <p>
               <strong>Requester Name: </strong>
@@ -128,9 +144,7 @@ function ReviewModal({
                   ))}
                 </ul>
               </>
-            ) : (
-              <></>
-            )}
+            ) : null}
             {/* Room Photos */}
             <div className="mt-5">
               <h2 className="font-semibold">Room/Unit Available</h2>
@@ -176,58 +190,120 @@ function ReviewModal({
             <h2 className="mb-3">
               <strong>II. Geographical Location</strong>
             </h2>
-            <div className="flex justify-center">
+            <div className="flex justify-center relative z-10">
               <MapComponent
                 location={{ coordinates: selectedRequest.location.coordinates }}
               />
             </div>
           </div>
-          <div className="mt-2">
-            <h2 className="py-5">
-              <strong>III. Legal Documents</strong>
-            </h2>
-            <div className="flex justify-center">
-              <MapComponent
-                location={{ coordinates: selectedRequest.location.coordinates }}
-              />
-            </div>
-          </div>
-          {/* Done Review button */}
-          <button
-            onClick={handleDoneReview}
-            className="px-4 py-2 bg-blue-500 text-white rounded mt-4"
-          >
-            Done Review
-          </button>
-
-          {/* Action Buttons */}
-          {showActionButtons && (
-            <div className="space-x-4 mt-4">
-              <button
+          <LegalDocuments selectedRequest={selectedRequest} />
+          <div className="mb-5 py-3">
+            {/* Action Buttons */}
+            <div className="flex justify-center space-x-10">
+              <span
                 onClick={handleApprove}
-                className="px-4 py-2 bg-green-500 text-white rounded"
+                className="py-2 px-4 cursor-pointer text-white bg-green-600 hover:bg-green-500 rounded"
               >
-                Approve
-              </button>
-              <button
-                onClick={handleDecline}
-                className="px-4 py-2 bg-red-500 text-white rounded"
+                Approve Request
+              </span>
+              <span
+                onClick={handleReject}
+                className="py-2 px-4 cursor-pointer text-white bg-red-600 hover:bg-red-500 rounded"
               >
-                Reject
-              </button>
+                Reject Request
+              </span>
             </div>
-          )}
+          </div>
         </div>
 
         <div className="flex justify-end mt-4">
           <button
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
+            className="px-5 py-2 bg-gray-600 border border-gray-500 text-white rounded hover:bg-gray-500"
             onClick={onClose}
           >
-            Close
+            Cancel
           </button>
         </div>
       </div>
+
+      {/* Confirmation Popup for Decline */}
+      {showConfirmPopup && confirmAction === "decline" && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-zinc-800 text-white p-6 rounded-lg max-w-sm shadow-lg w-full md:max-w-xl lg:max-w-2xl">
+            <p className="mb-4 text-center">
+              Are you sure you want to decline this request?
+            </p>
+            <div className="text-left">
+              <p className="mb-4">Please select the reason(s) for rejection:</p>
+              <form>
+                {REVIEW_ISSUES.map((issue) => (
+                  <div key={issue} className="flex items-center mb-2">
+                    <input
+                      type="checkbox"
+                      id={issue}
+                      checked={selectedIssues.includes(issue)}
+                      onChange={() => handleCheckboxChange(issue)}
+                      className="mr-2 rounded focus:outline-none focus:ring-transparent text-teal-400"
+                    />
+                    <label className="text-sm" htmlFor={issue}>
+                      {issue}
+                    </label>
+                  </div>
+                ))}
+              </form>
+              <div className="mt-4">
+                <p className="mb-2">Additional reason/comments:</p>
+                <textarea
+                  value={additionalComments}
+                  onChange={handleCommentsChange}
+                  rows="4"
+                  className="w-full p-2 border border-gray-600 rounded bg-gray-200 text-zinc-900 focus:outline-none focus:ring-teal-500"
+                  placeholder="Enter additional reasons or comments here..."
+                ></textarea>
+              </div>
+            </div>
+            <div className="flex justify-center mt-4 space-x-2">
+              <button
+                onClick={() =>
+                  confirmDecline({ selectedIssues, additionalComments })
+                }
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={cancelDecline}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Popup for Approve */}
+      {showConfirmPopup && confirmAction === "approve" && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-zinc-800 text-white p-6 rounded-lg max-w-sm shadow-lg text-center">
+            <p className="mb-4">
+              Are you sure you want to approve this request?
+            </p>
+            <button
+              onClick={confirmApprove}
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mr-2"
+            >
+              Confirm
+            </button>
+            <button
+              onClick={cancelApprove}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
