@@ -4,6 +4,14 @@ import Pagination from "../../ui/Pagination";
 import CopyableText from "../../ui/CopyableText";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 function ActivityLogs() {
   const itemsPerPage = 10;
@@ -151,36 +159,31 @@ function ActivityLogs() {
       </div>
 
       <div className="overflow-auto rounded-md px-3">
-        <table className="min-w-full bg-white text-center text-sm">
-          <thead className="bg-gray-200 dark:bg-zinc-700">
-            <tr className="border-b dark:border-zinc-600">
+        <Table>
+          <TableHeader>
+            <TableRow>
               {req_column.map((column) => (
-                <th key={column} className="px-6 py-2 text-gray-700 dark:text-gray-200 font-bold">
-                  {column}
-                </th>
+                <TableHead key={column}>{column}</TableHead>
               ))}
-            </tr>
-          </thead>
-          <tbody>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {currentLogs.map((log) => (
-              <tr
-                key={log.id}
-                className="border-b dark:text-gray-200 dark:bg-zinc-800 dark:border-zinc-700"
-              >
-                <td className="py-2 px-4">
+              <TableRow key={log.id}>
+                <TableCell>
                   <CopyableText text={log.id} />
-                </td>
-                <td className="py-2 px-4">{log.adminName}</td>
-                <td className="py-2 px-4">{log.role}</td>
-                <td className="py-2 px-4">{log.action}</td>
-                <td className="py-2 px-4">{log.timestamp}</td>
-                <td className="py-2 px-4">{log.ipAddress}</td>
-                <td className="py-2 px-4">{log.target}</td>
-                <td className="py-2 px-4">{log.target}</td>
-              </tr>
+                </TableCell>
+                <TableCell>{log.adminName}</TableCell>
+                <TableCell>{log.role}</TableCell>
+                <TableCell>{log.action}</TableCell>
+                <TableCell>{log.timestamp}</TableCell>
+                <TableCell>{log.ipAddress}</TableCell>
+                <TableCell>{log.target}</TableCell>
+                <TableCell>{log.target}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
 
         <Pagination
           totalItems={filteredLogs.length}

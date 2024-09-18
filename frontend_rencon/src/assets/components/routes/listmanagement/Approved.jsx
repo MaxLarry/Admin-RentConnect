@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { format } from 'date-fns';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { format } from "date-fns";
 import {
   Pagination,
   PaginationContent,
@@ -9,9 +9,18 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 import CopyableText from "../../ui/CopyableText";
-import ViewPropertyModal from './modals/ViewPropertyModal'; // Import the modal
+import ViewPropertyModal from "./modals/ViewPropertyModal"; // Import the modal
 
 function Approved({ searchQuery }) {
   const [approvedProperty, setApprovedProperty] = useState([]);
@@ -37,7 +46,10 @@ function Approved({ searchQuery }) {
           setApprovedProperty([]);
         }
       } catch (error) {
-        console.error("There was an error fetching the approved properties!", error);
+        console.error(
+          "There was an error fetching the approved properties!",
+          error
+        );
         setError("Failed to fetch approved properties");
         setApprovedProperty([]);
       } finally {
@@ -49,7 +61,12 @@ function Approved({ searchQuery }) {
   }, []);
 
   const req_column = [
-    "ID", "Owner's Name", "Property Type", "Location", "No. of Rooms/Units", "Listed Date"
+    "Property ID",
+    "Owner's Name",
+    "Property Type",
+    "Address",
+    "Rooms/Units Count",
+    "Listed Date",
   ];
 
   const handleCopy = (id) => {
@@ -95,88 +112,87 @@ function Approved({ searchQuery }) {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredRequests.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 
   return (
     <div className="container mx-auto px-4">
       <div className="flex justify-center overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 text-center text-xs">
-          <thead>
-            <tr className="border-b dark:border-zinc-600">
+        <Table className="min-w-full  dark:border-zinc-600">
+          <TableHeader>
+            <TableRow className="border-b dark:border-zinc-600">
               {req_column.map((column) => (
-                <th
+                <TableHead
                   key={column}
-                  className="px-6 py-2 text-gray-600 dark:text-gray-200 font-bold"
+                  className=" text-zinc-900 dark:text-gray-200 font-bold"
                 >
                   {column}
-                </th>
+                </TableHead>
               ))}
-            </tr>
-          </thead>
-          <tbody>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
             {currentItems.length > 0 ? (
               currentItems.map((property, index) => (
-                <tr
-                  key={property._id}
-                  className={`cursor-pointer ${
-                    index % 2 === 0
-                      ? "bg-gray-100 dark:bg-zinc-700"
-                      : "bg-white dark:bg-zinc-800"
-                  }`}
-                  onClick={() => handleRowClick(property)} // Set the row to be clickable
-                >
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200 relative">
-                    <CopyableText text={property._id} onCopy={() => handleCopy(property._id)} />
-                    {copiedId === property._id && (
-                      <span className="text-green-500">Copied!</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {property.profile?.fullName || "N/A"}
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {property.typeOfProperty || "N/A"}
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {property.address || "N/A"}
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {property.roomCount || 0}
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {property.created_at ? format(new Date(property.created_at), 'yyyy-MM-dd HH:mm') : "N/A"}
-                  </td>
-                </tr>
+                <TableRow key={property._id} className={`cursor-pointer }`}>
+                  <TableCell className="px-6 py-2 ">
+                    <CopyableText
+                      text={property._id}
+                      onCopy={() => handleCopy(property._id)}
+                    />
+                  </TableCell>
+                  <TableCell>{property.profile?.fullName}</TableCell>
+                  <TableCell>{property.typeOfProperty}</TableCell>
+                  <TableCell>{property.address}</TableCell>
+                  <TableCell>{property.roomCount}</TableCell>
+                  <TableCell>
+                    {format(new Date(property.created_at), "yyyy-MM-dd HH:mm")}
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan="6" className="text-center p-2 dark:text-gray-200">
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center"
+                >
                   No properties available.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
-      <Pagination className="mt-4 cursor-pointer">
-        <PaginationContent>
-          <PaginationPrevious onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} />
-          {Array.from({ length: totalPages }, (_, index) => (
-            <PaginationItem key={index}>
-              <PaginationLink
-                isActive={currentPage === index + 1}
-                onClick={() => setCurrentPage(index + 1)}
-              >
-                {index + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationNext onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} />
-        </PaginationContent>
-      </Pagination>
+      {filteredRequests.length > 0 && totalPages >= 1 && (
+        <Pagination className="mt-4 cursor-pointer">
+          <PaginationContent>
+            <PaginationPrevious
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            />
+            {Array.from({ length: totalPages }, (_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  isActive={currentPage === index + 1}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationNext
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+            />
+          </PaginationContent>
+        </Pagination>
+      )}
 
       {/* Modal for viewing selected property */}
       {showViewModal && selectedRequest && (

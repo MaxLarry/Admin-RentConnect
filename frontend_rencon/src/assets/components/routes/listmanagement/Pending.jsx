@@ -11,7 +11,15 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 function Pending({ searchQuery }) {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -170,48 +178,44 @@ function Pending({ searchQuery }) {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredRequests.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 
   return (
     <div className="container mx-auto px-4">
       <div className="flex justify-center overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 text-center text-sm">
-          <thead>
-            <tr className="border-b dark:border-zinc-600">
+        <Table className="min-w-full  dark:border-zinc-600">
+          <TableHeader>
+            <TableRow className="border-b dark:border-zinc-600">
               {req_column.map((column) => (
-                <th
+                <TableHead
                   key={column}
-                  className="px-6 py-2 text-gray-600 dark:text-gray-200 font-bold"
+                  className=" text-zinc-900 dark:text-gray-200 font-bold"
                 >
                   {column}
-                </th>
+                </TableHead>
               ))}
-            </tr>
-          </thead>
-          <tbody>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
             {currentItems.length > 0 ? (
               currentItems.map((request, index) => (
-                <tr
-                  key={request._id}
-                  className={`${
-                    index % 2 === 0
-                      ? "bg-gray-100 dark:bg-zinc-700"
-                      : "bg-white dark:bg-zinc-800"
-                  }`}
-                >
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200 relative">
-                    <CopyableText text={request._id} />
-                    {copiedId === request._id && (
-                      <span className="text-green-500">Copied!</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {request.profile.fullName}
-                  </td>
-                  <td
-                    className={`px-6 py-2 font-medium ${
+                <TableRow key={request._id}>
+                  <TableCell className="px-6 py-2 ">
+                    <CopyableText
+                      text={request._id}
+                      onCopy={() => handleCopy(request._id)}
+                    />
+                  </TableCell>
+                  <TableCell>{request.profile?.fullName}</TableCell>
+                  <TableCell>{request.typeOfProperty}</TableCell>
+                  <TableCell
+                    className={`${
                       request.status === "Approved"
                         ? "text-green-500 dark:text-green-400"
                         : request.status === "Rejected"
@@ -222,29 +226,33 @@ function Pending({ searchQuery }) {
                     }`}
                   >
                     {request.status}
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
+                  </TableCell>
+
+                  <TableCell>
                     {format(new Date(request.created_at), "yyyy-MM-dd HH:mm")}
-                  </td>
-                  <td className="px-6 py-2">
+                  </TableCell>
+                  <TableCell>
                     <span
                       onClick={() => handleReview(request)}
-                      className="cursor-pointer text-blue-500 hover:underline dark:text-blue-400"
+                      className="cursor-pointer text-teal-400 hover:underline dark:text-teal-500"
                     >
                       Review
                     </span>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan="5" className="text-center p-2 dark:text-gray-200">
-                  No requests Available.
-                </td>
-              </tr>
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center dark:text-gray-200"
+                >
+                  No properties available.
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Review Modal */}
@@ -265,28 +273,30 @@ function Pending({ searchQuery }) {
         />
       )}
 
-      <Pagination className="mt-4 cursor-pointer">
-        <PaginationContent>
-          <PaginationPrevious
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          />
-          {Array.from({ length: totalPages }, (_, index) => (
-            <PaginationItem key={index}>
-              <PaginationLink
-                isActive={currentPage === index + 1}
-                onClick={() => setCurrentPage(index + 1)}
-              >
-                {index + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationNext
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-          />
-        </PaginationContent>
-      </Pagination>
+      {filteredRequests.length > 0 && totalPages >= 1 && (
+        <Pagination className="mt-4 cursor-pointer">
+          <PaginationContent>
+            <PaginationPrevious
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            />
+            {Array.from({ length: totalPages }, (_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  isActive={currentPage === index + 1}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationNext
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+            />
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

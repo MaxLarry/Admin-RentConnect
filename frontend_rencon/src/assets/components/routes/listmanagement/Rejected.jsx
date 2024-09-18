@@ -2,13 +2,30 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 import CopyableText from "../../ui/CopyableText";
-import Pagination from "../../ui/Pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 function Rejected({ searchQuery }) {
   const req_column = [
     "Select",
     "ID",
     "Requester Name",
+    "Property Type",
     "Requested Date",
     "Rejected Date",
     "Note",
@@ -21,7 +38,6 @@ function Rejected({ searchQuery }) {
   const [rejectedRequests, setRejectedRequests] = useState([]);
   const itemsPerPage = 20;
 
-
   const filteredRequests = rejectedRequests.filter((property) => {
     const lowerCaseQuery = searchQuery.toLowerCase();
     const requestId = property._id ? property._id.toLowerCase() : "";
@@ -29,19 +45,25 @@ function Rejected({ searchQuery }) {
       ? property.profile.fullName.toLowerCase()
       : "";
 
-    return requestId.includes(lowerCaseQuery) || fullName.includes(lowerCaseQuery);
+    return (
+      requestId.includes(lowerCaseQuery) || fullName.includes(lowerCaseQuery)
+    );
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredRequests.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   // Handle select/unselect individual requests
   const handleSelectRejRequest = (id) => {
-    setSelectedRequests((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((selectedId) => selectedId !== id) // Unselect
-        : [...prevSelected, id] // Select
+    setSelectedRequests(
+      (prevSelected) =>
+        prevSelected.includes(id)
+          ? prevSelected.filter((selectedId) => selectedId !== id) // Unselect
+          : [...prevSelected, id] // Select
     );
   };
 
@@ -66,13 +88,16 @@ function Rejected({ searchQuery }) {
           setRejectedRequests([]); // No data available
         }
       } catch (error) {
-        console.error("There was an error fetching the pending requests!", error);
+        console.error(
+          "There was an error fetching the pending requests!",
+          error
+        );
         setRejectedRequests([]); // Set to empty array in case of error
       } finally {
         setLoading(false); // Stop loading
       }
     };
-  
+
     fetchRejectedRequests();
   }, []); // Empty dependency array means this runs only once, when the component mounts
 
@@ -80,94 +105,111 @@ function Rejected({ searchQuery }) {
   useEffect(() => {
     if (selectedRequests.length !== currentItems.length) {
       setSelectAll(false);
-    } else if (selectedRequests.length === currentItems.length && currentItems.length > 0) {
+    } else if (
+      selectedRequests.length === currentItems.length &&
+      currentItems.length > 0
+    ) {
       setSelectAll(true);
     }
   }, [selectedRequests, currentItems]); // Runs whenever selectedRequests or currentItems change
-  
+
   if (loading) {
     return <div>Loading...</div>;
   }
   return (
     <div className="container mx-auto px-4">
       <div className="flex justify-center overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 text-center text-sm">
-          <thead>
-            <tr className="border-b dark:border-zinc-600">
-              <th>
+        <Table className="min-w-full  dark:border-zinc-600">
+          <TableHeader>
+            <TableRow className="border-b dark:border-zinc-600">
+              <TableHead>
                 <input
                   className="rounded-md focus:outline-none focus:ring-transparent text-teal-400"
                   type="checkbox"
                   checked={selectAll}
                   onChange={handleSelectAll}
                 />
-              </th>
-              {req_column.slice(1).map((column) => (
-                <th
+              </TableHead>
+              {req_column.map((column) => (
+                <TableHead
                   key={column}
-                  className="px-6 py-2 text-gray-600 dark:text-gray-200 font-bold"
+                  className=" text-zinc-900 dark:text-gray-200 font-bold"
                 >
                   {column}
-                </th>
+                </TableHead>
               ))}
-            </tr>
-          </thead>
-          <tbody>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
             {currentItems.length > 0 ? (
               currentItems.map((property, index) => (
-                <tr
-                  key={property._id}
-                  className={`${
-                    index % 2 === 0
-                      ? "bg-gray-100 dark:bg-zinc-700"
-                      : "bg-white dark:bg-zinc-800"
-                  }`}
-                >
-                  <td className="px-6 py-2">
+                <TableRow key={property._id} className={`cursor-pointer }`}>
+                  <TableCell>
                     <input
                       className="rounded-md focus:outline-none focus:ring-transparent text-teal-400"
                       type="checkbox"
                       checked={selectedRequests.includes(property._id)}
                       onChange={() => handleSelectRejRequest(property._id)}
                     />
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    <CopyableText text={property._id} />
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {property.profile.fullName}
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {format(new Date(property.created_at), "yyyy-MM-dd HH:mm")}
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {property.rejected_at
-                      ? format(new Date(property.rejected_at), "yyyy-MM-dd HH:mm")
+                  </TableCell>
+                  <TableCell className="px-6 py-2 ">
+                    <CopyableText
+                      text={property._id}
+                      onCopy={() => handleCopy(property._id)}
+                    />
+                  </TableCell>
+                  <TableCell>{property.profile?.fullName}</TableCell>
+                  <TableCell>{property.typeOfProperty}</TableCell>
+                  <TableCell>
+                  {property.rejected_at
+                      ? format(
+                          new Date(property.rejected_at),
+                          "yyyy-MM-dd HH:mm"
+                        )
                       : "N/A"}
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-gray-200">
-                    {property.note || "No notes available"}
-                  </td>
-                </tr>
+                  </TableCell>
+                  <TableCell>{property.note || "No notes available"}</TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan="6" className="text-center p-4 dark:text-gray-200">
-                  No rejected properties found.
-                </td>
-              </tr>
+              <TableRow>
+                <TableCell
+                  colSpan={8}
+                  className="text-center"
+                >
+                  No properties available.
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
-      <Pagination
-        totalItems={filteredRequests.length}
-        itemsPerPage={itemsPerPage}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-      />
-
+      {filteredRequests.length > 0 && totalPages >= 1 && (
+        <Pagination className="mt-4 cursor-pointer">
+          <PaginationContent>
+            <PaginationPrevious
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            />
+            {Array.from({ length: totalPages }, (_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  isActive={currentPage === index + 1}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationNext
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+            />
+          </PaginationContent>
+        </Pagination>
+      )}
       {/* Popup Effect for Selected Items */}
       {selectedRequests.length > 0 && (
         <div className="w-full flex justify-center">

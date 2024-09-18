@@ -16,7 +16,7 @@ function CopyableText({ text }) {
   return (
     <div className="group relative inline-block">
       <span
-        className="cursor-pointer hover:text-blue-600"
+        className="cursor-pointer hover:text-teal-600"
         onClick={handleCopy}
       >
         {truncateId(text)}
