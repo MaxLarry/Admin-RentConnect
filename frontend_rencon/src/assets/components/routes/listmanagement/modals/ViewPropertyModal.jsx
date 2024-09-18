@@ -4,6 +4,7 @@ import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
 import MapComponent from "../LocationMap";
 import LegalDocuments from "./LegalDocs";
 import { AiOutlineClose } from "react-icons/ai"; // Importing the X icon
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 function ViewPropertyModal({ selectedRequest, closeModal }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -33,8 +34,8 @@ function ViewPropertyModal({ selectedRequest, closeModal }) {
       >
         <AiOutlineClose size={24} />
       </button>
-      <div className="relative bg-zinc-800 text-white p-6 rounded-lg w-full max-w-md md:max-w-2xl lg:max-w-4xl shadow-lg">
-        <div
+      <div className="relative bg-zinc-800 text-white p-6 rounded-lg w-full max-w-md md:max-w-2xl lg:max-w-4xl shadow-lg overflow-hidden">
+        <ScrollArea
           className="p-4 overflow-y-auto border-y border-zinc-700"
           style={{ maxHeight: "600px" }}
         >
@@ -111,7 +112,7 @@ function ViewPropertyModal({ selectedRequest, closeModal }) {
             </div>
           </div>
           <LegalDocuments selectedRequest={selectedRequest} />
-        </div>
+        </ScrollArea>
       </div>
     </div>
   );

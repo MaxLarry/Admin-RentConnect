@@ -25,10 +25,10 @@ const Notification = () => {
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
       <button
-        className="flex items-center space-x-2 px-3 text-zinc-900 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white focus:outline-none"
+        className="flex items-center space-x-2 px-2 text-zinc-900 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white focus:outline-none"
         onClick={toggleNotifications}
       >
-        <IoIosNotifications className="text-2xl" />
+        <IoIosNotifications className="text-xl" />
         {/* Optional: Add badge or notification count here */}
       </button>
 

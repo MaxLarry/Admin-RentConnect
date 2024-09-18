@@ -23,7 +23,7 @@ function ListingManagement() {
   };
 
   return (
-    <div className="p-4 sm:ml-64 min-h-screen block gap-2 flex-col lg:flex-row translate-all duration-300 mt-14">
+    <div className="px-4 pt-14 sm:ml-60 min-h-screen block gap-2 flex-col lg:flex-row translate-all duration-300">
       <div className="flex justify-between items-center">
         <h1 className="font-bold text-2xl p-4 text-gray-700 dark:text-gray-200">
           Listing Management

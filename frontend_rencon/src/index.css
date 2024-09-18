@@ -2,14 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-
 html {
-  /*overflow: hidden;*/ /*for locomotive*/
+  overflow: hidden;
   height: 100%;
 }
 
 body {
-  /*overflow: hidden;*/ /*for locomotive*/
+  overflow: hidden;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -27,29 +26,24 @@ body {
   height: 100%;
 }
 
-.lg-card{
-    background-color: #ffffffa8;
-    
+.lg-card {
+  background-color: #ffffffa8;
 }
 .lg-background {
-    background-image: url('assets/img/texture-dark.jpg');
-    background-size: cover;
-    background-position: center;
-  }
-
-.log-img{
-  background-image: url('assets/img/rent.png');
+  background-image: url("assets/img/texture-dark.jpg");
   background-size: cover;
   background-position: center;
 }
 
-
+.log-img {
+  background-image: url("assets/img/rent.png");
+  background-size: cover;
+  background-position: center;
+}
 
 .scroll-container {
   overflow: hidden;
 }
-
-
 
 @layer base {
   :root {
@@ -106,8 +100,6 @@ body {
     --chart-5: 340 75% 55%;
   }
 }
-
-
 
 @layer base {
   * {

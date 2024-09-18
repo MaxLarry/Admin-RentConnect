@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { MdManageAccounts } from "react-icons/md";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FiChevronDown} from "react-icons/fi";
 import { HiLogout } from "react-icons/hi";
 import { TiUser } from "react-icons/ti";
 import useAuth from "../auth/useAuth";
@@ -32,26 +32,28 @@ const ProfileDropdown = () => {
 
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
-      <button
-        className="flex items-center space-x-2 px-3 text-zinc-900 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white focus:outline-none"
-        onClick={toggleDropdown}
-      >
-        <Avatar>
-          <AvatarImage src="https://github.com/shasdcn.png" alt="@shadcn" />
-          <AvatarFallback>
-            <FaUserCircle className="text-4xl" />
-          </AvatarFallback>
-        </Avatar>
+<button
+  className="flex items-center space-x-2 py-1 px-3 text-zinc-900 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white focus:outline-none"
+  onClick={toggleDropdown}
+>
+  <Avatar>
+    <AvatarImage src="https://github.com/shasdcn.png" alt="@shadcn" />
+    <AvatarFallback>
+      <FaUserCircle />
+    </AvatarFallback>
+  </Avatar>
 
-        <span className="text-zinc-900 dark:text-white flex-1 tracking-s font-medium">
-          {user ? user.name : "Loading..."}
-        </span>
-        {isOpen ? (
-          <FiChevronUp className="text-xl" /> // Up arrow when open
-        ) : (
-          <FiChevronDown className="text-xl" /> // Down arrow when closed
-        )}
-      </button>
+  <span className="text-zinc-900 dark:text-white flex-1 tracking-s font-medium text-sm">
+    {user ? user.name : "Loading..."}
+  </span>
+
+  <FiChevronDown
+    className={`text-xl transition-transform duration-300 ${
+      isOpen ? "rotate-180" : ""
+    }`}
+  />
+</button>
+
 
       {isOpen && (
         <ul className="absolute right-0 mt-3 w-52 bg-white dark:bg-gray-800 shadow-lg rounded-b-lg overflow-hidden z-50">
