@@ -1,9 +1,19 @@
 import React, { useState } from "react";
-import { FiSearch } from "react-icons/fi";
-import Pagination from "../../ui/Pagination";
 import CopyableText from "../../ui/CopyableText";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { Button } from "@/components/ui/button"
+import { SearchInput } from "@/components/ui/input"
+import { parse, isAfter, isBefore } from 'date-fns';
+import {DatePickerWithRange} from "@/components/ui/DatePickerWithRange"
+ 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -12,15 +22,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 function ActivityLogs() {
   const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = React.useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRole, setSelectedRole] = useState("All");
-  const [selectedAction, setSelectedAction] = useState("All");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [selectedRole, setSelectedRole] = useState("All Roles");
+  const [selectedAction, setSelectedAction] = useState("All Actions");
+  const [dateRange, setDateRange] = useState(null);
 
   const logs = [
     {
@@ -60,14 +70,14 @@ function ActivityLogs() {
     setSearchQuery(e.target.value.toLowerCase());
   };
 
-  // Handle filter by role
-  const handleRoleChange = (e) => {
-    setSelectedRole(e.target.value);
+  // Handle role change from dropdown
+  const handleRoleSelect = (role) => {
+    setSelectedRole(role);
   };
 
-  // Handle filter by action
-  const handleActionChange = (e) => {
-    setSelectedAction(e.target.value);
+  // Handle action change from dropdown
+  const handleActionSelect = (action) => {
+    setSelectedAction(action);
   };
 
   // Filter logs based on search, role, action, and date range
@@ -76,15 +86,20 @@ function ActivityLogs() {
       log.adminName.toLowerCase().includes(searchQuery) ||
       log.action.toLowerCase().includes(searchQuery) ||
       log.id.toLowerCase().includes(searchQuery);
-
-    const isMatchRole = selectedRole === "All" || log.role === selectedRole;
-    const isMatchAction = selectedAction === "All" || log.action === selectedAction;
-
-    const isWithinDateRange =
-      (!startDate || new Date(log.timestamp) >= startDate) &&
-      (!endDate || new Date(log.timestamp) <= endDate);
-
-    return isMatchSearchQuery && isMatchRole && isMatchAction && isWithinDateRange;
+  
+    const isMatchRole = selectedRole === "All Roles" || log.role === selectedRole;
+    const isMatchAction = selectedAction === "All Actions" || log.action === selectedAction;
+  
+    // Parse log timestamp to Date object using `date-fns`
+    const logDate = parse(log.timestamp, "yyyy-MM-dd HH:mm:ss", new Date());
+  
+    // Date range filtering using `isAfter` and `isBefore` from `date-fns`
+    const isMatchDateRange =
+      !dateRange || 
+      (!dateRange.from || isAfter(logDate, dateRange.from) || logDate === dateRange.from) && // Compare logDate with `from`
+      (!dateRange.to || isBefore(logDate, dateRange.to) || logDate === dateRange.to); // Compare logDate with `to`
+  
+    return isMatchSearchQuery && isMatchRole && isMatchAction && isMatchDateRange;
   });
 
   // Pagination logic
@@ -92,78 +107,76 @@ function ActivityLogs() {
   const indexOfFirstLog = indexOfLastLog - itemsPerPage;
   const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog);
 
+  const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+
   return (
-    <div className="p-4 sm:ml-64 min-h-screen block gap-2 flex-col lg:flex-row translate-all duration-300 mt-14">
-      <div className="flex justify-between items-center">
-        <h1 className="font-bold text-2xl p-4 text-gray-700 dark:text-gray-200">
+    <div className="px-4 pt-14 sm:ml-60 min-h-screen block gap-2 flex-col lg:flex-row translate-all duration-300">
+      <div className="flex justify-between items-center p-5">
+        <h1 className="font-bold text-2xl p-4">
           Activity Logs
         </h1>
       </div>
 
       {/* Search, Role Filter, Action Filter, and Date Picker */}
-      <div className="flex flex-wrap gap-4 p-4">
+      <div className="flex flex-wrap gap-4 px-9 pb-5">
         <div className="relative">
-          <input
+          <SearchInput
             type="text"
             placeholder="Search logs..."
-            className="p-1 rounded-md border dark:bg-zinc-700 dark:text-gray-200 focus:ring-teal-400"
+            className="rounded-md border focus:ring-teal-400 w-auto"
             value={searchQuery}
             onChange={handleSearchChange}
           />
-          <FiSearch className="absolute right-3 top-2 text-gray-400" />
         </div>
 
-        <select
-          value={selectedRole}
-          onChange={handleRoleChange}
-          className="p-1 rounded-md text-xs dark:bg-zinc-700 dark:text-gray-200 focus:ring-teal-400"
-        >
-          <option value="All">All Roles</option>
-          <option value="Super-Admin">Super-Admin</option>
-          <option value="Admin">Admin</option>
-        </select>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button className="text-xs">
+              {selectedRole || "All Roles"}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => handleRoleSelect("All Roles")}>
+              All Roles
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRoleSelect("Super-Admin")}>
+              Super-Admin
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRoleSelect("Admin")}>
+              Admin
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-        <select
-          value={selectedAction}
-          onChange={handleActionChange}
-          className="p-1 rounded-md text-xs dark:bg-zinc-700 dark:text-gray-200 focus:ring-teal-400"
-        >
-          <option value="All">All Actions</option>
-          <option value="Added a listing">Added a listing</option>
-          <option value="Updated user info">Updated user info</option>
-          {/* Add other actions as needed */}
-        </select>
-
-        <div className="flex items-center">
-          <DatePicker
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
-            selectsStart
-            startDate={startDate}
-            endDate={endDate}
-            placeholderText="Start Date"
-            className="p-2 rounded-md border dark:bg-zinc-700 dark:text-gray-200"
-          />
-          <span className="mx-2">to</span>
-          <DatePicker
-            selected={endDate}
-            onChange={(date) => setEndDate(date)}
-            selectsEnd
-            startDate={startDate}
-            endDate={endDate}
-            minDate={startDate}
-            placeholderText="End Date"
-            className="p-2 rounded-md border dark:bg-zinc-700 dark:text-gray-200"
-          />
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button className=" text-xs">
+              {selectedAction || "All Actions"}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => handleActionSelect("All Actions")}>
+              All Actions
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleActionSelect("Added a listing")}>
+              Added a listing
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleActionSelect("Updated user info")}>
+              Updated user info
+            </DropdownMenuItem>
+            {/* Add other actions as needed */}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DatePickerWithRange onDateChange={setDateRange} />
       </div>
 
-      <div className="overflow-auto rounded-md px-3">
+      <div className="overflow-auto rounded-md px-9">
         <Table>
           <TableHeader>
             <TableRow>
               {req_column.map((column) => (
-                <TableHead key={column}>{column}</TableHead>
+                <TableHead key={column}
+                className=" text-zinc-900 dark:text-gray-200 font-bold">{column}</TableHead>
               ))}
             </TableRow>
           </TableHeader>
@@ -185,12 +198,30 @@ function ActivityLogs() {
           </TableBody>
         </Table>
 
-        <Pagination
-          totalItems={filteredLogs.length}
-          itemsPerPage={itemsPerPage}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-        />
+        {filteredLogs.length > 0 && totalPages >= 1 && (
+          <Pagination className="mt-4 cursor-pointer">
+            <PaginationContent>
+              <PaginationPrevious
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              />
+              {Array.from({ length: totalPages }, (_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    isActive={currentPage === index + 1}
+                    onClick={() => setCurrentPage(index + 1)}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationNext
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+              />
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
     </div>
   );

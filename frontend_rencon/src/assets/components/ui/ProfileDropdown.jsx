@@ -21,14 +21,14 @@ const ProfileDropdown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center space-x-2 py-1 px-3 text-zinc-900 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white focus:outline-none">
+        <button className="flex items-center space-x-2 py-1 px-3  hover:text-gray-700  dark:hover:text-white focus:outline-none">
           <Avatar>
             <AvatarImage src="https://github.com/shasdcn.png" alt="@shadcn" />
             <AvatarFallback>
               <FaUserCircle />
             </AvatarFallback>
           </Avatar>
-          <span className="text-zinc-900 dark:text-white flex-1 tracking-s font-medium text-sm">
+          <span className=" flex-1 tracking-s font-medium text-sm">
             {user ? user.name : "Loading..."}
           </span>
           <FiChevronDown className="text-xl" />
