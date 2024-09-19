@@ -99,6 +99,7 @@ function Approved({ searchQuery }) {
     const fullName = property.profile?.fullName
       ? property.profile.fullName.toLowerCase()
       : "";
+    const address = property.address ? property.address.toLowerCase() : "";
     const createdAt = property.created_at
       ? format(new Date(property.created_at), "yyyy-MM-dd HH:mm").toLowerCase()
       : "";
@@ -106,6 +107,7 @@ function Approved({ searchQuery }) {
     return (
       requestId.includes(lowerCaseQuery) ||
       fullName.includes(lowerCaseQuery) ||
+      address.includes(lowerCaseQuery) ||
       createdAt.includes(lowerCaseQuery)
     );
   });

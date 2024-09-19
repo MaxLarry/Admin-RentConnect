@@ -4,6 +4,7 @@ import Login from './assets/components/ui/Login';
 import Dashboard from './assets/components/routes/dashboard/Dashboard';
 import ListingManagement from './assets/components/routes/listmanagement/listingManagement';
 import ActivityLogs from './assets/components/routes/activitylogs/ActivityLogs';
+import UserManagement from './assets/components/routes/user_management/UserManagement';
 import withAuth from './assets/components/auth/withAuth';
 import PublicRoute from './assets/components/auth/publicRoute';
 import Layout from './assets/components/ui/Layout'; // New Layout Component
@@ -34,6 +35,10 @@ function App() {
   const ProtectedDashboard = withAuth(Dashboard);
   const ProtectedListingManagement = withAuth(ListingManagement);
   const ProtectedActivityLogs = withAuth(ActivityLogs);
+  const ProtectedUserManagement = withAuth(UserManagement);
+  const ProtectedInbox = withAuth(ActivityLogs);
+  const ProtectedDataVisualization = withAuth(ActivityLogs);
+  const ProtectedSafetyCompliance = withAuth(ActivityLogs);
 
   return (
     <Router>
@@ -46,8 +51,10 @@ function App() {
           <Route path="/dashboard" element={<ProtectedDashboard />} />
           <Route path="/listing-management" element={<ProtectedListingManagement />} />
           <Route path="/activity-logs" element={<ProtectedActivityLogs />} />
-          <Route path="#" element={<ProtectedListingManagement />} />
-          <Route path="#" element={<ProtectedListingManagement />} />
+          <Route path="/user-management" element={<ProtectedUserManagement />} />
+          <Route path="/compliance-safety" element={<ProtectedSafetyCompliance />} />
+          <Route path="/inbox" element={<ProtectedInbox />} />
+          <Route path="/data" element={<ProtectedDataVisualization />} />
         </Route>
       </Routes>
     </Router>

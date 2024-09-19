@@ -30,7 +30,7 @@ const Sidebar = ({ isSidebarOpen }) => {
         setActiveLink("Inbox");
         break;
       case "/activity-logs":
-        setActiveLink("Log Activity");
+        setActiveLink("Activity Logs");
         break;
       default:
         setActiveLink(""); // Reset if no match

@@ -14,6 +14,7 @@ router.get("/checkAuth", protect, (req, res) => {
     phone_num: req.user.phone_num,
     last_login: req.user.last_login,
     status: req.user.status,
+    profilePicture: req.user.profilePicture,
     // Include any additional fields if necessary
   },} );
 });

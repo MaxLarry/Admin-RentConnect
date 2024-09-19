@@ -8,7 +8,8 @@ const AdminSchema = new mongoose.Schema({
   role: { type: String, required: true },
   phone_num: { type: String, required: true },
   last_login: { type: Date },
-  status: { type: String, default: "active" }
+  status: { type: String, default: "active" },
+  profilePicture:{type: String, require: false}
 }, { timestamps: true }); // Automatically add created_at and updated_at fields
 
 

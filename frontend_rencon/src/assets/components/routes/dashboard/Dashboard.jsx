@@ -19,12 +19,12 @@ function Dashboard() {
     <>
       <ScrollArea
         className=" px-4 pt-14 sm:ml-60 h-full block gap-2 flex-col lg:flex-row translate-all
-    duration-300  text-zinc-900 tracking-tighter"
+    duration-300  tracking-tighter"
       >
-        <h1 className="font-bold text-2xl p-4 text-zinc-900 dark:text-gray-200">
+        <h1 className="font-bold text-2xl p-4">
           Dashboard
         </h1>
-        <div className="grid p-4 gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-6 max-w-full w-full mx-auto">
+        <div className="grid p-4 gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-6 grid-rows-2 max-w-full mx-auto">
           <ActiveUsercard />
           <PropertyListedGraph />
           <PendingRequestdash />

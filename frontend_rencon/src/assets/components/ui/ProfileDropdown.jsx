@@ -17,19 +17,21 @@ import {
 
 const ProfileDropdown = () => {
   const { user, logout } = useAuth();
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center space-x-2 py-1 px-3  hover:text-gray-700  dark:hover:text-white focus:outline-none">
           <Avatar>
-            <AvatarImage src="https://github.com/shasdcn.png" alt="@shadcn" />
-            <AvatarFallback>
-              <FaUserCircle />
-            </AvatarFallback>
+          {user?.profilePicture ? (
+              <AvatarImage src={user.profilePicture} alt="admin_photo" />
+            ) : (
+              <AvatarFallback>
+                <FaUserCircle />
+              </AvatarFallback>
+            )}
           </Avatar>
           <span className=" flex-1 tracking-s font-medium text-sm">
-            {user ? user.name : "Loading..."}
+          {user?.name || "Guest" }{/*this approach will make sure that help the frontent to load and prevent error*/}
           </span>
           <FiChevronDown className="text-xl" />
         </button>
