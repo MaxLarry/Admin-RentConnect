@@ -39,8 +39,9 @@ function Pending({ searchQuery }) {
   const req_column = [
     "ID",
     "Requester Name",
+    "Property Type",
     "Status",
-    "Requested Date",
+    "Request Date",
     "Action",
   ];
 

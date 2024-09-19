@@ -139,8 +139,8 @@ function Approved({ searchQuery }) {
           <TableBody>
             {currentItems.length > 0 ? (
               currentItems.map((property, index) => (
-                <TableRow key={property._id} className={`cursor-pointer }`}>
-                  <TableCell className="px-6 py-2 ">
+                <TableRow onClick={() => handleRowClick(property)} key={property._id} className="cursor-pointer">
+                  <TableCell>
                     <CopyableText
                       text={property._id}
                       onCopy={() => handleCopy(property._id)}
@@ -198,6 +198,7 @@ function Approved({ searchQuery }) {
       {showViewModal && selectedRequest && (
         <ViewPropertyModal
           selectedRequest={selectedRequest}
+          title={`Property ID - ${selectedRequest?._id}`}
           closeModal={closeModal} // Pass function to close the modal
         />
       )}

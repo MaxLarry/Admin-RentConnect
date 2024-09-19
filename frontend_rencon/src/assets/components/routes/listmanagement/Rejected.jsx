@@ -22,11 +22,10 @@ import {
 
 function Rejected({ searchQuery }) {
   const req_column = [
-    "Select",
     "ID",
     "Requester Name",
     "Property Type",
-    "Requested Date",
+    "Request Date",
     "Rejected Date",
     "Note",
   ];
@@ -44,9 +43,14 @@ function Rejected({ searchQuery }) {
     const fullName = property.profile?.fullName
       ? property.profile.fullName.toLowerCase()
       : "";
+    const createdAt = property.created_at
+      ? format(new Date(property.created_at), "yyyy-MM-dd HH:mm").toLowerCase()
+      : "";
 
     return (
-      requestId.includes(lowerCaseQuery) || fullName.includes(lowerCaseQuery)
+      requestId.includes(lowerCaseQuery) ||
+      fullName.includes(lowerCaseQuery) ||
+      createdAt.includes(lowerCaseQuery)
     );
   });
 
@@ -56,6 +60,8 @@ function Rejected({ searchQuery }) {
     indexOfFirstItem,
     indexOfLastItem
   );
+
+  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 
   // Handle select/unselect individual requests
   const handleSelectRejRequest = (id) => {
@@ -99,9 +105,8 @@ function Rejected({ searchQuery }) {
     };
 
     fetchRejectedRequests();
-  }, []); // Empty dependency array means this runs only once, when the component mounts
+  }, []); 
 
-  // Separate useEffect for managing the "select all" state
   useEffect(() => {
     if (selectedRequests.length !== currentItems.length) {
       setSelectAll(false);
@@ -153,7 +158,7 @@ function Rejected({ searchQuery }) {
                       onChange={() => handleSelectRejRequest(property._id)}
                     />
                   </TableCell>
-                  <TableCell className="px-6 py-2 ">
+                  <TableCell>
                     <CopyableText
                       text={property._id}
                       onCopy={() => handleCopy(property._id)}
@@ -162,6 +167,13 @@ function Rejected({ searchQuery }) {
                   <TableCell>{property.profile?.fullName}</TableCell>
                   <TableCell>{property.typeOfProperty}</TableCell>
                   <TableCell>
+                  {property.created_at
+                      ? format(
+                          new Date(property.created_at),
+                          "yyyy-MM-dd HH:mm"
+                        )
+                      : "N/A"}
+                  </TableCell>                  <TableCell>
                   {property.rejected_at
                       ? format(
                           new Date(property.rejected_at),
