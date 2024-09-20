@@ -1,6 +1,10 @@
 const UserProfileRequestService = require("../services/UserList.services");
 const userAdminService = require("../services/UserList.service");
+const Admin = require("../models/Admin");
+const bcrypt = require("bcrypt");
 
+
+/*
 async function getAlluserProfileRequest(req, res) {
   try {
     const requests = await UserProfileRequestService.getAllUserRequests();
@@ -17,7 +21,7 @@ async function getAlluserProfileRequest(req, res) {
 }
 module.exports = {
   getAlluserProfileRequest,
-};
+};*/
 
 // Fetch all admin users
 const fetchAdmins = async (req, res) => {
@@ -27,10 +31,14 @@ const fetchAdmins = async (req, res) => {
       return res.status(404).json({ message: "No admins found" });
     }
     // Map through the admins and concatenate first_name and last_name
-    const adminsWithFullName = admins.map((admin) => ({
-      ...admin._doc, // Keep other properties of the admin object
-      fullName: `${admin.first_name} ${admin.last_name}`, // Concatenate first_name and last_name
-    }));
+    const adminsWithFullName = admins.map((admin) => {
+      const { password_hash, ...adminData } = admin._doc; // Exclude password_hash
+      return {
+        ...adminData, // Keep other properties of the admin object
+        fullName: `${admin.first_name} ${admin.last_name}`, // Concatenate first_name and last_name
+      };
+    });
+
 
     res.status(200).json(adminsWithFullName);
   } catch (error) {
@@ -40,6 +48,37 @@ const fetchAdmins = async (req, res) => {
   }
 };
 
+
+const addAdminUser = async (req, res) => {
+  try {
+    // Check if the admin already exists
+    const existingAdmin = await Admin.findOne({ email: req.body.email });
+    if (existingAdmin) {
+      return res.status(400).json({ message: 'Admin already exists.' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    // Create a new admin user
+    const newAdmin = new Admin({
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      email: req.body.email,
+      password_hash: hashedPassword,
+      phone_num: req.body.phone,
+      role: req.body.role,
+    });
+    await newAdmin.save();
+
+    return res.status(201).json({ message: 'Admin added successfully.' });
+  } catch (error) {
+    console.error("Error adding admin user:", error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
 module.exports = {
-  fetchAdmins,
+  fetchAdmins,addAdminUser
 };

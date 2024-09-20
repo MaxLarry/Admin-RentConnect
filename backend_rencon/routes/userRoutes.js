@@ -1,8 +1,9 @@
 const express = require('express');
-const UserListController = require('../controllers/userListController')
+const { fetchAdmins, addAdminUser } = require('../controllers/userListController');
 const router = express.Router();
 
 //router.get('/user-profile-requests', UserListController.getAlluserProfileRequest);
-router.get('/admins', UserListController.fetchAdmins);
+router.get('/admin', fetchAdmins);
+router.post('/admin/add', addAdminUser)
 
 module.exports = router;

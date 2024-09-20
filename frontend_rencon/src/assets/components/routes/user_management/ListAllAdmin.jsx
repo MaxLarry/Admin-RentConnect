@@ -8,7 +8,7 @@ import { DropdownMenuCheckboxes } from "./DropdowMenuCheckbox"; // Fixed typo in
 import { Checkbox } from "@/components/ui/checkbox"; // Import Shadcn checkbox
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import AddAdminUser from "./AddAdminUser";
+import { AddAdminUser } from "./AddAdminUser";
 import OptionEllipsis from "./OptionEllipsis";
 
 import {
@@ -30,8 +30,8 @@ function ListAllAdmin() {
   const [copiedId, setCopiedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const itemsPerPage = 20;
-  const admin_column = ["Name", "ID", "Role", "Last Active", "Date added",""];
+  const itemsPerPage = 2;
+  const admin_column = ["Name", "ID", "Role", "Last Active", "Date added", ""];
 
   const filteredAdmin = listAdmin.filter((admins) => {
     const lowerCaseQuery = searchQuery.toLowerCase();
@@ -85,7 +85,7 @@ function ListAllAdmin() {
     const fetchAdmins = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("/users/admins");
+        const response = await axios.get("/user/admin");
         setListAdmin(response.data || []);
       } catch (error) {
         console.error("There was an error fetching the Admin List!", error);
@@ -160,25 +160,25 @@ function ListAllAdmin() {
                     />
                   </TableCell>
                   <TableCell>
-  <div className="flex items-center">
-    <Avatar>
-      {admins?.profilePicture ? (
-        <AvatarImage
-          src={admins.profilePicture}
-          alt="admin_photo"
-        />
-      ) : (
-        <AvatarFallback>
-          <FaUserCircle />
-        </AvatarFallback>
-      )}
-    </Avatar>
-    <div className="p-2 flex flex-col">
-      <span>{admins?.fullName}</span>
-      <span>{admins?.email}</span> 
-    </div>
-  </div>
-</TableCell>
+                    <div className="flex items-center">
+                      <Avatar>
+                        {admins?.profilePicture ? (
+                          <AvatarImage
+                            src={admins.profilePicture}
+                            alt="admin_photo"
+                          />
+                        ) : (
+                          <AvatarFallback>
+                            <FaUserCircle  className="text-9xl"/>
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div className="p-2 flex flex-col">
+                        <span>{admins?.fullName}</span>
+                        <span>{admins?.email}</span>
+                      </div>
+                    </div>
+                  </TableCell>
 
                   <TableCell>
                     <CopyableText
