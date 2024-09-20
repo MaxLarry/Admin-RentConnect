@@ -21,7 +21,7 @@ function UserTabs({ activeTab, setActiveTab }) {
           onClick={() => handleClick(tab)}
           className={`items-center p-2 block border-l-2 pl-4 -ml-px border-transparent hover:border-teal-400 dark:hover:border-teal-500 ${
             activeTab === tab
-              ? 'border-teal-500 text-teal-500' // Add styles for the active tab here
+              ? 'border-teal-300 text-teal-500' // Add styles for the active tab here
               : ''
           } hover:text-neutral-400 dark:hover:text-neutral-500`}
         >

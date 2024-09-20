@@ -5,6 +5,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 const listingPropertyRoutes = require('./routes/propertyListingRoutes');
+const UserRoutes = require('./routes/userRoutes');
 
 //const userRoutes = require('./routes/userRoutes');
 
@@ -24,6 +25,7 @@ app.use(cors({
 // Routes
 app.use('/auth', authRoutes);
 app.use('/requests', listingPropertyRoutes);
+app.use('/users', UserRoutes)
 //app.use('/user', userRoutes);
 
 

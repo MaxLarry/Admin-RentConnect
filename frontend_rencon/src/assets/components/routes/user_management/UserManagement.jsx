@@ -58,9 +58,9 @@ function UserManagement() {
       <div className="grid gap-4 p-4 grid-cols-1 lg:grid-cols-6 max-w-full mx-auto">
         <UserTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        <Card className="lg:col-start-2 lg:col-end-7 lg:row-start-1 lg:row-end-3">
+        <div className="lg:col-start-2 lg:col-end-7 lg:row-start-1 lg:row-end-3">
           <CardContent>{renderContent()}</CardContent>
-        </Card>
+        </div>
       </div>
     </div>
   );

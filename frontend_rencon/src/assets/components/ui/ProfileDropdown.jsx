@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { MdManageAccounts } from "react-icons/md";
 import { HiLogout } from "react-icons/hi";
@@ -17,12 +17,14 @@ import {
 
 const ProfileDropdown = () => {
   const { user, logout } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={(open) => setIsOpen(open)}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center space-x-2 py-1 px-3  hover:text-gray-700  dark:hover:text-white focus:outline-none">
+        <button className="flex items-center space-x-2 py-1 px-3 hover:text-gray-700 dark:hover:text-white focus:outline-none">
           <Avatar>
-          {user?.profilePicture ? (
+            {user?.profilePicture ? (
               <AvatarImage src={user.profilePicture} alt="admin_photo" />
             ) : (
               <AvatarFallback>
@@ -30,12 +32,17 @@ const ProfileDropdown = () => {
               </AvatarFallback>
             )}
           </Avatar>
-          <span className=" flex-1 tracking-s font-medium text-sm">
-          {user?.name || "Guest" }{/*this approach will make sure that help the frontent to load and prevent error*/}
+          <span className="flex-1 tracking-s font-medium text-sm">
+            {user?.name || ""}{/* This ensures the frontend loads without errors */}
           </span>
-          <FiChevronDown className="text-xl" />
+          <FiChevronDown
+            className={`text-xl transform transition-transform ${
+              isOpen ? "rotate-180" : "rotate-0"
+            }`}
+          />
         </button>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent className="w-52">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -48,10 +55,7 @@ const ProfileDropdown = () => {
           Account Setting
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="text-red-500"
-          onSelect={logout}
-        >
+        <DropdownMenuItem className="text-red-500" onSelect={logout}>
           <HiLogout className="mr-2" />
           Logout
         </DropdownMenuItem>

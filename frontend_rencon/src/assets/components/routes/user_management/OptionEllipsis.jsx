@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {
     Dialog,
@@ -9,15 +9,13 @@ import {
     DialogTrigger,
   } from "@/components/ui/dialog"
   
-function AddAdminUser() {
+function OptionEllipsis() {
 
   return (
-    <Button 
-    className="text-xs space-x-1" variant="outline"
-  ><Plus className="w-5"/>
-    <span>Add Admin</span>
+    <Button  variant="ghost" className="p-2"
+  ><EllipsisVertical className="w-4"/>
   </Button>
   );
 }
 
-export default AddAdminUser;
+export default OptionEllipsis;
