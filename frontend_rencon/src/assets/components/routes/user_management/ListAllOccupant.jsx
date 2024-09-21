@@ -4,11 +4,9 @@ import { format } from "date-fns";
 import CopyableText from "../../ui/CopyableText";
 import { FaUserCircle } from "react-icons/fa";
 import { SearchInput } from "@/components/ui/input";
-import { DropdownMenuCheckboxes } from "./DropdowMenuCheckbox"; // Fixed typo in import name
 import { Checkbox } from "@/components/ui/checkbox"; // Import Shadcn checkbox
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { AddAdminUser } from "./AddAdminUser";
 import OptionEllipsis from "./OptionEllipsis";
 
 import {
@@ -20,52 +18,46 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-function ListAllAdmin() {
-  const [listAdmin, setListAdmin] = useState([]); // set all the admins list
-  const [adminCount, setAdminCount] = useState(0); //store the count of admin response
+function ListAllOccupant() {
+  const [listOccupant, setListOccupant] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedAdmin, setSelectedAdmin] = useState([]);
+  const [selectedOccupant, setSelectedOccupant] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [copiedId, setCopiedId] = useState(null);
-  const [selectedRoles, setSelectedRoles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   const itemsPerPage = 20;
-  const admin_column = ["Name", "ID", "Role", "Last Active", "Date added", ""];
+  const landlord_column = ["Name", "ID", "Status", "Last Active", "Date Register", ""];
 
-  const filteredAdmin = listAdmin
-  .filter((admins) => {
+  const filteredOccupant = listOccupant
+  .filter((occupants) => {
     const lowerCaseQuery = searchQuery.toLowerCase();
-    const adminId = admins._id ? admins._id.toLowerCase() : "";
-    const fullName = admins?.fullName ? admins.fullName.toLowerCase() : "";
-    const createdAt = admins.created_at
-      ? format(new Date(admins.created_at), "yyyy-MM-dd HH:mm").toLowerCase()
+    const occupantId = occupants._id ? occupants._id.toLowerCase() : "";
+    const fullName = occupants?.fullName ? occupants.fullName.toLowerCase() : "";
+    const createdAt = occupants.created_at
+      ? format(new Date(occupants.created_at), "yyyy-MM-dd HH:mm").toLowerCase()
       : "";
 
-    const roleMatches =
-      selectedRoles.length === 0 || selectedRoles.includes(admins.role);
-
     return (
-      (adminId.includes(lowerCaseQuery) ||
-        fullName.includes(lowerCaseQuery) ||
-        createdAt.includes(lowerCaseQuery)) &&
-      roleMatches
+      occupantId.includes(lowerCaseQuery) ||
+      fullName.includes(lowerCaseQuery) ||
+      createdAt.includes(lowerCaseQuery)
     );
   })
-  .sort((a, b) => {
+    .sort((a, b) => {
     // Sort by created_at in descending order (new to old)
     return new Date(b.created_at) - new Date(a.created_at);
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredAdmin.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredAdmin.length / itemsPerPage);
+  const currentItems = filteredOccupant.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredOccupant.length / itemsPerPage);
 
-  const handleselectedAdmin = (id) => {
-    setSelectedAdmin((prevSelected) =>
+  const handleselectedOccupant = (id) => {
+    setSelectedOccupant((prevSelected) =>
       prevSelected.includes(id)
         ? prevSelected.filter((selectedId) => selectedId !== id)
         : [...prevSelected, id]
@@ -74,50 +66,42 @@ function ListAllAdmin() {
 
   const handleSelectAll = () => {
     if (selectAll) {
-      setSelectedAdmin([]);
+      setSelectedOccupant([]);
     } else {
-      setSelectedAdmin(currentItems.map((admin) => admin._id));
+      setSelectedOccupant(currentItems.map((admin) => admin._id));
     }
     setSelectAll(!selectAll);
   };
 
-  // Handle role selection change
-  const handleRoleChange = (role) => {
-    setSelectedRoles((prevSelected) =>
-      prevSelected.includes(role)
-        ? prevSelected.filter((r) => r !== role)
-        : [...prevSelected, role]
-    );
-  };
-
   useEffect(() => {
-    if (selectedAdmin.length !== currentItems.length) {
+    if (selectedOccupant.length !== currentItems.length) {
       setSelectAll(false);
     } else if (
-      selectedAdmin.length === currentItems.length &&
+      selectedOccupant.length === currentItems.length &&
       currentItems.length > 0
     ) {
       setSelectAll(true);
     }
-  }, [selectedAdmin, currentItems]);
+  }, [selectedOccupant, currentItems]);
 
+
+  //api fetch all Occupants
   useEffect(() => {
-    const fetchAdmins = async () => {
+    const fetchoccupants = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("/user/admin");
-        setListAdmin(response.data.admins || []);
-        setAdminCount(response.data.count);
+        const response = await axios.get("/user/occupant");
+        setListOccupant(response.data || []);
       } catch (error) {
-        console.error("There was an error fetching the Admin List!", error);
-        setError("Failed to fetch Admin List");
-        setListAdmin([]);
+        console.error("There was an error fetching the Occupants List!", error);
+        setError("Failed to fetch Occupants List");
+        setListOccupant([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAdmins();
+    fetchoccupants();
   }, []);
 
   if (loading) {
@@ -131,24 +115,15 @@ function ListAllAdmin() {
   return (
     <>
       <div className="flex flex-wrap gap-4 pb-5">
-        <div className="flex space-x-2 text-xl font-bold">
-          <h1>Admin</h1>
-        <h2>{adminCount}</h2>
-        </div>
         <div className="relative ml-auto">
           <SearchInput
             type="text"
-            placeholder="Search user..."
+            placeholder="Search occupants..."
             className="rounded-md border focus:ring-teal-400 w-auto"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <DropdownMenuCheckboxes
-          selectedRoles={selectedRoles}
-          onRoleChange={handleRoleChange}
-        />
-        <AddAdminUser />
       </div>
       <div className="flex justify-center overflow-x-auto">
         <Table className="min-w-full dark:border-zinc-600">
@@ -160,7 +135,7 @@ function ListAllAdmin() {
                   onCheckedChange={handleSelectAll} // Handle select all change
                 />
               </TableHead>
-              {admin_column.map((column, index) => (
+              {landlord_column.map((column, index) => (
                 <TableHead
                   key={index}
                   className="text-zinc-900 dark:text-gray-200 font-bold"
@@ -173,56 +148,56 @@ function ListAllAdmin() {
 
           <TableBody>
             {currentItems.length > 0 ? (
-              currentItems.map((admins) => (
+              currentItems.map((occupants) => (
                 <TableRow
-                  key={admins._id}
+                  key={occupants._id}
                   className="cursor-pointer"
                   data-state={
-                    selectedAdmin.includes(admins._id) ? "selected" : ""
+                    selectedOccupant.includes(occupants._id) ? "selected" : ""
                   }
                 >
                   <TableCell>
                     <Checkbox
-                      checked={selectedAdmin.includes(admins._id)}
-                      onCheckedChange={() => handleselectedAdmin(admins._id)}
+                      checked={selectedOccupant.includes(occupants._id)}
+                      onCheckedChange={() => handleselectedOccupant(occupants._id)}
                     />
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center">
                       <Avatar>
-                        {admins?.profilePicture ? (
+                        {occupants?.profilePicture ? (
                           <AvatarImage
-                            src={admins.profilePicture}
+                            src={occupants.profilePicture}
                             alt="admin_photo"
                           />
                         ) : (
                           <AvatarFallback>
-                            <FaUserCircle className="text-9xl" />
+                            <FaUserCircle  className="text-9xl"/>
                           </AvatarFallback>
                         )}
                       </Avatar>
                       <div className="p-2 flex flex-col">
-                        <span>{admins?.fullName}</span>
-                        <span>{admins?.email}</span>
+                        <span>{occupants?.fullName}</span>
+                        <span>{occupants?.email}</span>
                       </div>
                     </div>
                   </TableCell>
 
                   <TableCell>
                     <CopyableText
-                      text={admins._id}
-                      onCopy={() => setCopiedId(admins._id)}
+                      text={occupants._id}
+                      onCopy={() => setCopiedId(occupants._id)}
                     />
                   </TableCell>
-                  <TableCell>{admins?.role}</TableCell>
+                  <TableCell>{occupants?.Status}</TableCell>
                   <TableCell>
-                    {admins.last_login
-                      ? format(new Date(admins.last_login), "yyyy-MM-dd HH:mm")
+                    {occupants.last_login
+                      ? format(new Date(occupants.last_login), "yyyy-MM-dd HH:mm")
                       : "N/A"}
                   </TableCell>
                   <TableCell>
-                    {admins.created_at
-                      ? format(new Date(admins.created_at), "yyyy-MM-dd HH:mm")
+                    {occupants.created_at
+                      ? format(new Date(occupants.created_at), "yyyy-MM-dd HH:mm")
                       : "N/A"}
                   </TableCell>
                   <TableCell className="w-10 pl-0 text-center">
@@ -233,7 +208,7 @@ function ListAllAdmin() {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="text-center">
-                  No admins available.
+                  No occupants available.
                 </TableCell>
               </TableRow>
             )}
@@ -241,7 +216,7 @@ function ListAllAdmin() {
         </Table>
       </div>
 
-      {filteredAdmin.length > 0 && totalPages > 0 && (
+      {filteredOccupant.length > 0 && totalPages > 0 && (
         <div className="flex justify-end mt-4 space-x-2">
           <Button
             disabled={currentPage === 1}
@@ -267,4 +242,4 @@ function ListAllAdmin() {
   );
 }
 
-export default ListAllAdmin;
+export default ListAllOccupant;

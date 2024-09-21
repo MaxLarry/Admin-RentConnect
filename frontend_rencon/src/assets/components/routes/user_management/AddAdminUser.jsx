@@ -1,8 +1,10 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 import {
   Form,
   FormControl,
@@ -47,6 +49,8 @@ const formSchema = z.object({
 
 export function AddAdminUser() {
   const [loading, setLoading] = useState(false); // State for showing the loader
+  const [isOpen, setIsOpen] = useState(false); // State for dialog visibility
+  const { toast } = useToast();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -74,17 +78,28 @@ export function AddAdminUser() {
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay for 2 seconds
       const response = await axios.post("/user/admin/add", formattedData);
       console.log(response.data); // Handle success
+
+      // Toast for successful addition
+      toast({
+        description: response.data.message, //message from backend
+        variant: "success", // Use a success variant
+      });
+
+      setIsOpen(false); // Close the dialog upon success
     } catch (error) {
-      console.error(
-        "Error adding admin user:",
-        error.response?.data || error.message
-      );
+      // Extracting the error message from the response, if available
+      const errorMessage = error.response?.data?.message || error.message;
+      toast({
+        description: errorMessage, // Use the extracted error message
+        variant: "destructive",
+      });
     } finally {
       setLoading(false); // Stop loader
     }
   }
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="text-xs space-x-1" variant="outline">
           <Plus className="w-5" />
@@ -197,13 +212,16 @@ export function AddAdminUser() {
                       <SelectItem value="User Manager">User Manager</SelectItem>
                     </SelectContent>
                   </Select>
-
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button className="flex ml-auto" type="submit">
-              Add Admin
+            <Button
+              className="flex ml-auto"
+              disabled={loading} // disable when loading
+              type="submit"
+            >
+              {loading ? "Processing..." : "Add Admin"}
             </Button>
           </form>
         </Form>
@@ -215,6 +233,7 @@ export function AddAdminUser() {
           ""
         )}
       </DialogContent>
+      <Toaster />
     </Dialog>
   );
 }

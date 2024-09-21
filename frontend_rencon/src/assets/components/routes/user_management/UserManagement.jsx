@@ -4,6 +4,8 @@ import { SearchInput } from "@/components/ui/input";
 import UserTabs from "./usertabs";
 import ListAllUser from "./ListAllUser";
 import ListAllAdmin from "./ListAllAdmin";
+import ListAllLandlord from "./ListAllLandlord";
+import ListAllOccupant from "./ListAllOccupant";
 import {
   Card,
   CardContent,
@@ -12,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 function UserManagement() {
   const navigate = useNavigate();
@@ -37,9 +40,9 @@ function UserManagement() {
       case "All Users":
         return <ListAllUser />;
       case "Landlords":
-        return <ListAllAdmin />;
+        return <ListAllLandlord />;
       case "Occupants":
-        return <ListAllAdmin  />;
+        return <ListAllOccupant  />;
       case "Admins":
         return <ListAllAdmin  />;
       case "Verification":
@@ -50,7 +53,8 @@ function UserManagement() {
   };
 
   return (
-    <div className="px-4 pt-14 sm:ml-60 min-h-screen block gap-2 flex-col lg:flex-row translate-all duration-300">
+    <ScrollArea className="px-4 pt-14 sm:ml-60 h-full block gap-2 flex-col lg:flex-row translate-all
+    duration-300">
       <div className="flex justify-between items-center p-5">
         <h1 className="font-bold text-2xl p-4">User Management</h1>
       </div>
@@ -62,7 +66,7 @@ function UserManagement() {
           <CardContent>{renderContent()}</CardContent>
         </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 }
 

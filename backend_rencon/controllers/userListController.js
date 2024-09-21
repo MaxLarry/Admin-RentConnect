@@ -1,5 +1,4 @@
-const UserProfileRequestService = require("../services/UserList.services");
-const userAdminService = require("../services/UserList.service");
+const userListService = require("../services/UserList.service");
 const Admin = require("../models/Admin");
 const bcrypt = require("bcrypt");
 
@@ -23,13 +22,47 @@ module.exports = {
   getAlluserProfileRequest,
 };*/
 
+// Fetch all landlords users
+async function fetchAllLandlords(req, res) {
+  try {
+    const landlords = await userListService.getAllLandlords();
+
+    if (landlords.length === 0) {
+      return res.json({ message: "No data available" });
+    }
+
+    res.json(landlords);
+  } catch (error) {
+    console.error("Error fetching list of Landlords:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+async function fetchAllOccupants(req, res) {
+  try {
+    const occupants = await userListService.getAllOccupants();
+
+    if (occupants.length === 0) {
+      return res.json({ message: "No data available" });
+    }
+
+    res.json(occupants);
+  } catch (error) {
+    console.error("Error fetching list of Landlords:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 // Fetch all admin users
 const fetchAdmins = async (req, res) => {
   try {
-    const admins = await userAdminService.getAllAdmins();
+    const admins = await userListService.getAllAdmins();
+    
     if (admins.length === 0) {
-      return res.status(404).json({ message: "No admins found" });
+      return res.status(404).json({ message: "No admins found", count: 0 });
     }
+    
     // Map through the admins and concatenate first_name and last_name
     const adminsWithFullName = admins.map((admin) => {
       const { password_hash, ...adminData } = admin._doc; // Exclude password_hash
@@ -39,12 +72,10 @@ const fetchAdmins = async (req, res) => {
       };
     });
 
-
-    res.status(200).json(adminsWithFullName);
+    // Include the count of all admins in the response
+    res.status(200).json({ count: admins.length, admins: adminsWithFullName });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching admins", error: error.message });
+    res.status(500).json({ message: "Error fetching admins", error: error.message });
   }
 };
 
@@ -54,7 +85,7 @@ const addAdminUser = async (req, res) => {
     // Check if the admin already exists
     const existingAdmin = await Admin.findOne({ email: req.body.email });
     if (existingAdmin) {
-      return res.status(400).json({ message: 'Admin already exists.' });
+      return res.status(400).json({ message: 'Email already exists.' });
     }
 
     // Hash the password
@@ -73,12 +104,12 @@ const addAdminUser = async (req, res) => {
 
     return res.status(201).json({ message: 'Admin added successfully.' });
   } catch (error) {
-    console.error("Error adding admin user:", error);
+    console.error("Error adding admin user:", error);//debugging libagin
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
 
 module.exports = {
-  fetchAdmins,addAdminUser
+  fetchAdmins, addAdminUser, fetchAllLandlords, fetchAllOccupants
 };

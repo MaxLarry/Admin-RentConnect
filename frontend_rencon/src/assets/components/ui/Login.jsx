@@ -3,13 +3,17 @@ import axios from "axios";
 import RentLogo from "../../img/rentconff1_white.svg";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const { toast } = useToast();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
@@ -17,13 +21,19 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading
     try {
-      //console.log("momomomomomo");
       await axios.post("/auth/login", { email, password });
-      //console.log("memeeammama");
       navigate("/dashboard");
     } catch (error) {
+      console.error("Login error:", error);
       setError("Invalid email or password");
+      toast({
+        description: "Invalid email or password", 
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -50,8 +60,6 @@ const Login = () => {
             </div>
             <h2 className="text-2xl font-bold">Admin Login</h2>
           </div>
-
-          {error && <div className="mb-4 text-red-600">{error}</div>}
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
@@ -123,14 +131,20 @@ const Login = () => {
             <div>
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                disabled={loading} // Disable when loading
+                className={`flex w-full justify-center rounded-md px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 ${
+                  loading 
+                    ? "bg-gray-600 text-gray-400 cursor-not-allowed" 
+                    : "bg-indigo-600 text-white hover:bg-indigo-500 focus:ring-indigo-500"
+                }`}
               >
-                Log in
+                {loading ? "Logging in..." : "Log in"}
               </button>
             </div>
           </form>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 };

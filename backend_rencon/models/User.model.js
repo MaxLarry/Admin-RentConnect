@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const userReqSchema = new Schema({
+const userProfileSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, required: true, ref: "users" },
   contactDetails: {
     phone: { type: String, required: true },
@@ -20,10 +20,45 @@ const userReqSchema = new Schema({
   valid_id: { type: String, required: true },
 });
 
-const UserProfileRequest = mongoose.model(
-  "UserProfileRequest",
-  userReqSchema,
+const UserProfile = mongoose.model(
+  "UserProfile",
+  userProfileSchema,
   "pending_request_profile"
 );
 
-module.exports = { UserProfileRequest };
+
+const userAccountSchema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  bookmarks: [{
+    type: Schema.Types.ObjectId,
+    ref: 'SomeModel' // Replace 'SomeModel' with the model name you're referencing for bookmarks
+  }],
+  isProfileComplete: {
+    type: Boolean,
+    default: false
+  },
+  role: {
+    type: String,
+    enum: ['Occupant', 'Landlord'],
+    default: 'Occupant'
+  },
+  profilePicture: {
+    type: String,
+    default: ''
+  }
+}, {
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
+});
+
+const UserAccount = mongoose.model('users', userAccountSchema);
+
+
+module.exports = { UserProfile, UserAccount };

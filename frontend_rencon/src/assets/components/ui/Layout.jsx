@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom"; // Outlet renders child routes
 import Header from "../ui/Header";
 import Sidebar from "../ui/Sidebar";
 import { ThemeProvider, useTheme } from "@/components/ui/theme-provider"; // Use the updated ThemeProvider and useTheme
+import { Toaster } from "@/components/ui/sonner";
 
 function Layout() {
   const { theme, setTheme } = useTheme(); // Access theme and setTheme from useTheme hook
@@ -24,6 +25,7 @@ function Layout() {
         darkMode={theme === "dark"} // Pass the current theme as a prop
       />
       <Outlet />
+      <Toaster />
   </ThemeProvider>
   );
 }
