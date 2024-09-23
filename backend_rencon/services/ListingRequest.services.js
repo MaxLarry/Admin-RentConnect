@@ -250,6 +250,7 @@ const getAllApprovedListing = async () => {
             deposit: "$rooms.deposit",
             advance: "$rooms.advance",
             availability: "$rooms.availability",
+            status: "$rooms.roomStatus",
           },
         },
       },
@@ -276,15 +277,29 @@ const getAllApprovedListing = async () => {
               deposit: "$rooms.deposit",
               advance: "$rooms.advance",
               availability: "$rooms.availability",
+              status: "$rooms.status",
             },
           },
         },
       },
       {
         $addFields: {
-          roomCount: { $size: "$rooms" }, // Add roomCount by calculating the size of the rooms array
-        },
-      },
+          roomCount: {
+            $cond: {
+              if: { $or: [{ $eq: ["$rooms", null] }, { $eq: [{ $size: "$rooms" }, 0] }] },
+              then: 0,
+              else: { $size: {
+                $filter: {
+                  input: "$rooms",
+                  as: "room",
+                  cond: { $gt: [{ $size: "$$room.roomPhoto" }, 0] }
+                }
+              }}
+            }
+          }
+        }
+      }
+      
     ]);
 
     return result;
@@ -430,7 +445,19 @@ const getAllRejectedRequest = async () => {
       },      
       {
         $addFields: {
-          roomCount: { $size: "$rooms" }, // Add roomCount by calculating the size of the rooms array
+          roomCount: {
+            $cond: {
+              if: { $or: [{ $eq: ["$rooms", null] }, { $eq: [{ $size: "$rooms" }, 0] }] },
+              then: 0,
+              else: { $size: {
+                $filter: {
+                  input: "$rooms",
+                  as: "room",
+                  cond: { $gt: [{ $size: "$$room.roomPhoto" }, 0] }
+                }
+              }}
+            },
+          },
         },
       },
     ]);

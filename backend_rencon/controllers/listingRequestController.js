@@ -1,5 +1,6 @@
 // controllers/listingRequestController.js
 const PropertyListService = require("../services/ListingRequest.services");
+const { PropertyList, Room } = require("../models/Property_list.model");
 
 // Get all Approved Listing Properties
 async function getAllApprovedListing(req, res) {

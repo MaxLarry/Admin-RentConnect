@@ -83,7 +83,6 @@ function Pending({ searchQuery }) {
       // Set the selected request and open the modal
       setSelectedRequest(request);
       setShowReviewModal(true);
-      setShowActionButtons(false); // Hide action buttons initially
     } catch (error) {
       console.error(
         `Error updating request status for ID: ${request._id}`,

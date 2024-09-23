@@ -5,7 +5,8 @@ function UserTabs({ activeTab, setActiveTab }) {
     "Landlords",
     "Occupants",
     "Admins",
-    "Verification",
+    "User Verification",
+    "Unverified",
   ];
 
   const handleClick = (tabName) => {

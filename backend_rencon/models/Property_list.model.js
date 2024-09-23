@@ -44,6 +44,78 @@ const PropertyListSchema = new Schema({
 const PropertyList = mongoose.model("PropertyList", PropertyListSchema, "listing_properties");
 
 
+const roomSchema = new mongoose.Schema({
+  propertyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Property',
+    required: true
+  },
+  roomNumber: {
+    type: Number,
+    required: true
+  },
+  photo1: {
+    type: String,
+    default: null
+  },
+  photo2: {
+    type: String,
+    default: null
+  },
+  photo3: {
+    type: String,
+    default: null
+  },
+  price: {
+    type: Number,
+    required: true
+  },
+  capacity: {
+    type: Number,
+    required: true
+  },
+  deposit: {
+    type: Number,
+    required: true
+  },
+  advance: {
+    type: Number,
+    required: true
+  },
+  roomStatus: {
+    type: String,
+    enum: ['available', 'unavailable', 'reserved'],
+    default: 'available'
+  },
+  reservationDuration: {
+    type: Number,
+    required: true
+  },
+  reservationFee: {
+    type: Number,
+    required: true
+  },
+  occupantUsers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users'
+  }],
+  occupantNonUsers: [{
+    type: mongoose.Schema.Types.Mixed // Placeholder for non-user occupant data
+  }],
+  dueDate: {
+    type: Date,
+    required: true
+  },
+  created_at: {
+    type: Date,
+    default: Date.now
+  },
+  updated_at: {
+    type: Date,
+    default: Date.now
+  }
+});
 
+const Room = mongoose.model('rooms', roomSchema);
 
-module.exports = { /*ListingRequest, */ PropertyList };
+module.exports = { Room,  PropertyList };

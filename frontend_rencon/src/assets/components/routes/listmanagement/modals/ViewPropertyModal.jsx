@@ -83,7 +83,7 @@ function ViewPropertyModal({ selectedRequest, title, closeModal }) {
                             (photo, index) => (
                               <CarouselItem
                                 key={index}
-                                className="flex justify-center items-center" 
+                                className="flex justify-center items-center"
                               >
                                 <img
                                   src={photo}
@@ -146,21 +146,19 @@ function ViewPropertyModal({ selectedRequest, title, closeModal }) {
                           <div className="mb-4 space-y-2">
                             <Carousel>
                               <CarouselContent>
-                                {room.roomPhoto.map(
-                                  (room, index) => (
-                                    <CarouselItem
-                                      key={index}
-                                      className="flex justify-center items-center"
-                                    >
-                                      <img
-                                        src={room}
-                                        alt={`Room ${index + 1}`}
-                                        className="w-full h-40 object-cover rounded-lg"
-                                        style={{ objectFit: "cover" }}
-                                      />
-                                    </CarouselItem>
-                                  )
-                                )}
+                                {room.roomPhoto.map((room, index) => (
+                                  <CarouselItem
+                                    key={index}
+                                    className="flex justify-center items-center"
+                                  >
+                                    <img
+                                      src={room}
+                                      alt={`Room ${index + 1}`}
+                                      className="w-full h-40 object-cover rounded-lg"
+                                      style={{ objectFit: "cover" }}
+                                    />
+                                  </CarouselItem>
+                                ))}
                               </CarouselContent>
                             </Carousel>
                             <p className="text-sm">
@@ -177,6 +175,20 @@ function ViewPropertyModal({ selectedRequest, title, closeModal }) {
                             </p>
                             <p className="text-sm">
                               <strong>Price:</strong> ₱{room.price}
+                            </p>
+                            <p className="text-sm">
+                              <strong>Status: </strong>
+                              <span
+                                className={`font-semibold ${
+                                  room.status === "occupied"
+                                    ? "text-teal-500"
+                                    : room.status === "available"
+                                    ? "text-green-500"
+                                    : "text-gray-500" // default color if status is neither
+                                }`}
+                              >
+                                {room.status}
+                              </span>
                             </p>
                           </div>
                         ) : (

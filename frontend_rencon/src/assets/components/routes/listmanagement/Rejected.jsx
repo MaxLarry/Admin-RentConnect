@@ -3,6 +3,8 @@ import axios from "axios";
 import { format } from "date-fns";
 import CopyableText from "../../ui/CopyableText";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Shadcn checkbox
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 import {
   Pagination,
   PaginationContent,
@@ -29,6 +31,7 @@ import {
 } from "@/components/ui/dialog";
 
 function Rejected({ searchQuery }) {
+  const { toast } = useToast();
   const req_column = [
     "ID",
     "Requester Name",
@@ -93,15 +96,22 @@ function Rejected({ searchQuery }) {
     setSelectAll(!selectAll);
   };
 
+  //handle deletion hehe
   const handleDeleteSelectedRequests = async () => {
     if (selectedRequests.length === 0) return;
-
+  
     try {
       // Send a DELETE request with the selected property IDs
-      await axios.delete("/requests/deletion-properties", {
+      const response = await axios.delete("/requests/deletion-properties", {
         data: { ids: selectedRequests },
       });
-
+  
+      // Show success toast with message from backend
+      toast({
+        description: response.data.message, // message from backend
+        variant: "success", // Use a success variant
+      });
+  
       // Update the state to remove the deleted requests
       setRejectedRequests((prevRequests) =>
         prevRequests.filter(
@@ -113,28 +123,38 @@ function Rejected({ searchQuery }) {
       setDialogOpen(false); // Close dialog after deletion
     } catch (error) {
       console.error("Error deleting selected requests:", error);
+      toast({
+        description: error.message || "Failed to delete selected requests.", // Use the extracted error message
+        variant: "destructive",
+      });
     }
   };
+  
 
+  //fetch all rejected list properties mamamo
   useEffect(() => {
     const fetchRejectedRequests = async () => {
       setLoading(true);
       try {
         const response = await axios.get("/requests/rejected-properties");
-        setRejectedRequests(response.data || []);
+  
+        // Ensure that the response is an array, even if it's empty
+        if (Array.isArray(response.data)) {
+          setRejectedRequests(response.data);
+        } else {
+          setRejectedRequests([]); // Fallback if the response is not an array
+        }
       } catch (error) {
-        console.error(
-          "There was an error fetching the pending requests!",
-          error
-        );
-        setRejectedRequests([]);
+        console.error("There was an error fetching the pending requests!", error);
+        setRejectedRequests([]); // Fallback in case of error
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchRejectedRequests();
   }, []);
+  
 
   useEffect(() => {
     if (selectedRequests.length !== currentItems.length) {
@@ -302,6 +322,8 @@ function Rejected({ searchQuery }) {
           </div>
         </div>
       )}
+      
+      <Toaster />
     </div>
   );
 }
