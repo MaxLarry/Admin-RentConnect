@@ -6,15 +6,15 @@ function TabsButton({ activeTab, setActiveTab }) {
   const tabs = [
     {
       name: "Pending",
-      icon: <MdOutlinePendingActions size={18} />,
+      icon: <MdOutlinePendingActions size={14} />,
     },
     {
       name: "Approved",
-      icon: <FiCheckSquare size={18} />,
+      icon: <FiCheckSquare size={14} />,
     },
     {
       name: "Rejected",
-      icon: <FiTrash2 size={18} />,
+      icon: <FiTrash2 size={14} />,
     },
   ];
 
@@ -35,9 +35,9 @@ function TabsButton({ activeTab, setActiveTab }) {
           }`}
         >
           {tab.icon}
-          <span className="mt-1">{tab.name}</span>
+          <span className="mt-1 text-sm">{tab.name}</span>
           {activeTab === tab.name && (
-            <span className="absolute bottom-0 left-0 w-full h-1 bg-teal-400 "></span>
+            <span className="relative bottom-0 left-0 w-full h-1 rounded-t-xl bg-teal-400 "></span>
           )}
         </button>
       ))}

@@ -9,4 +9,7 @@ router.get('/pending-requests', ListingRequestProperty.getAllPendingRequests);
 router.get('/rejected-properties', ListingRequestProperty.getAllRejectedRequest);
 router.put('/:id', ListingRequestProperty.updateRequestStatus);
 
+
+router.delete('/deletion-properties', ListingRequestProperty.deletePropertiesWithRooms);
+
 module.exports = router;

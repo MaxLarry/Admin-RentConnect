@@ -110,6 +110,10 @@ function Approved({ searchQuery }) {
       address.includes(lowerCaseQuery) ||
       createdAt.includes(lowerCaseQuery)
     );
+  })
+  .sort((a, b) => {
+    // Sort by created_at in descending order (new to old)
+    return new Date(b.created_at) - new Date(a.created_at);
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;

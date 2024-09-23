@@ -43,4 +43,7 @@ const PropertyListSchema = new Schema({
 //const ListingRequest = mongoose.model("ListingRequest", listingRequestSchema);
 const PropertyList = mongoose.model("PropertyList", PropertyListSchema, "listing_properties");
 
+
+
+
 module.exports = { /*ListingRequest, */ PropertyList };

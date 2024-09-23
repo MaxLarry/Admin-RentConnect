@@ -24,7 +24,7 @@ function Dashboard() {
         <h1 className="font-bold text-2xl p-4">
           Dashboard
         </h1>
-        <div className="grid p-4 gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-6 grid-rows-2 max-w-full mx-auto">
+        <div className="grid p-4 gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-6 grid-rows-subgrid max-w-full mx-auto">
           <ActiveUsercard />
           <PropertyListedGraph />
           <PendingRequestdash />

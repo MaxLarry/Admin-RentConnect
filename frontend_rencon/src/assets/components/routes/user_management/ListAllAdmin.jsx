@@ -33,7 +33,7 @@ function ListAllAdmin() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const itemsPerPage = 20;
-  const admin_column = ["Name", "ID", "Role", "Last Active", "Date added", ""];
+  const admin_column = ["Name", "ID", "Role", "Last Login", "Date added", ""];
 
   const filteredAdmin = listAdmin
   .filter((admins) => {
@@ -131,7 +131,7 @@ function ListAllAdmin() {
   return (
     <>
       <div className="flex flex-wrap gap-4 pb-5">
-        <div className="flex space-x-2 text-xl font-bold">
+        <div className="flex space-x-2 text-xl font-bold justify-center items-center">
           <h1>Admin</h1>
         <h2>{adminCount}</h2>
         </div>

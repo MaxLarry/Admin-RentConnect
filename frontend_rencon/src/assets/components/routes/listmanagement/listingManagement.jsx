@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Pending from './Pending';
 import Rejected from './Rejected';
 import Approved from './Approved';
 import TabsButton from './TabsButton';
+import { useNavigate, useLocation } from "react-router-dom";
 import { SearchInput } from '@/components/ui/input';
 
 function ListingManagement() {
-  const [activeTab, setActiveTab] = useState("Pending");
+  
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get tab name from URL
+  const queryParams = new URLSearchParams(location.search);
+  const initialTab = queryParams.get("listing") || "Pending";
+  const [activeTab, setActiveTab] = useState(initialTab);
+  useEffect(() => {
+    const currentTab = queryParams.get("listing");
+    if (currentTab !== activeTab) {
+      navigate(`?listing=${activeTab}`, { replace: true }); // Update URL without reloading
+    }
+  }, [activeTab, queryParams, navigate]);
 
   const renderContent = () => {
     switch (activeTab) {

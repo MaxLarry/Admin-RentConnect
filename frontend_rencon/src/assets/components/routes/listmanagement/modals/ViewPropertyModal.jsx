@@ -6,52 +6,38 @@ import LegalDocuments from "./LegalDocs";
 import { AiOutlineClose } from "react-icons/ai"; // Importing the X icon
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  CarouselDots,
+} from "@/components/ui/carousel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 function ViewPropertyModal({ selectedRequest, title, closeModal }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const handlePrev = () => {
-    setCurrentImageIndex((prev) =>
-      prev > 0 ? prev - 1 : selectedRequest.property_photo.length - 1
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentImageIndex((prev) =>
-      prev < selectedRequest.property_photo.length - 1 ? prev + 1 : 0
-    );
-  };
 
   const handleDotClick = (index) => {
     setCurrentImageIndex(index);
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-      {/* Close Button inside the modal */}
-      <button
-        onClick={closeModal}
-        className="absolute top-2 right-9 p-2 bg-gray-700 rounded-full hover:bg-gray-600"
-      >
-        <AiOutlineClose size={24} />
-      </button>
-      <Card className="relative  p-6 rounded-lg w-full max-w-md md:max-w-2xl lg:max-w-4xl shadow-lg ">
-        <CardHeader className="p-5 border-b">
-          <CardTitle>Property Details</CardTitle>
-          <CardDescription>{title}</CardDescription>
-        </CardHeader>
+    <Dialog open={true} onOpenChange={closeModal}>
+      <DialogContent className="max-w-md md:max-w-2xl lg:max-w-4xl absolute p-6 rounded-lg shadow-lg">
+        <DialogHeader>
+          <DialogTitle>Property Details</DialogTitle>
+          <DialogDescription>{title}</DialogDescription>
+        </DialogHeader>
         <ScrollArea>
-          <CardContent
-          className="p-5"
-            style={{ maxHeight: "600px" }}
-          >
+          <div className="p-5" style={{ maxHeight: "600px" }}>
             <div className="text-sm space-y-2">
               <p>
                 <strong>Owner's Name: </strong>
@@ -82,39 +68,41 @@ function ViewPropertyModal({ selectedRequest, title, closeModal }) {
                 {/* Image Slider */}
                 {selectedRequest.property_photo.length > 0 ? (
                   <div className="flex flex-col items-center justify-center w-full py-5">
-                    <div className="relative w-96 flex items-center justify-center bg-white rounded-lg">
-                      <button
-                        onClick={handlePrev}
-                        className="absolute left-2 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
-                      >
-                        <MdNavigateBefore size={24} />
-                      </button>
-                      <img
-                        src={selectedRequest.property_photo[currentImageIndex]}
-                        alt={`Property ${currentImageIndex + 1}`}
-                        className="max-w-full max-h-64 rounded-lg"
-                      />
-                      <button
-                        onClick={handleNext}
-                        className="absolute right-2 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
-                      >
-                        <MdNavigateNext size={24} />
-                      </button>
-                    </div>
-
-                    {/* Dots for Image Navigation */}
-                    <div className="flex justify-center space-x-2 mt-4">
-                      {selectedRequest.property_photo.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleDotClick(index)}
-                          className={`h-2 w-2 rounded-full ${
-                            currentImageIndex === index
-                              ? "bg-teal-500"
-                              : "bg-gray-400"
-                          }`}
-                        ></button>
-                      ))}
+                    <div className="relative flex items-center justify-center w-full py-5">
+                      <Carousel className="w-full max-w-3xl">
+                        {" "}
+                        {/* Adjust carousel size */}
+                        <CarouselPrevious
+                          className="absolute left-0 z-10 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
+                          style={{ transform: "translateX(-50%)" }} // Ensure the button is visible outside the image
+                        >
+                          <MdNavigateBefore size={24} />
+                        </CarouselPrevious>
+                        <CarouselContent>
+                          {selectedRequest.property_photo.map(
+                            (photo, index) => (
+                              <CarouselItem
+                                key={index}
+                                className="flex justify-center items-center" 
+                              >
+                                <img
+                                  src={photo}
+                                  alt={`Property ${index + 1}`}
+                                  className="w-full max-w-3xl h-full object-cover rounded-lg"
+                                  style={{ objectFit: "cover" }}
+                                />
+                              </CarouselItem>
+                            )
+                          )}
+                        </CarouselContent>
+                        <CarouselNext
+                          className="absolute right-0 z-10 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
+                          style={{ transform: "translateX(50%)" }} // Ensure the button is visible outside the image
+                        >
+                          <MdNavigateNext size={24} />
+                        </CarouselNext>
+                        <CarouselDots />
+                      </Carousel>
                     </div>
                   </div>
                 ) : (
@@ -156,11 +144,25 @@ function ViewPropertyModal({ selectedRequest, title, closeModal }) {
                       <div key={index} className="relative">
                         {room.roomPhoto && room.roomPhoto.length > 0 ? (
                           <div className="mb-4 space-y-2">
-                            <img
-                              src={room.roomPhoto[0]} // Display the first photo of the room
-                              alt={`Room ${index + 1}`}
-                              className="w-full h-40 object-cover rounded-lg"
-                            />
+                            <Carousel>
+                              <CarouselContent>
+                                {room.roomPhoto.map(
+                                  (room, index) => (
+                                    <CarouselItem
+                                      key={index}
+                                      className="flex justify-center items-center"
+                                    >
+                                      <img
+                                        src={room}
+                                        alt={`Room ${index + 1}`}
+                                        className="w-full h-40 object-cover rounded-lg"
+                                        style={{ objectFit: "cover" }}
+                                      />
+                                    </CarouselItem>
+                                  )
+                                )}
+                              </CarouselContent>
+                            </Carousel>
                             <p className="text-sm">
                               <strong>Room Number:</strong> {room.roomNumber}
                             </p>
@@ -201,10 +203,10 @@ function ViewPropertyModal({ selectedRequest, title, closeModal }) {
               </div>
             </div>
             <LegalDocuments selectedRequest={selectedRequest} />
-          </CardContent>
+          </div>
         </ScrollArea>
-      </Card>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

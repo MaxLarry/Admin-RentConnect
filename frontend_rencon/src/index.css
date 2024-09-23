@@ -45,6 +45,9 @@ body {
   overflow: hidden;
 }
 
+.noselect {
+  user-select: none;
+}
 @layer base {
   :root {
     --background: 0 0% 100%;

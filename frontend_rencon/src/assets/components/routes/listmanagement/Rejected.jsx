@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 import CopyableText from "../../ui/CopyableText";
+import { Checkbox } from "@/components/ui/checkbox"; // Import Shadcn checkbox
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -19,6 +19,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 function Rejected({ searchQuery }) {
   const req_column = [
@@ -32,9 +40,10 @@ function Rejected({ searchQuery }) {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [selectedRequests, setSelectedRequests] = useState([]); // List of selected requests
+  const [selectedRequests, setSelectedRequests] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [rejectedRequests, setRejectedRequests] = useState([]);
+  const [dialogOpen, setDialogOpen] = useState(false); // Dialog state
   const itemsPerPage = 20;
 
   const filteredRequests = rejectedRequests.filter((property) => {
@@ -52,6 +61,10 @@ function Rejected({ searchQuery }) {
       fullName.includes(lowerCaseQuery) ||
       createdAt.includes(lowerCaseQuery)
     );
+  })
+  .sort((a, b) => {
+    // Sort by created_at in descending order (new to old)
+    return new Date(b.created_at) - new Date(a.created_at);
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -63,49 +76,65 @@ function Rejected({ searchQuery }) {
 
   const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 
-  // Handle select/unselect individual requests
   const handleSelectRejRequest = (id) => {
-    setSelectedRequests(
-      (prevSelected) =>
-        prevSelected.includes(id)
-          ? prevSelected.filter((selectedId) => selectedId !== id) // Unselect
-          : [...prevSelected, id] // Select
+    setSelectedRequests((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((selectedId) => selectedId !== id)
+        : [...prevSelected, id]
     );
   };
 
-  // Handle select/unselect all requests
   const handleSelectAll = () => {
     if (selectAll) {
-      setSelectedRequests([]); // Unselect all
+      setSelectedRequests([]);
     } else {
-      setSelectedRequests(currentItems.map((property) => property._id)); // Select all visible requests
+      setSelectedRequests(currentItems.map((property) => property._id));
     }
     setSelectAll(!selectAll);
   };
+
+  const handleDeleteSelectedRequests = async () => {
+    if (selectedRequests.length === 0) return;
+
+    try {
+      // Send a DELETE request with the selected property IDs
+      await axios.delete("/requests/deletion-properties", {
+        data: { ids: selectedRequests },
+      });
+
+      // Update the state to remove the deleted requests
+      setRejectedRequests((prevRequests) =>
+        prevRequests.filter(
+          (property) => !selectedRequests.includes(property._id)
+        )
+      );
+      setSelectedRequests([]);
+      setSelectAll(false);
+      setDialogOpen(false); // Close dialog after deletion
+    } catch (error) {
+      console.error("Error deleting selected requests:", error);
+    }
+  };
+
   useEffect(() => {
-    // Fetch rejected requests only when the component mounts
     const fetchRejectedRequests = async () => {
-      setLoading(true); // Start loading
+      setLoading(true);
       try {
         const response = await axios.get("/requests/rejected-properties");
-        if (response.data && response.data.length > 0) {
-          setRejectedRequests(response.data);
-        } else {
-          setRejectedRequests([]); // No data available
-        }
+        setRejectedRequests(response.data || []);
       } catch (error) {
         console.error(
           "There was an error fetching the pending requests!",
           error
         );
-        setRejectedRequests([]); // Set to empty array in case of error
+        setRejectedRequests([]);
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
 
     fetchRejectedRequests();
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (selectedRequests.length !== currentItems.length) {
@@ -116,29 +145,28 @@ function Rejected({ searchQuery }) {
     ) {
       setSelectAll(true);
     }
-  }, [selectedRequests, currentItems]); // Runs whenever selectedRequests or currentItems change
+  }, [selectedRequests, currentItems]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
+
   return (
     <div className="container mx-auto px-4">
       <div className="flex justify-center overflow-x-auto">
-        <Table className="min-w-full  dark:border-zinc-600">
+        <Table className="min-w-full dark:border-zinc-600">
           <TableHeader>
             <TableRow className="border-b dark:border-zinc-600">
               <TableHead>
-                <input
-                  className="rounded-md focus:outline-none focus:ring-transparent text-teal-400"
-                  type="checkbox"
+                <Checkbox
                   checked={selectAll}
-                  onChange={handleSelectAll}
+                  onCheckedChange={handleSelectAll}
                 />
               </TableHead>
               {req_column.map((column) => (
                 <TableHead
                   key={column}
-                  className=" text-zinc-900 dark:text-gray-200 font-bold"
+                  className="text-zinc-900 dark:text-gray-200 font-bold"
                 >
                   {column}
                 </TableHead>
@@ -148,33 +176,34 @@ function Rejected({ searchQuery }) {
 
           <TableBody>
             {currentItems.length > 0 ? (
-              currentItems.map((property, index) => (
-                <TableRow key={property._id} className={`cursor-pointer }`}>
+              currentItems.map((property) => (
+                <TableRow key={property._id} className="cursor-pointer">
                   <TableCell>
-                    <input
-                      className="rounded-md focus:outline-none focus:ring-transparent text-teal-400"
-                      type="checkbox"
+                    <Checkbox
                       checked={selectedRequests.includes(property._id)}
-                      onChange={() => handleSelectRejRequest(property._id)}
+                      onCheckedChange={() =>
+                        handleSelectRejRequest(property._id)
+                      }
                     />
                   </TableCell>
                   <TableCell>
                     <CopyableText
                       text={property._id}
-                      onCopy={() => handleCopy(property._id)}
+                      onCopy={() => console.log("Copying ID")}
                     />
                   </TableCell>
                   <TableCell>{property.profile?.fullName}</TableCell>
                   <TableCell>{property.typeOfProperty}</TableCell>
                   <TableCell>
-                  {property.created_at
+                    {property.created_at
                       ? format(
                           new Date(property.created_at),
                           "yyyy-MM-dd HH:mm"
                         )
                       : "N/A"}
-                  </TableCell>                  <TableCell>
-                  {property.rejected_at
+                  </TableCell>
+                  <TableCell>
+                    {property.rejected_at
                       ? format(
                           new Date(property.rejected_at),
                           "yyyy-MM-dd HH:mm"
@@ -186,10 +215,7 @@ function Rejected({ searchQuery }) {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={8}
-                  className="text-center"
-                >
+                <TableCell colSpan={8} className="text-center">
                   No properties available.
                 </TableCell>
               </TableRow>
@@ -222,7 +248,7 @@ function Rejected({ searchQuery }) {
           </PaginationContent>
         </Pagination>
       )}
-      {/* Popup Effect for Selected Items */}
+
       {selectedRequests.length > 0 && (
         <div className="w-full flex justify-center">
           <div className="fixed bottom-5 max-w-fit border rounded-lg text-sm shadow-md border-zinc-700 bg-zinc-800 text-white p-4 flex justify-between gap-10 items-center transition-transform transform translate-y-0 animate-slide-up">
@@ -239,12 +265,39 @@ function Rejected({ searchQuery }) {
               >
                 Cancel
               </button>
-              <button
-                className="px-4 py-2 rounded-md border border-gray-500 hover:border-white"
-                onClick={() => console.log("Delete selected requests")}
-              >
-                Delete
-              </button>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <button
+                    className="px-4 py-2 rounded-md border border-gray-500 hover:border-white"
+                    onClick={() => setDialogOpen(true)}
+                  >
+                    Delete
+                  </button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to delete the selected rejected
+                      requests?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex justify-end mt-4">
+                    <button
+                      className="px-4 py-2 mr-2 rounded-md text-gray-600"
+                      onClick={() => setDialogOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="px-4 py-2 rounded-md bg-red-500 text-white"
+                      onClick={handleDeleteSelectedRequests} // Call the delete function
+                    >
+                      Confirm
+                    </button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>

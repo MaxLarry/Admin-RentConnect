@@ -1,8 +1,18 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 function MostVisited() {
   return (
-    <div className="bg-white border border-gray-200  dark:bg-zinc-800 dark:border-zinc-700 px-10 py-5 rounded-md shadow-md h-full block items-center lg:col-start-1 lg:col-end-4 lg:row-start-5 lg:row-end-6 md:col-start-1 md:col-end-3 relative">
+    <Card className=" px-10 py-5 rounded-md shadow-md h-full block items-center lg:col-start-1 lg:col-end-4 lg:row-start-5 lg:row-end-6 md:col-start-1 md:col-end-3 relative">
+      <CardContent className='py-5 px-0'>
       <span className="text-lg font-bold text-zinc-900 dark:text-white">
         Most Visited Properties
       </span>
@@ -23,7 +33,8 @@ function MostVisited() {
           <p className="mt-2 text-gray-600">Description for property 3.</p>
         </div>
       </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 

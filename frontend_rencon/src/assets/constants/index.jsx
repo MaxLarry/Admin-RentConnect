@@ -1,4 +1,5 @@
 import { MdSpaceDashboard, MdHomeWork, MdPeople, MdSecurity, MdMail, MdHistory } from "react-icons/md";
+import { FaChartPie } from "react-icons/fa";
 import { GrCompliance } from "react-icons/gr";
 import { RiSettings3Fill } from "react-icons/ri";
 import { IoHelpCircle } from "react-icons/io5";
@@ -24,6 +25,11 @@ export const links = [
         to: "/compliance-safety",
         icon: GrCompliance,
         text: "Compliance & Safety"
+    },
+    {
+        to: "/data-overview",
+        icon: FaChartPie,
+        text: "Data Overview"
     },
     {
         to: "/inbox",

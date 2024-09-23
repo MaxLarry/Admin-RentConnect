@@ -115,6 +115,10 @@ function ListAllOccupant() {
   return (
     <>
       <div className="flex flex-wrap gap-4 pb-5">
+      <div className="flex space-x-2 text-xl font-bold justify-center items-center">
+          <h1>Occupants</h1>
+        <h2></h2>
+        </div>
         <div className="relative ml-auto">
           <SearchInput
             type="text"

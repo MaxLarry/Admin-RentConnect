@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Import from react-router-dom
-import { SearchInput } from "@/components/ui/input";
 import UserTabs from "./usertabs";
-import ListAllUser from "./ListAllUser";
 import ListAllAdmin from "./ListAllAdmin";
 import ListAllLandlord from "./ListAllLandlord";
 import ListAllOccupant from "./ListAllOccupant";
 import {
-  Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -22,7 +15,7 @@ function UserManagement() {
   
   // Get tab name from URL
   const queryParams = new URLSearchParams(location.search);
-  const initialTab = queryParams.get("tab") || "All Users";
+  const initialTab = queryParams.get("tab") || "Landlords";
   
   const [activeTab, setActiveTab] = useState(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,8 +30,6 @@ function UserManagement() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case "All Users":
-        return <ListAllUser />;
       case "Landlords":
         return <ListAllLandlord />;
       case "Occupants":

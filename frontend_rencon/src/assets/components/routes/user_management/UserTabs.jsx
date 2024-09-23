@@ -2,7 +2,6 @@ import React from "react";
 
 function UserTabs({ activeTab, setActiveTab }) {
   const tabs = [
-    "All Users",
     "Landlords",
     "Occupants",
     "Admins",

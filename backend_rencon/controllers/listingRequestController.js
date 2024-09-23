@@ -67,9 +67,38 @@ const updateRequestStatus = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+//deletion of Properties With Rooms
+const deletePropertiesWithRooms = async (req, res) => {
+  const { ids } = req.body; // Get the array of property IDs from the request body
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: 'No property IDs provided for deletion' });
+  }
+
+  try {
+      // Step 1: Delete the rooms associated with the properties
+      await Room.deleteMany({ propertyId: { $in: ids } });
+
+      // Step 2: Delete the properties
+      const result = await PropertyList.deleteMany({ _id: { $in: ids } });
+
+      if (result.deletedCount === 0) {
+          return res.status(404).json({ message: 'No properties found for the given IDs' });
+      }
+
+      return res.status(200).json({ message: 'Properties and associated rooms deleted successfully' });
+  } catch (error) {
+      console.error("Error deleting properties and rooms:", error);
+      return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
 module.exports = {
   getAllPendingRequests,
   getAllApprovedListing,
   getAllRejectedRequest,
-  updateRequestStatus
+  updateRequestStatus,
+  deletePropertiesWithRooms
 };

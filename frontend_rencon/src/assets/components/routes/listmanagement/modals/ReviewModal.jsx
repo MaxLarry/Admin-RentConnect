@@ -13,7 +13,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  CarouselDots,
+} from "@/components/ui/carousel";
 function ReviewModal({
   isOpen,
   onClose,
@@ -101,39 +108,41 @@ function ReviewModal({
                 {/* Image Slider */}
                 {selectedRequest.property_photo.length > 0 ? (
                   <div className="flex flex-col items-center justify-center w-full py-5">
-                    <div className="relative w-96 border flex items-center justify-center rounded-lg">
-                      <button
-                        onClick={handlePrev}
-                        className="absolute left-2 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
-                      >
-                        <MdNavigateBefore size={24} />
-                      </button>
-                      <img
-                        src={selectedRequest.property_photo[currentImageIndex]}
-                        alt={`Property ${currentImageIndex + 1}`}
-                        className="max-w-full max-h-64 rounded-lg"
-                      />
-                      <button
-                        onClick={handleNext}
-                        className="absolute right-2 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
-                      >
-                        <MdNavigateNext size={24} />
-                      </button>
-                    </div>
-
-                    {/* Dots for Image Navigation */}
-                    <div className="flex justify-center space-x-2 mt-4">
-                      {selectedRequest.property_photo.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleDotClick(index)}
-                          className={`h-2 w-2 rounded-full ${
-                            currentImageIndex === index
-                              ? "bg-teal-500"
-                              : "bg-gray-400"
-                          }`}
-                        ></button>
-                      ))}
+                    <div className="relative flex items-center justify-center w-full py-5">
+                      <Carousel className="w-full max-w-3xl">
+                        {" "}
+                        {/* Adjust carousel size */}
+                        <CarouselPrevious
+                          className="absolute left-0 z-10 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
+                          style={{ transform: "translateX(-50%)" }} // Ensure the button is visible outside the image
+                        >
+                          <MdNavigateBefore size={24} />
+                        </CarouselPrevious>
+                        <CarouselContent>
+                          {selectedRequest.property_photo.map(
+                            (photo, index) => (
+                              <CarouselItem
+                                key={index}
+                                className="flex justify-center items-center" 
+                              >
+                                <img
+                                  src={photo}
+                                  alt={`Property ${index + 1}`}
+                                  className="w-full max-w-3xl h-full object-cover rounded-lg"
+                                  style={{ objectFit: "cover" }}
+                                />
+                              </CarouselItem>
+                            )
+                          )}
+                        </CarouselContent>
+                        <CarouselNext
+                          className="absolute right-0 z-10 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
+                          style={{ transform: "translateX(50%)" }} // Ensure the button is visible outside the image
+                        >
+                          <MdNavigateNext size={24} />
+                        </CarouselNext>
+                        <CarouselDots />
+                      </Carousel>
                     </div>
                   </div>
                 ) : (
@@ -175,11 +184,23 @@ function ReviewModal({
                       <div key={index} className="relative">
                         {room.roomPhoto && room.roomPhoto.length > 0 ? (
                           <div className="mb-4 space-y-2">
-                            <img
-                              src={room.roomPhoto[0]} // Display the first photo of the room
-                              alt={`Room ${index + 1}`}
-                              className="w-full h-40 object-cover rounded-lg"
-                            />
+                            <Carousel>
+                              <CarouselContent>
+                                {room.roomPhoto.map((room, index) => (
+                                  <CarouselItem
+                                    key={index}
+                                    className="flex justify-center items-center"
+                                  >
+                                    <img
+                                      src={room}
+                                      alt={`Room ${index + 1}`}
+                                      className="w-full h-40 object-cover rounded-lg"
+                                      style={{ objectFit: "cover" }}
+                                    />
+                                  </CarouselItem>
+                                ))}
+                              </CarouselContent>
+                            </Carousel>
                             <p className="text-sm">
                               <strong>Room Number:</strong> {room.roomNumber}
                             </p>
