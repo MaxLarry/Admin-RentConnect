@@ -5,6 +5,7 @@ import Dashboard from './assets/components/routes/dashboard/Dashboard';
 import ListingManagement from './assets/components/routes/listmanagement/listingManagement';
 import ActivityLogs from './assets/components/routes/activitylogs/ActivityLogs';
 import UserManagement from './assets/components/routes/user_management/UserManagement';
+import DataOverview from './assets/components/routes/dataOverview/DataOverview';
 import withAuth from './assets/components/auth/withAuth';
 import PublicRoute from './assets/components/auth/publicRoute';
 import Layout from './assets/components/ui/Layout'; // New Layout Component
@@ -37,7 +38,7 @@ function App() {
   const ProtectedActivityLogs = withAuth(ActivityLogs);
   const ProtectedUserManagement = withAuth(UserManagement);
   const ProtectedInbox = withAuth(ActivityLogs);
-  const ProtectedDataVisualization = withAuth(ActivityLogs);
+  const ProtectedDataOverview = withAuth(DataOverview);
   const ProtectedSafetyCompliance = withAuth(ActivityLogs);
 
   return (
@@ -53,8 +54,8 @@ function App() {
           <Route path="/activity-logs" element={<ProtectedActivityLogs />} />
           <Route path="/user-management" element={<ProtectedUserManagement />} />
           <Route path="/compliance-safety" element={<ProtectedSafetyCompliance />} />
+          <Route path="/data-overview" element={<ProtectedDataOverview />} />
           <Route path="/inbox" element={<ProtectedInbox />} />
-          <Route path="/data" element={<ProtectedDataVisualization />} />
         </Route>
       </Routes>
     </Router>

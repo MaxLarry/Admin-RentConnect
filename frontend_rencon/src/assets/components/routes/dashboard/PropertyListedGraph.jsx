@@ -1,102 +1,33 @@
 // PropertyListedGraph.js
 import React, { useState } from "react";
-import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
-import { Card, CardContent } from "@/components/ui/card";
-import DropdownFilter from "./Dropdownfilter";
-
-// Register the scales and elements for the chart
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+import { TrendingUp } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis, Tooltip } from "recharts";
+import {
+  ChartContainer,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Card, CardContent, CardFooter } from "@/components/ui/card"; 
+import DropdownFilter from "./DropdownFilter"; 
 
 function PropertyListedGraph() {
   const [selectedValue, setSelectedValue] = useState("30d");
 
-  // Sample data for the chart based on selected time range
-  const data = {
-    labels: ["January", "February", "March", "April", "May", "June"],
-    datasets: [
-      {
-        label: "Request",
-        data: [30, 90, 40, 60, 70, 90],
-        fill: false,
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        tension: 0.4,
-        borderWidth: 2,
-      },
-    ],
-  };
-
-  // Custom plugin for drawing the vertical line on hover
-  const verticalLinePlugin = {
-    id: "verticalLinePlugin",
-    afterDraw: (chart) => {
-      const { ctx, tooltip, chartArea } = chart;
-
-      if (tooltip && tooltip.getActiveElements().length > 0) {
-        const activePoint = tooltip.getActiveElements()[0];
-        const x = activePoint.element.x;
-        const topY = chartArea.top;
-        const bottomY = chartArea.bottom;
-
-        ctx.save();
-        ctx.beginPath();
-
-        ctx.setLineDash([9, 5]);
-        ctx.moveTo(x, topY);
-        ctx.lineTo(x, bottomY);
-
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "rgba(155, 155, 155, 0.8)";
-        ctx.stroke();
-        ctx.restore();
-      }
+  const chartConfig = {
+    Properties: {
+      label: "Properties",
+      color: "hsl(var(--chart-1))",
     },
-  };
+  }
 
-  ChartJS.register(verticalLinePlugin);
+  const chartData = [
+    { month: "January", Properties: 186, },
+    { month: "February", Properties: 305, },
+    { month: "March", Properties: 237, },
+    { month: "April", Properties: 73, },
+    { month: "May", Properties: 209, },
+    { month: "June", Properties: 214, },
+  ];
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        grid: {
-          display: false,
-        },
-      },
-      y: {
-        grid: {
-          color: "#e5e7eb",
-        },
-        border: {
-          display: false,
-        },
-      },
-    },
-    elements: {
-      line: {
-        cubicInterpolationMode: "monotone",
-      },
-      point: {
-        radius: 0,
-        hoverRadius: 5,
-        hitRadius: 40,
-      },
-    },
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        mode: "index",
-        intersect: false,
-      },
-      verticalLinePlugin: true,
-    },
-  };
-
-  // Available time range options
   const opt = [
     { value: "24h", label: "24h" },
     { value: "30d", label: "30d" },
@@ -105,22 +36,72 @@ function PropertyListedGraph() {
     { value: "all", label: "All time" },
   ];
 
+
   return (
     <Card className="px-10 py-5 rounded-md shadow-md block items-center lg:col-start-4 lg:col-end-7  md:col-start-1 md:col-end-3 relative">
       <CardContent className="p-0">
-        <div className="flex justify-between">
+        <div className="flex justify-between pb-6">
           <div>
-            <div className="text-lg font-bold text-zinc-900 dark:text-white">1230</div>
-            <span className="text-md font-normal text-gray-500 dark:text-gray-200">Listed Properties</span>
+            <div className="text-lg font-bold">1230</div>
+            <span className="text-md font-normal">Listed Properties</span>
           </div>
           <DropdownFilter options={opt} selectedValue={selectedValue} setSelectedValue={setSelectedValue} />
         </div>
-        <div className="flex mt-4">
-          <div className="h-auto w-full">
-            <Line className="w-fit" data={data} options={options} />
+        <ChartContainer config={chartConfig} className='pb-6'>
+          <AreaChart
+            accessibilityLayer
+            data={chartData}
+            margin={{
+              left: 12,
+              right: 12,
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <Tooltip cursor={false} content={<ChartTooltipContent />} />
+            <defs>
+              <linearGradient id="fillProperties" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-Properties)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-Properties)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
+            <Area
+              dataKey="Properties"
+              type="natural"
+              fill="url(#fillProperties)"
+              fillOpacity={0.4}
+              stroke="var(--color-Properties)"
+              stackId="a"
+            />
+          </AreaChart>
+        </ChartContainer>
+      </CardContent>
+      <CardFooter className='p-0'>
+        <div className="flex w-full items-start gap-2 text-sm">
+          <div className="grid gap-2">
+            <div className="flex items-center gap-2 font-medium leading-none">
+              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+            </div>
+            <div className="flex items-center gap-2 leading-none text-muted-foreground">
+              January - June 2024
+            </div>
           </div>
         </div>
-      </CardContent>
+      </CardFooter>
     </Card>
   );
 }

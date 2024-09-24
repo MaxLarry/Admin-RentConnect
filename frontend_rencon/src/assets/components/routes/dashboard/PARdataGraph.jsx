@@ -1,115 +1,37 @@
 import React, { useState } from "react";
-import { Line } from "react-chartjs-2";
-import { IoIosArrowDown } from "react-icons/io";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from "chart.js";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-
-// Register the necessary components, including Filler
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
+import { TrendingUp } from "lucide-react";
+import { Area, AreaChart, Line, CartesianGrid, XAxis, Tooltip } from "recharts"; // Removed 'defs'
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import DropdownFilter from "./DropdownFilter";
 
 function PARdataGraph() {
   const [selectedValue, setSelectedValue] = useState("30d");
 
-  // Sample data for the chart based on selected time range
-  const data = {
-    labels: ["January", "February", "March", "April", "May", "June"],
-    datasets: [
-      {
-        label: "Pending",
-        data: [30, 20, 10, 15, 12, 98],
-        borderColor: "rgba(54, 162, 235, 1)",
-        backgroundColor: "rgba(54, 162, 235, 0.5)",
-        fill: true,
-        tension: 0.4,
-        borderWidth: 2,
-      },
-      {
-        label: "Approved",
-        data: [20, 25, 30, 35, 90, 45],
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.5)",
-        fill: true,
-        tension: 0.4,
-        borderWidth: 2,
-      },
-      {
-        label: "Rejected",
-        data: [10, 15, 70, 10, 38, 5],
-        borderColor: "rgba(255, 99, 132, 1)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-        fill: true,
-        tension: 0.4,
-        borderWidth: 2,
-      },
-    ],
-  };
-
-  // Chart options
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        grid: {
-          display: false,
-        },
-      },
-      y: {
-        grid: {
-          color: "#e5e7eb",
-        },
-        border: {
-          display: false,
-        },
-      },
+  const chartConfig = {
+    approved: {
+      label: "Approved Requests",
+      color: "hsl(var(--chart-1))",
     },
-    elements: {
-      line: {
-        cubicInterpolationMode: "monotone",
-      },
-      point: {
-        radius: 0,
-        hoverRadius: 5,
-        hitRadius: 20,
-      },
+    pending: {
+      label: "Pending Requests",
+      color: "hsl(var(--chart-2))",
     },
-    plugins: {
-      legend: {
-        labels: {
-          usePointStyle: true,
-          pointStyle: "circle",
-        },
-      },
+    rejected: {
+      label: "Rejected Requests",
+      color: "hsl(var(--chart-3))",
     },
   };
 
-  // Available options for the dropdown
+  const chartData = [
+    { month: "January", approved: 12, pending: 503, rejected: 20 },
+    { month: "February", approved: 33, pending: 790, rejected: 30 },
+    { month: "March", approved: 237, pending: 90, rejected: 50 },
+    { month: "April", approved: 73, pending: 45, rejected: 10 },
+    { month: "May", approved: 209, pending: 65, rejected: 25 },
+    { month: "June", approved: 214, pending: 80, rejected: 40 },
+  ];
+
   const opt = [
     { value: "24h", label: "24h" },
     { value: "30d", label: "30d" },
@@ -118,51 +40,109 @@ function PARdataGraph() {
     { value: "all", label: "All time" },
   ];
 
-  // Handle option click
-  const handleOptionClick = (value) => {
-    setSelectedValue(value);
-  };
-
   return (
-    <Card className="px-10 py-5 rounded-md shadow-md h-full block items-center lg:col-start-4 lg:col-end-7 lg:row-start-4 lg:row-end-6 md:col-start-1 md:col-end-3 relative">
-      <CardContent>
-        <div className="flex justify-between mb-9">
+    <Card className="px-10 py-8 rounded-md shadow-md h-full block items-center lg:col-start-4 lg:col-end-7 lg:row-start-4 lg:row-end-6 md:col-start-1 md:col-end-3 relative">
+      <CardContent className="p-0">
+        <div className="flex justify-between pb-6">
           <span className="text-lg font-bold text-zinc-900 dark:text-white">
             Property Listing Status Overview
           </span>
-
-          {/* shadcn Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="text-sm text-gray-700 dark:text-gray-200 py-2 px-4 flex justify-between items-center"
-              >
-                {opt.find((opt) => opt.value === selectedValue)?.label}
-                <IoIosArrowDown className="ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              {opt.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.value}
-                  className="text-sm dark:text-gray-200 hover:bg-zinc-800"
-                  onClick={() => handleOptionClick(opt.value)}
-                >
-                  {opt.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <DropdownFilter options={opt} selectedValue={selectedValue} setSelectedValue={setSelectedValue} />
         </div>
+        <ChartContainer config={chartConfig} className="pb-6">
+          <AreaChart
+            accessibilityLayer
+            data={chartData}
+            margin={{
+              left: 12,
+              right: 12,
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <Tooltip cursor={false} content={<ChartTooltipContent /> } /> 
 
-        {/* Chart container */}
-        <div className="flex mt-4">
-          <div className="h-full w-full">
-            <Line className="w-fit" data={data} options={options} />
+            <defs>
+           
+              <linearGradient id="fillApproved" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-approved)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-approved)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fillPending" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-pending)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-pending)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fillRejected" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-rejected)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-rejected)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
+            <Area
+              dataKey="approved"
+              type="natural"
+              fill="url(#fillApproved)"
+              fillOpacity={0.4}
+              stroke="var(--color-approved)"
+            />
+            <Area
+              dataKey="pending"
+              type="natural"
+              fill="url(#fillPending)"
+              fillOpacity={0.4}
+              stroke="var(--color-pending)"
+            />
+            <Area
+              dataKey="rejected"
+              type="natural"
+              fill="url(#fillRejected)"
+              fillOpacity={0.4}
+              stroke="var(--color-rejected)"
+            />
+          </AreaChart>
+        </ChartContainer>
+      </CardContent>
+      <CardFooter className="p-0">
+        <div className="flex w-full items-start gap-2 text-sm">
+          <div className="grid gap-2">
+            <div className="flex items-center gap-2 font-medium leading-none">
+              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+            </div>
+            <div className="flex items-center gap-2 leading-none text-muted-foreground">
+              January - June 2024
+            </div>
           </div>
         </div>
-      </CardContent>
+      </CardFooter>
     </Card>
   );
 }
