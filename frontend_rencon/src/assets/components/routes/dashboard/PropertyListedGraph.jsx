@@ -2,30 +2,31 @@
 import React, { useState } from "react";
 import { TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, Tooltip } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Card, CardContent, CardFooter } from "@/components/ui/card"; 
-import DropdownFilter from "./DropdownFilter"; 
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import DropdownFilter from "./DropdownFilter";
 
 function PropertyListedGraph() {
   const [selectedValue, setSelectedValue] = useState("30d");
 
   const chartConfig = {
-    Properties: {
-      label: "Properties",
+    "Boarding House": {
+      label: "Boarding House",
       color: "hsl(var(--chart-1))",
     },
-  }
+    Apartment: {
+      label: "Apartment",
+      color: "hsl(var(--chart-2))",
+    },
+  };
 
   const chartData = [
-    { month: "January", Properties: 186, },
-    { month: "February", Properties: 305, },
-    { month: "March", Properties: 237, },
-    { month: "April", Properties: 73, },
-    { month: "May", Properties: 209, },
-    { month: "June", Properties: 214, },
+    { month: "January", "Boarding House": 120, Apartment: 66 },
+    { month: "February", "Boarding House": 190, Apartment: 115 },
+    { month: "March", "Boarding House": 145, Apartment: 92 },
+    { month: "April", "Boarding House": 60, Apartment: 13 },
+    { month: "May", "Boarding House": 140, Apartment: 69 },
+    { month: "June", "Boarding House": 170, Apartment: 44 },
   ];
 
   const opt = [
@@ -36,7 +37,6 @@ function PropertyListedGraph() {
     { value: "all", label: "All time" },
   ];
 
-
   return (
     <Card className="px-10 py-5 rounded-md shadow-md block items-center lg:col-start-4 lg:col-end-7  md:col-start-1 md:col-end-3 relative">
       <CardContent className="p-0">
@@ -45,9 +45,13 @@ function PropertyListedGraph() {
             <div className="text-lg font-bold">1230</div>
             <span className="text-md font-normal">Listed Properties</span>
           </div>
-          <DropdownFilter options={opt} selectedValue={selectedValue} setSelectedValue={setSelectedValue} />
+          <DropdownFilter
+            options={opt}
+            selectedValue={selectedValue}
+            setSelectedValue={setSelectedValue}
+          />
         </div>
-        <ChartContainer config={chartConfig} className='pb-6'>
+        <ChartContainer config={chartConfig} className="pb-6">
           <AreaChart
             accessibilityLayer
             data={chartData}
@@ -66,31 +70,58 @@ function PropertyListedGraph() {
             />
             <Tooltip cursor={false} content={<ChartTooltipContent />} />
             <defs>
-              <linearGradient id="fillProperties" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient
+                id="fillBoardingHouse"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
                 <stop
                   offset="5%"
-                  stopColor="var(--color-Properties)"
+                  stopColor="hsl(var(--chart-1))" // Updated to use the correct color
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-Properties)"
+                  stopColor="hsl(var(--chart-1))" // Updated to use the correct color
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fillApartment" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="hsl(var(--chart-2))" // Updated to use the correct color
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="hsl(var(--chart-2))" // Updated to use the correct color
                   stopOpacity={0.1}
                 />
               </linearGradient>
             </defs>
+
             <Area
-              dataKey="Properties"
+              dataKey="Boarding House"
               type="natural"
-              fill="url(#fillProperties)"
-              fillOpacity={0.4}
-              stroke="var(--color-Properties)"
+              fill="url(#fillBoardingHouse)"
+              stroke="hsl(var(--chart-1))" // Ensure stroke color matches the area
               stackId="a"
+              dot={{ fill: "hsl(var(--chart-1))" }} // Set the dot color
+            />
+            <Area
+              dataKey="Apartment"
+              type="natural"
+              fill="url(#fillApartment)"
+              stroke="hsl(var(--chart-2))" // Ensure stroke color matches the area
+              stackId="a"
+              dot={{ fill: "hsl(var(--chart-2))" }} // Set the dot color
             />
           </AreaChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className='p-0'>
+      <CardFooter className="p-0">
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 font-medium leading-none">

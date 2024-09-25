@@ -19,21 +19,20 @@ import {
 export const description = "A donut chart with text";
 
 const chartData = [
-  { category: "Landlords", user: 150, fill: "var(--color-landlord)" },
-  { category: "Occupants", user: 300, fill: "var(--color-occupant)" },
-  { category: "Unverified Users", user: 100, fill: "var(--color-unverified)" },
+  { category: "Boarding House", count: 150, fill: "var(--color-landlord)" },
+  { category: "Apartment", count: 300, fill: "var(--color-occupant)" },
 ];
 
 const chartConfig = {
-  user: {
-    label: "User",
+  count: {
+    label: "count",
   },
   landlord: {
-    label: "Landlords",
+    label: "Boarding House",
     color: "hsl(var(--chart-1))",
   },
   occupant: {
-    label: "Occupants",
+    label: "Apartment",
     color: "hsl(var(--chart-2))",
   },
   unverified: {
@@ -44,13 +43,13 @@ const chartConfig = {
 
 function PropertyListedCount() {
   const totalUser = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.user, 0);
+    return chartData.reduce((acc, curr) => acc + curr.count, 0);
   }, []);
 
   return (
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-4 noselect">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Total Number of User</CardTitle>
+        <CardTitle>Listed Property</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -65,7 +64,7 @@ function PropertyListedCount() {
             />
             <Pie
              data={chartData}
-             dataKey="user"
+             dataKey="count"
              label
              nameKey="category"
              innerRadius={50}

@@ -2,11 +2,11 @@ import * as React from "react";
 import { TrendingUp } from "lucide-react";
 import {
   CartesianGrid,
-  LabelList,
-  Line,
-  LineChart,
+  Bar,
+  BarChart,
   XAxis,
   Tooltip,
+  LabelList,
 } from "recharts";
 import {
   Card,
@@ -21,15 +21,40 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-export const description = "A line chart with a label";
+export const description = "A bar chart with a label";
 
 const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { month: "January", desktop: 186 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
 ];
 
 const chartConfig = {
@@ -37,14 +62,9 @@ const chartConfig = {
     label: "Desktop",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
 };
 
 function ActiveuserHistogram() {
-
   return (
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-10 noselect">
       <CardHeader>
@@ -52,10 +72,8 @@ function ActiveuserHistogram() {
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}
-        className="aspect-auto h-[250px] w-full">
-          <LineChart
-            accessibilityLayer
+        <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+          <BarChart
             data={chartData}
             margin={{
               top: 20,
@@ -71,30 +89,11 @@ function ActiveuserHistogram() {
               tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
             />
-            <Tooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <Line
-              dataKey="desktop"
-              type="natural"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={{
-                fill: "var(--color-desktop)",
-              }}
-              activeDot={{
-                r: 6,
-              }}
-            >
-              <LabelList
-                position="top"
-                offset={12}
-                className="fill-foreground"
-                fontSize={12}
-              />
-            </Line>
-          </LineChart>
+            <Tooltip content={<ChartTooltipContent indicator="bar" />} cursor={false} />
+            <Bar dataKey="desktop" fill="var(--color-desktop)">
+              <LabelList position="top" offset={12} className="fill-foreground" fontSize={12} />
+            </Bar>
+          </BarChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">

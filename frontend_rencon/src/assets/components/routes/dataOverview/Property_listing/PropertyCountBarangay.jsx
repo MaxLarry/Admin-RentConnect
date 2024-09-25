@@ -3,8 +3,8 @@ import { TrendingUp } from "lucide-react";
 import {
   CartesianGrid,
   LabelList,
-  Line,
-  LineChart,
+  Bar,
+  BarChart,
   XAxis,
   Tooltip,
 } from "recharts";
@@ -19,87 +19,94 @@ import {
 import {
   ChartContainer,
   ChartTooltipContent,
+  ChartTooltip,
 } from "@/components/ui/chart";
 
-export const description = "A line chart with a label";
+export const description = "A stacked bar chart with labels";
 
 const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { baranggay: "Maningning", apartment: 186, boardinghouse: 80 },
+  { baranggay: "Manggahan", apartment: 305, boardinghouse: 200 },
+  { baranggay: "Bancao-Bancao", apartment: 237, boardinghouse: 120 },
+  { baranggay: "Tiniguiban", apartment: 73, boardinghouse: 190 },
+  { baranggay: "San Jose", apartment: 209, boardinghouse: 130 },
+  { baranggay: "Irawan", apartment: 214, boardinghouse: 140 },
 ];
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  apartment: {
+    label: "Apartment",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: "Mobile",
+  boardinghouse: {
+    label: "Boarding House",
     color: "hsl(var(--chart-2))",
   },
 };
 
-function ActiveuserHistogram() {
-
+function PropertyCountBarangay() {
   return (
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-10 noselect">
       <CardHeader>
-        <CardTitle>Active User</CardTitle>
+        <CardTitle>Number of Listed Properties per Barangay</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}
-        className="aspect-auto h-[250px] w-full">
-          <LineChart
-            accessibilityLayer
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[250px] w-full"
+        >
+          <BarChart
             data={chartData}
             margin={{
               top: 20,
               left: 12,
               right: 12,
             }}
+            stackOffset="sign"
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="baranggay"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
             />
             <Tooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
             />
-            <Line
-              dataKey="desktop"
-              type="natural"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={{
-                fill: "var(--color-desktop)",
-              }}
-              activeDot={{
-                r: 6,
-              }}
+            <Bar
+              dataKey="apartment"
+              stackId="a"
+              fill="var(--color-apartment)"
+              radius={[0, 0, 4, 4]}
             >
               <LabelList
                 position="top"
-                offset={12}
                 className="fill-foreground"
                 fontSize={12}
               />
-            </Line>
-          </LineChart>
+            </Bar>
+            <Bar
+              dataKey="boardinghouse"
+              stackId="a"
+              fill="var(--color-boardinghouse)"
+              radius={[4, 4, 0, 0]}
+            >
+              <LabelList
+                position="top"
+                className="fill-foreground"
+                fontSize={12}
+              />
+            </Bar>
+          </BarChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          Trending up by 5.2% in this barangay{" "}
+          <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
           Showing total visitors for the last 6 months
@@ -109,4 +116,4 @@ function ActiveuserHistogram() {
   );
 }
 
-export default ActiveuserHistogram;
+export default PropertyCountBarangay;

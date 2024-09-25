@@ -85,6 +85,12 @@ function GraphV() {
               fillOpacity={0.4}
               stroke="var(--color-Request)"
               stackId="a"
+              dot={{
+                fill: "var(--color-Request)",
+              }}
+              activeDot={{
+                r: 6,
+              }}
             />
           </AreaChart>
         </ChartContainer>

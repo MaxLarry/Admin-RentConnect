@@ -7,12 +7,12 @@ import { useTheme } from "@/components/ui/theme-provider"; // Import useTheme ho
 
 const Sidebar = ({ isSidebarOpen }) => {
   const { theme, setTheme } = useTheme(); // Use theme and setTheme from useTheme hook
-  const [activeLink, setActiveLink] = useState('');
+  const [activeLink, setActiveLink] = useState("");
   const location = useLocation();
 
   useEffect(() => {
     const path = location.pathname;
-    
+
     switch (path) {
       case "/dashboard":
         setActiveLink("Dashboard");
@@ -25,6 +25,9 @@ const Sidebar = ({ isSidebarOpen }) => {
         break;
       case "/compliance-safety":
         setActiveLink("Compliance & Safety");
+        break;
+      case "/data-overview":
+        setActiveLink("Data Overview");
         break;
       case "/inbox":
         setActiveLink("Inbox");
@@ -62,7 +65,9 @@ const Sidebar = ({ isSidebarOpen }) => {
           ))}
         </ul>
         <div className="mt-4 pt-4 border-t border-gray-500">
-          <h2 className="font-light pb-2 px-3 text-gray-500 text-sm">SUPPORT</h2>
+          <h2 className="font-light pb-2 px-3 text-gray-500 text-sm">
+            SUPPORT
+          </h2>
           <ul className="space-y-2 text-sm font-normal">
             {support.map((item, index) => (
               <LinkItem
