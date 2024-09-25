@@ -53,6 +53,20 @@ async function fetchAllOccupants(req, res) {
   }
 };
 
+async function fetchAllUserRequest(req, res) {
+  try {
+    const UserRequest = await userListService.getAllUserRequests();
+
+    if (UserRequest.length === 0) {
+      return res.json({ message: "No data available" });
+    }
+
+    res.json(UserRequest);
+  } catch (error) {
+    console.error("Error fetching list of User Request:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 // Fetch all admin users
 const fetchAdmins = async (req, res) => {
@@ -111,5 +125,5 @@ const addAdminUser = async (req, res) => {
 
 
 module.exports = {
-  fetchAdmins, addAdminUser, fetchAllLandlords, fetchAllOccupants
+  fetchAdmins, addAdminUser, fetchAllLandlords, fetchAllOccupants, fetchAllUserRequest
 };

@@ -14,5 +14,5 @@ const ProfileSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now },
 });
 
-const Profile = mongoose.model("profiles", ProfileSchema);
+const Profile = mongoose.model( "Profile" , ProfileSchema, "pending_request_profile"); // initial collection name
 module.exports = Profile;

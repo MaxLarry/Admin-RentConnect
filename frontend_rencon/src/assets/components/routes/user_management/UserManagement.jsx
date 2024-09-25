@@ -4,6 +4,7 @@ import UserTabs from "./usertabs";
 import ListAllAdmin from "./ListAllAdmin";
 import ListAllLandlord from "./ListAllLandlord";
 import ListAllOccupant from "./ListAllOccupant";
+import ListAllUSerVerification from "./ListAllUSerVerification";
 import {
   CardContent,
 } from "@/components/ui/card";
@@ -36,8 +37,8 @@ function UserManagement() {
         return <ListAllOccupant  />;
       case "Admins":
         return <ListAllAdmin  />;
-      case "Verification":
-        return <ListAllAdmin  />;
+      case "User Verification":
+        return <ListAllUSerVerification  />;
       default:
         return null;
     }
@@ -46,8 +47,8 @@ function UserManagement() {
   return (
     <ScrollArea className="px-4 pt-14 sm:ml-60 h-full block gap-2 flex-col lg:flex-row translate-all
     duration-300">
-      <div className="flex justify-between items-center p-5">
-        <h1 className="font-bold text-2xl p-4">User Management</h1>
+      <div className="flex justify-between items-center px-5 p-9">
+        <h1 className="font-bold text-2xl">User Management</h1>
       </div>
 
       <div className="grid gap-4 p-4 grid-cols-1 lg:grid-cols-6 max-w-full mx-auto">

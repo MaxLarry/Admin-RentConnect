@@ -78,10 +78,10 @@ const deletePropertiesWithRooms = async (req, res) => {
   }
 
   try {
-      // Step 1: Delete the rooms associated with the properties
+      // Delete the rooms associated with the properties
       await Room.deleteMany({ propertyId: { $in: ids } });
 
-      // Step 2: Delete the properties
+      //Delete the properties
       const result = await PropertyList.deleteMany({ _id: { $in: ids } });
 
       if (result.deletedCount === 0) {

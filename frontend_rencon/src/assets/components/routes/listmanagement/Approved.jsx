@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
+import OptionEllipsis from "./OptionEllipsis";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Pagination,
   PaginationContent,
@@ -27,10 +38,12 @@ function Approved({ searchQuery }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [copiedId, setCopiedId] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false); // Modal visibility state
   const [selectedRequest, setSelectedRequest] = useState(null); // Selected property state
+  const [dialogOpen, setDialogOpen] = useState(false); // State for dialog
+  const [propertyToDelete, setPropertyToDelete] = useState(null); // Property to delete state
 
+  const { toast } = useToast();
   const itemsPerPage = 20;
 
   useEffect(() => {
@@ -67,7 +80,44 @@ function Approved({ searchQuery }) {
     "Address",
     "Rooms/Units Count",
     "Listed Date",
+    "",
   ];
+
+  const handleDelete = (property) => {
+    setPropertyToDelete(property); // Set property to delete
+    setDialogOpen(true); // Open confirmation dialog
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!propertyToDelete) return;
+
+    try {
+      // Send a DELETE request with the selected property ID
+      const response = await axios.delete('/requests/deletion-properties', {
+        data: { ids: [propertyToDelete._id] }
+      });
+
+      // Show success toast with message from backend
+      toast({
+        description: response.data.message, // message from backend
+        variant: "success", // Use a success variant
+      });
+
+      // Update the state to remove the deleted request
+      setApprovedProperty((prevRequests) =>
+        prevRequests.filter((property) => property._id !== propertyToDelete._id)
+      );
+
+      setDialogOpen(false); // Close dialog after deletion
+      setPropertyToDelete(null); // Reset property to delete
+    } catch (error) {
+      console.error("Error deleting property:", error);
+      toast({
+        description: error.message || "Failed to delete property.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleCopy = (id) => {
     navigator.clipboard.writeText(id);
@@ -93,28 +143,32 @@ function Approved({ searchQuery }) {
     return <div>{error}</div>;
   }
 
-  const filteredRequests = approvedProperty.filter((property) => {
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    const requestId = property._id ? property._id.toLowerCase() : "";
-    const fullName = property.profile?.fullName
-      ? property.profile.fullName.toLowerCase()
-      : "";
-    const address = property.address ? property.address.toLowerCase() : "";
-    const createdAt = property.created_at
-      ? format(new Date(property.created_at), "yyyy-MM-dd HH:mm").toLowerCase()
-      : "";
+  const filteredRequests = approvedProperty
+    .filter((property) => {
+      const lowerCaseQuery = searchQuery.toLowerCase();
+      const requestId = property._id ? property._id.toLowerCase() : "";
+      const fullName = property.profile?.fullName
+        ? property.profile.fullName.toLowerCase()
+        : "";
+      const address = property.address ? property.address.toLowerCase() : "";
+      const createdAt = property.created_at
+        ? format(
+            new Date(property.created_at),
+            "yyyy-MM-dd HH:mm"
+          ).toLowerCase()
+        : "";
 
-    return (
-      requestId.includes(lowerCaseQuery) ||
-      fullName.includes(lowerCaseQuery) ||
-      address.includes(lowerCaseQuery) ||
-      createdAt.includes(lowerCaseQuery)
-    );
-  })
-  .sort((a, b) => {
-    // Sort by created_at in descending order (new to old)
-    return new Date(b.created_at) - new Date(a.created_at);
-  });
+      return (
+        requestId.includes(lowerCaseQuery) ||
+        fullName.includes(lowerCaseQuery) ||
+        address.includes(lowerCaseQuery) ||
+        createdAt.includes(lowerCaseQuery)
+      );
+    })
+    .sort((a, b) => {
+      // Sort by created_at in descending order (new to old)
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -145,7 +199,7 @@ function Approved({ searchQuery }) {
           <TableBody>
             {currentItems.length > 0 ? (
               currentItems.map((property, index) => (
-                <TableRow onClick={() => handleRowClick(property)} key={property._id} className="cursor-pointer">
+                <TableRow key={property._id} className="cursor-pointer">
                   <TableCell>
                     <CopyableText
                       text={property._id}
@@ -159,14 +213,18 @@ function Approved({ searchQuery }) {
                   <TableCell>
                     {format(new Date(property.created_at), "yyyy-MM-dd HH:mm")}
                   </TableCell>
+                  <TableCell className="w-10 pl-0 text-center">
+                    <OptionEllipsis
+                      onView={() => handleRowClick(property)} // View action
+                      onDelete={() => handleDelete(property)} // Delete action
+                      onSuspend={() => handleSuspend(property)} // Suspend action
+                    />
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="text-center"
-                >
+                <TableCell colSpan={6} className="text-center">
                   No properties available.
                 </TableCell>
               </TableRow>
@@ -200,7 +258,6 @@ function Approved({ searchQuery }) {
         </Pagination>
       )}
 
-      {/* Modal for viewing selected property */}
       {showViewModal && selectedRequest && (
         <ViewPropertyModal
           selectedRequest={selectedRequest}
@@ -208,6 +265,37 @@ function Approved({ searchQuery }) {
           closeModal={closeModal} // Pass function to close the modal
         />
       )}
+
+      {/* Confirmation Dialog for Delete */}
+      {dialogOpen && propertyToDelete && (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="pb-3">Confirm Deletion</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete the property with ID:{" "}
+                <strong>{propertyToDelete._id}</strong>
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                className="px-4 py-2 rounded-md bg-red-500 text-white"
+                onClick={handleConfirmDelete}
+              >
+                Confirm
+              </button>
+              <button
+                className="px-4 py-2 mr-2 rounded-md text-gray-600"
+                onClick={() => setDialogOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      <Toaster />
     </div>
   );
 }

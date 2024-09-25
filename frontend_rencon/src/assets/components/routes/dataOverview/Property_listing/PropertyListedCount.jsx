@@ -42,7 +42,7 @@ const chartConfig = {
   },
 };
 
-function UserStats() {
+function PropertyListedCount() {
   const totalUser = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.user, 0);
   }, []);
@@ -50,7 +50,7 @@ function UserStats() {
   return (
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-4 noselect">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Pie Chart - Donut with Text</CardTitle>
+        <CardTitle>Total Number of User</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -118,4 +118,4 @@ function UserStats() {
   );
 }
 
-export default UserStats;
+export default PropertyListedCount;

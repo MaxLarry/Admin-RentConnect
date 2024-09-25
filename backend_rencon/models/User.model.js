@@ -58,7 +58,7 @@ const userAccountSchema = new Schema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
-const UserAccount = mongoose.model('users', userAccountSchema);
+const UserAccount = mongoose.model('users', userAccountSchema, 'users');
 
 
 module.exports = { UserProfile, UserAccount };

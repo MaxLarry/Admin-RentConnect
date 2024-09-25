@@ -1,6 +1,7 @@
 // userService.js
 const Admin = require('../models/Admin'); // Import your User model
-const {UserAccount}  = require('../models/User.model')
+const {UserAccount}  = require('../models/User.model');
+const Profile = require('../models/Profile')
 
 // Fetch all admin users
 const getAllAdmins = async () => {
@@ -153,7 +154,44 @@ const getAllOccupants = async () => {
   }
 };
 
+const getAllUserRequests = async () => {
+  try {
+    const result = await Profile.aggregate([
+      {
+        $match: { profileStatus: "Pending" } // Filter for occupants
+      },
+      {
+        $lookup: {
+          from: "users", // Join with profiles
+          localField: "userId",
+          foreignField: "_id",
+          as: "users"
+        }
+      },
+      {
+        $unwind: { path: "$users", preserveNullAndEmptyArrays: true }
+      },
+      {
+        $group: {
+          _id: "$users._id", // Group by the occupant's user ID
+          email: { $first: "$users.email" },
+          role: { $first: "$users.role" },
+          profilePicture: { $first: "$profilePicture" },
+          fullName: { $first: { $concat: ["$firstName", " ", "$lastName"] } },
+          gender: { $first: "$gender" },
+          contactDetails: { $first: "$contactDetails" },
+          registeredDate: {$first: "$users.created_at"},
+          Status: { $first: "$profileStatus" },
+          valid_id: { $first: "$valid_id" },
+        }
+      }
+    ]);
 
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
 
 
 
@@ -161,4 +199,5 @@ module.exports = {
   getAllAdmins,
   getAllLandlords,
   getAllOccupants,
+  getAllUserRequests,
 };
