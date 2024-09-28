@@ -19,7 +19,7 @@ const getAllLandlords = async () => {
   try {
     const result = await UserAccount.aggregate([
       {
-        $match: { role: "landlord" } // Filter for landlords
+        $match: { role: "landlord", isProfileComplete: true } // Filter for landlords
       },
       {
         $lookup: {
@@ -54,16 +54,20 @@ const getAllLandlords = async () => {
       {
         $group: {
           _id: "$_id", // Group by the user id (which ensures each user appears only once)
+          profile_id:{$first: "$profile._id"},
           email: { $first: "$email" },
           role: { $first: "$role" },
           profilePicture: { $first: "$profilePicture" },
+          firstName:{$first: "$profile.firstName"},
+          lastName:{$first: "$profile.lastName"},
           fullName: { $first: { $concat: ["$profile.firstName", " ", "$profile.lastName"] } },
           gender: { $first: "$profile.gender" },
           contactDetails: { $first: "$profile.contactDetails" },
           Status: { $first: "$profile.profileStatus" },
           valid_id: { $first: "$profile.valid_id" },
           properties: { $push: { property_id: "$properties._id", property_photo: { $filter: { input: ["$properties.photo", "$properties.photo2", "$properties.photo3"], as: "photo", cond: { $ne: ["$$photo", null] } } }, roomCount: { $size: "$rooms" } } },
-          created_at: { $first: "$created_at" }
+          created_at: { $first: "$created_at" },
+          last_login:  { $first: "$last_login" }
         }
       }
     ]);
@@ -78,7 +82,7 @@ const getAllOccupants = async () => {
   try {
     const result = await UserAccount.aggregate([
       {
-        $match: { role: "occupant" } // Filter for occupants
+        $match: { role: "occupant", isProfileComplete: true } // Filter for occupants
       },
       {
         $lookup: {
@@ -120,30 +124,49 @@ const getAllOccupants = async () => {
         $unwind: { path: "$propertyInfo", preserveNullAndEmptyArrays: true } // Unwind property info
       },
       {
+        $lookup: {
+          from: "pending_request_profile", // Join with profiles to get landlord info
+          localField: "propertyInfo.userId", // Assume landlordId is stored in propertyInfo
+          foreignField: "userId", // Match with the landlord's userId in profiles
+          as: "landlordProfile"
+        }
+      },
+      {
+        $unwind: { path: "$landlordProfile", preserveNullAndEmptyArrays: true } // Unwind landlord profile info
+      },
+      {
         $group: {
           _id: "$_id", // Group by the occupant's user ID
+          profile_id: { $first: "$profile._id" },
           email: { $first: "$email" },
           role: { $first: "$role" },
           profilePicture: { $first: "$profilePicture" },
           fullName: { $first: { $concat: ["$profile.firstName", " ", "$profile.lastName"] } },
+          firstName: { $first: "$profile.firstName" },
+          lastName: { $first: "$profile.lastName" },
           gender: { $first: "$profile.gender" },
           contactDetails: { $first: "$profile.contactDetails" },
           Status: { $first: "$profile.profileStatus" },
           valid_id: { $first: "$profile.valid_id" },
-          rentedRooms: {
+          currentProperty: {
             $push: {
               roomId: "$rentedRooms._id",
               propertyId: "$rentedRooms.propertyId",
               propertyAddress: {
                 $concat: ["$propertyInfo.street", ", ", "$propertyInfo.barangay", ", ", "$propertyInfo.city"]
-              },              
+              },
+              landlordName: {
+                $concat: ["$landlordProfile.firstName", " ", "$landlordProfile.lastName"]
+              }, // Add landlord's name here
               price: "$rentedRooms.price",
               capacity: "$rentedRooms.capacity",
               roomStatus: "$rentedRooms.roomStatus",
-              dueDate: "$rentedRooms.dueDate"
+              dueDate: "$rentedRooms.dueDate",
+              rentedDate: "$rentedRooms.rentedDate"
             }
           },
-          created_at: { $first: "$created_at" }
+          created_at: { $first: "$created_at" },
+          last_login: { $first: "$last_login" }
         }
       }
     ]);
@@ -153,6 +176,7 @@ const getAllOccupants = async () => {
     throw error;
   }
 };
+
 
 const getAllUserRequests = async () => {
   try {
@@ -170,6 +194,9 @@ const getAllUserRequests = async () => {
       },
       {
         $unwind: { path: "$users", preserveNullAndEmptyArrays: true }
+      },
+      {
+        $match: { "users.isProfileComplete": false } // Match if the profile is not complete
       },
       {
         $group: {

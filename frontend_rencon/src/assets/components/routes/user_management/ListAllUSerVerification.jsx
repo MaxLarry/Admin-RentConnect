@@ -20,6 +20,7 @@ import {
 
 function ListAllUSerVerification() {
   const [listUserRequest, setListUserRequest] = useState([]);
+  const [requestCount, setRequestCount] = useState(0); //store the count of request response
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedLandlord, setSelectedLandlord] = useState([]);
@@ -91,7 +92,11 @@ function ListAllUSerVerification() {
       setLoading(true);
       try {
         const response = await axios.get("/user/user-request");
-        setListUserRequest(response.data || []);
+        if (response.data && response.data.length > 0) {
+          setListUserRequest(response.data);
+        } else {
+          setListUserRequest([]);
+        }
       } catch (error) {
         console.error("There was an error fetching the Landlord List!", error);
         setError("Failed to fetch Landlord List");
@@ -103,7 +108,6 @@ function ListAllUSerVerification() {
 
     fetchLandlords();
   }, []);
-
   if (loading) {
     return <div>Loading...</div>;
   }

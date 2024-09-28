@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Import from react-router-dom
 import UserTabs from "./usertabs";
-import ListAllAdmin from "./ListAllAdmin";
-import ListAllLandlord from "./ListAllLandlord";
-import ListAllOccupant from "./ListAllOccupant";
+import ListAllAdmin from "./Admin/ListAllAdmin";
+import ListAllLandlord from "./Landlord/ListAllLandlord";
+import ListAllOccupant from "./Occupant/ListAllOccupant";
 import ListAllUSerVerification from "./ListAllUSerVerification";
 import {
   CardContent,

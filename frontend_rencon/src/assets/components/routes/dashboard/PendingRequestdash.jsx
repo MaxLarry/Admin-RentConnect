@@ -113,7 +113,7 @@ function PendingRequestdash() {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedRequests.slice(indexOfFirstItem, indexOfLastItem);
-  console.log(currentItems); // Log the sliced items for debugging
+  //console.log(currentItems); // Log the sliced items for debugging
   
   const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 

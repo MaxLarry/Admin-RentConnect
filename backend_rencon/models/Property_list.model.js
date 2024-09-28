@@ -116,6 +116,6 @@ const roomSchema = new mongoose.Schema({
   }
 });
 
-const Room = mongoose.model('rooms', roomSchema);
+const Room = mongoose.model('Room', roomSchema, 'rooms');
 
 module.exports = { Room,  PropertyList };

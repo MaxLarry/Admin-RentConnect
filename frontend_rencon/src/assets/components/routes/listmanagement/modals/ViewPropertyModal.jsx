@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { format } from "date-fns";
-import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
 import MapComponent from "../LocationMap";
 import LegalDocuments from "./LegalDocs";
-import { AiOutlineClose } from "react-icons/ai"; // Importing the X icon
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Carousel,
@@ -23,11 +21,6 @@ import {
 } from "@/components/ui/dialog";
 
 function ViewPropertyModal({ selectedRequest, title, closeModal }) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const handleDotClick = (index) => {
-    setCurrentImageIndex(index);
-  };
 
   return (
     <Dialog open={true} onOpenChange={closeModal}>
@@ -76,7 +69,6 @@ function ViewPropertyModal({ selectedRequest, title, closeModal }) {
                           className="absolute left-0 z-10 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
                           style={{ transform: "translateX(-50%)" }} // Ensure the button is visible outside the image
                         >
-                          <MdNavigateBefore size={24} />
                         </CarouselPrevious>
                         <CarouselContent>
                           {selectedRequest.property_photo.map(
@@ -99,7 +91,6 @@ function ViewPropertyModal({ selectedRequest, title, closeModal }) {
                           className="absolute right-0 z-10 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
                           style={{ transform: "translateX(50%)" }} // Ensure the button is visible outside the image
                         >
-                          <MdNavigateNext size={24} />
                         </CarouselNext>
                         <CarouselDots />
                       </Carousel>

@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -227,7 +226,7 @@ export function AddAdminUser() {
         </Form>
         {loading ? (
           <div className="absolute inset-0 flex justify-center items-center bg-black/40">
-            <LoaderSpinner /> {/* Centered LoaderSpinner */}
+            <LoaderSpinner />
           </div>
         ) : (
           ""

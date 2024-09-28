@@ -125,7 +125,7 @@ function Approved({ searchQuery }) {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleRowClick = (property) => {
+  const handleView = (property) => {
     setSelectedRequest(property); // Set the selected property
     setShowViewModal(true); // Open the modal
   };
@@ -215,7 +215,7 @@ function Approved({ searchQuery }) {
                   </TableCell>
                   <TableCell className="w-10 pl-0 text-center">
                     <OptionEllipsis
-                      onView={() => handleRowClick(property)} // View action
+                      onView={() => handleView(property)} // View action
                       onDelete={() => handleDelete(property)} // Delete action
                       onSuspend={() => handleSuspend(property)} // Suspend action
                     />
