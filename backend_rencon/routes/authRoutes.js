@@ -16,7 +16,6 @@ router.get("/checkAuth", protect, (req, res) => {
     last_login: req.user.last_login,
     status: req.user.status,
     profilePicture: req.user.profilePicture,
-    // Include any additional fields if necessary
   },} );
 });
 

@@ -39,7 +39,7 @@ const userAccountSchema = new Schema({
   },
   bookmarks: [{
     type: Schema.Types.ObjectId,
-    ref: 'SomeModel' // Replace 'SomeModel' with the model name you're referencing for bookmarks
+    ref: 'bookmarks' 
   }],
   isProfileComplete: {
     type: Boolean,
@@ -47,8 +47,8 @@ const userAccountSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['Occupant', 'Landlord'],
-    default: 'Occupant'
+    enum: ['occupant', 'landlord'],
+    default: 'none'
   },
   profilePicture: {
     type: String,
@@ -58,7 +58,7 @@ const userAccountSchema = new Schema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
-const UserAccount = mongoose.model('users', userAccountSchema, 'users');
+const UserAccount = mongoose.model('UserAccount', userAccountSchema, 'users');
 
 
 module.exports = { UserProfile, UserAccount };

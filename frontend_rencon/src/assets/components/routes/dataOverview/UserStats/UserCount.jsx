@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { TrendingUp } from "lucide-react";
 import { Label, Pie, PieChart } from "recharts";
 
@@ -18,40 +20,78 @@ import {
 
 export const description = "A donut chart with text";
 
-const chartData = [
-  { category: "Landlords", user: 150, fill: "var(--color-landlord)" },
-  { category: "Occupants", user: 300, fill: "var(--color-occupant)" },
-  { category: "Unverified Users", user: 100, fill: "var(--color-unverified)" },
-];
-
-const chartConfig = {
-  user: {
-    label: "User",
-  },
-  landlord: {
-    label: "Landlords",
-    color: "hsl(var(--chart-1))",
-  },
-  occupant: {
-    label: "Occupants",
-    color: "hsl(var(--chart-2))",
-  },
-  unverified: {
-    label: "Unverified Users",
-    color: "hsl(var(--chart-3))",
-  },
-};
 
 function UserCount() {
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      setLoading(true);
+
+      try {
+        const response = await axios.get("/data/user-count");
+
+        if (response.data && response.data.length > 0) {
+          const { LandlordCount, OccupantCount, UnverifiedCount } = response.data[0];
+
+          // Map the response to the expected chartData format
+          setChartData([
+            { category: "Landlords", user: LandlordCount, fill: "var(--color-landlord)" },
+            { category: "Occupants", user: OccupantCount, fill: "var(--color-occupant)" },
+            { category: "Unverified Users", user: UnverifiedCount, fill: "var(--color-unverified)" },
+          ]);
+        } else {
+          setChartData([]);
+        }
+      } catch (error) {
+        console.error("There was an error fetching the User Count!", error);
+        setError("Failed to fetch User Count");
+        setChartData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserCount();
+  }, []);
+
   const totalUser = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.user, 0);
-  }, []);
+  }, [chartData]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  const chartConfig = {
+    user: {
+      label: "User",
+    },
+    landlord: {
+      label: "Landlords",
+      color: "hsl(var(--chart-1))",
+    },
+    occupant: {
+      label: "Occupants",
+      color: "hsl(var(--chart-2))",
+    },
+    unverified: {
+      label: "Unverified Users",
+      color: "hsl(var(--chart-3))",
+    },
+  };
 
   return (
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-4 noselect">
       <CardHeader className="items-center pb-0">
         <CardTitle>Total Number of User</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription>Current Total of Registered User</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -111,7 +151,7 @@ function UserCount() {
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total users for the last 6 months
+          Showing the total of user who Registered
         </div>
       </CardFooter>
     </Card>

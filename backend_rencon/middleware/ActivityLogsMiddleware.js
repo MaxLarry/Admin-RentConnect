@@ -9,7 +9,7 @@ const logActivity = async (adminId, adminName, role, action, ipAddress, changes)
         action,
         ip_address: ipAddress,
         changes,
-        timestamps: new Date() // Optional: You can set this explicitly, but it's handled by the schema
+        timestamps: new Date() 
       });
       await log.save();
     } catch (error) {

@@ -1,5 +1,8 @@
 import * as React from "react";
+import { useState } from "react";
 import { TrendingUp } from "lucide-react";
+import axios from "axios";
+import DropdownFilter from "../DropdownFilter";
 import {
   CartesianGrid,
   LabelList,
@@ -16,10 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 
 export const description = "A line chart with a label";
 
@@ -44,16 +44,34 @@ const chartConfig = {
 };
 
 function NewlyRegistered() {
-
+  const [selectedValue, setSelectedValue] = useState("30d");
+  const opt = [
+    { value: "24h", label: "24h" },
+    { value: "30d", label: "30d" },
+    { value: "90d", label: "90d" },
+    { value: "1y", label: "1y" },
+    { value: "all", label: "All time" },
+  ];
   return (
     <Card className="rounded-md shadow-md block items-center col-start-4 md:col-end-3 lg:col-end-10 noselect">
-      <CardHeader>
-        <CardTitle>Newly Registered user</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+      <CardHeader className="flex flex-row justify-between pb-6">
+        <div>
+          <CardTitle>Newly Registered user</CardTitle>
+          <CardDescription>January - June 2024</CardDescription>
+          </div>
+          <div>
+          <DropdownFilter
+            options={opt}
+            selectedValue={selectedValue}
+            setSelectedValue={setSelectedValue}
+          />
+        </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}
-        className="aspect-auto h-[250px] w-full">
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[250px] w-full"
+        >
           <LineChart
             accessibilityLayer
             data={chartData}

@@ -7,7 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const listingPropertyRoutes = require('./routes/propertyListingRoutes');
 const UserRoutes = require('./routes/userRoutes');
 const ActivityLogRoutes = require('./routes/activityLogsRoutes');
-
+const DataOverviewRoutes = require('./routes/dataOverviewRoutes');
 //const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
@@ -26,9 +26,9 @@ app.use(cors({
 // Routes
 app.use('/auth', authRoutes);
 app.use('/requests', listingPropertyRoutes);
-app.use('/user', UserRoutes)
-app.use('/logs', ActivityLogRoutes)
-
+app.use('/user', UserRoutes);
+app.use('/logs', ActivityLogRoutes);
+app.use('/data', DataOverviewRoutes)
 
 const PORT = process.env.PORT || 5000; // Default to 5000 if PORT is not defined
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

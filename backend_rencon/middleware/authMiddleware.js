@@ -49,7 +49,7 @@ const logActivity = async (user, action, ipAddress, entityAffected, changes = ''
       admin_id: user._id,
       role: user.role,
       action,
-      entity_affected: entityAffected, // use the correct variable
+      entity_affected: entityAffected,
       ip_address: ipAddress, // Capture IP address
       changes,
     });
