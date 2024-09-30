@@ -1,6 +1,7 @@
 // controllers/listingRequestController.js
 const PropertyListService = require("../services/ListingRequest.services");
 const { PropertyList, Room } = require("../models/Property_list.model");
+const { logActivity } = require("../middleware/authMiddleware"); 
 
 // Get all Approved Listing Properties
 async function getAllApprovedListing(req, res) {
@@ -54,20 +55,78 @@ const updateRequestStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
+  // Validate status
+  if (!status || typeof status !== 'string') {
+    return res.status(400).json({ message: "Valid status is required" });
+  }
+
+  //console.log(status); //debugging
+  let action;
+  switch (status) {
+    case "Approved":
+      action = "Approved listing";
+      break;
+    case "Rejected":
+      action = "Rejected listing";
+      break;
+    case "Waiting":
+      action = "Cancel Review";
+      break;
+    case "Under Review":
+      action = "Review Property";
+      break;
+    default:
+      return res.status(400).json({ message: "Invalid status provided" });
+  }
+
   try {
+    // Fetch the current request to get its current status
+    const currentRequest = await PropertyList.findById(id);   // Adjusted to use `findById`
+    
+    const oldStatus = currentRequest.status;  // Get the current status of the request
+
+    // Update the request status
     const updatedRequest = await PropertyListService.updateRequestStatus(id, status);
-    res.json(updatedRequest);
+
+    // Log the activity (non-blocking)
+    const changes = `Status changed from ${oldStatus} to ${status}`;
+    logActivity(req.user, action, req.ip, `Listing request with ID: ${id}`, changes).catch(err => {
+      console.error('Failed to log activity:', err);
+    });
+
+    return res.json({
+      message: "Request status updated successfully",
+      updatedRequest,
+    });
   } catch (error) {
     console.error(`Error updating status for request with ID: ${id}`, error);
-    if (error.message === "Status is required") {
-      return res.status(400).json({ message: error.message });
-    }
+
     if (error.message === "Request not found") {
       return res.status(404).json({ message: error.message });
     }
-    res.status(500).json({ message: "Server error" });
+
+    return res.status(500).json({ message: "Server error" });
   }
 };
+
+// const updateRequestStatus = async (req, res) => {
+//   const { id } = req.params;
+//   const { status } = req.body;
+
+//   try {
+//     const updatedRequest = await PropertyListService.updateRequestStatus(id, status);
+//     res.json(updatedRequest);
+//   } catch (error) {
+//     console.error(`Error updating status for request with ID: ${id}`, error);
+//     if (error.message === "Status is required") {
+//       return res.status(400).json({ message: error.message });
+//     }
+//     if (error.message === "Request not found") {
+//       return res.status(404).json({ message: error.message });
+//     }
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 
 //deletion of Properties With Rooms
 const deletePropertiesWithRooms = async (req, res) => {

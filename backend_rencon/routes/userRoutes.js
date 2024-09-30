@@ -29,7 +29,6 @@ router.get("/occupant", fetchAllOccupants);
 router.get("/user-request", fetchAllUserRequest);
 router.get("/unverified-user", fetchAllUnverified);
 
-
 router.put('/user-edit/:id', updateUser);
 router.put('/admin-edit/:id', updateAdmin);
 router.put('/update-status/:id', updateRequestProfileStatus);

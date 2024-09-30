@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
+import {Button} from "@/components/ui/button";
 import CopyableText from "../../ui/CopyableText";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Shadcn checkbox
 import { Toaster } from "@/components/ui/toaster";
@@ -52,12 +53,8 @@ function Rejected({ searchQuery }) {
   const filteredRequests = rejectedRequests.filter((property) => {
     const lowerCaseQuery = searchQuery.toLowerCase();
     const requestId = property._id ? property._id.toLowerCase() : "";
-    const fullName = property.profile?.fullName
-      ? property.profile.fullName.toLowerCase()
-      : "";
-    const createdAt = property.created_at
-      ? format(new Date(property.created_at), "yyyy-MM-dd HH:mm").toLowerCase()
-      : "";
+    const fullName = property.profile?.fullName ? property.profile.fullName.toLowerCase() : "";
+    const createdAt = property.created_at ? format(new Date(property.created_at), "yyyy-MM-dd HH:mm").toLowerCase() : "";
 
     return (
       requestId.includes(lowerCaseQuery) ||
@@ -271,7 +268,7 @@ function Rejected({ searchQuery }) {
 
       {selectedRequests.length > 0 && (
         <div className="w-full flex justify-center">
-          <div className="fixed bottom-5 max-w-fit border rounded-lg text-sm shadow-md border-zinc-700 bg-zinc-800 text-white p-4 flex justify-between gap-10 items-center transition-transform transform translate-y-0 animate-slide-up">
+          <div className="fixed bottom-5 max-w-fit border rounded-lg text-sm shadow-md p-4 flex justify-between gap-10 items-center transition-transform transform translate-y-0 animate-slide-up">
             <div className="flex gap-3">
               <div className="text-gray-200 bg-teal-400 px-2 rounded-md">
                 {selectedRequests.length}
@@ -279,20 +276,21 @@ function Rejected({ searchQuery }) {
               <p>Rejected Request(s) Selected</p>
             </div>
             <div>
-              <button
-                className="px-4 py-2 mr-2 rounded- text-white hover:text-gray-400"
+              <Button
+              variant="outline"
+                className="mr-2 "
                 onClick={() => setSelectedRequests([])}
               >
                 Cancel
-              </button>
+              </Button>
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
-                  <button
-                    className="px-4 py-2 rounded-md border border-gray-500 hover:border-white"
+                  <Button
+                  variant= "outline"
                     onClick={() => setDialogOpen(true)}
                   >
                     Delete
-                  </button>
+                  </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -303,18 +301,20 @@ function Rejected({ searchQuery }) {
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex justify-end mt-4">
-                    <button
-                      className="px-4 py-2 mr-2 rounded-md text-gray-600"
+                    <Button
+                    variant= "outline"
+                      className="mr-2"
                       onClick={() => setDialogOpen(false)}
                     >
                       Cancel
-                    </button>
-                    <button
-                      className="px-4 py-2 rounded-md bg-red-500 text-white"
+                    </Button>
+                    <Button
+                    variant= "outline"
+                      className= "text-red-500"
                       onClick={handleDeleteSelectedRequests} // Call the delete function
                     >
                       Confirm
-                    </button>
+                    </Button>
                   </div>
                 </DialogContent>
               </Dialog>
