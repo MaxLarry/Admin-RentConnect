@@ -1,6 +1,6 @@
 // userService.js
 const Admin = require('../models/Admin'); // Import your User model
-const {UserAccount}  = require('../models/User.model');
+const {UserAccount, UserProfile}  = require('../models/User.model');
 const Profile = require('../models/Profile')
 
 // Fetch all admin users
@@ -14,6 +14,38 @@ const getAllAdmins = async () => {
   }
 };
 
+const getAllUnverified = async () => {
+  try {
+    const result = await UserAccount.aggregate([
+      {
+        $match: { isProfileComplete: false } // Filter for Unverified
+      },
+      {
+        $lookup: {
+          from: "pending_request_profile", // Join with profiles
+          localField: "_id",
+          foreignField: "userId",
+          as: "profile"
+        }
+      },
+      {
+        $unwind: { path: "$profile", preserveNullAndEmptyArrays: true }
+      },
+      {
+        $group: {
+          _id: "$_id", 
+          email: { $first: "$email" },
+          created_at: { $first: "$created_at" },
+          last_login:  { $first: "$last_login" }
+        }
+      },
+    ]);
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
 
 const getAllLandlords = async () => {
   try {
@@ -69,7 +101,7 @@ const getAllLandlords = async () => {
           created_at: { $first: "$created_at" },
           last_login:  { $first: "$last_login" }
         }
-      }
+      },
     ]);
 
     return result;
@@ -182,7 +214,7 @@ const getAllUserRequests = async () => {
   try {
     const result = await Profile.aggregate([
       {
-        $match: { profileStatus: "Pending" } // Filter for occupants
+        $match: { profileStatus: "pending" } // Filter for occupants
       },
       {
         $lookup: {
@@ -201,15 +233,18 @@ const getAllUserRequests = async () => {
       {
         $group: {
           _id: "$users._id", // Group by the occupant's user ID
+          profileId:{ $first: "$_id" },
           email: { $first: "$users.email" },
           role: { $first: "$users.role" },
           profilePicture: { $first: "$profilePicture" },
           fullName: { $first: { $concat: ["$firstName", " ", "$lastName"] } },
           gender: { $first: "$gender" },
           contactDetails: { $first: "$contactDetails" },
+          dateRequest: {$first: "$users.created_at"},
           registeredDate: {$first: "$users.created_at"},
           Status: { $first: "$profileStatus" },
           valid_id: { $first: "$valid_id" },
+          isProfileComplete: { $first: "$users.isProfileComplete" } 
         }
       }
     ]);
@@ -220,6 +255,37 @@ const getAllUserRequests = async () => {
   }
 };
 
+const updateRequestProfileStatus = async (userId, profileStatus, isProfileComplete) => {
+  if (!profileStatus) {
+    throw new Error("Profile status is required");
+  }
+
+  // Update profileStatus in UserProfile collection
+  const userProfile = await UserProfile.findOneAndUpdate(
+    { userId }, // Find by userId in the UserProfile collection
+    { profileStatus }, // Update the profileStatus
+    { new: true } // Return the updated document
+  );
+
+  if (!userProfile) {
+    throw new Error("UserProfile not found");
+  }
+
+  // If isProfileComplete is provided, update it in the UserAccount collection
+  if (typeof isProfileComplete !== "undefined") {
+    const user = await UserAccount.findByIdAndUpdate(
+      userId, // Find by userId in the UserAccount collection
+      { isProfileComplete }, // Update the isProfileComplete field
+      { new: true } // Return the updated document
+    );
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+  }
+
+  return userProfile; // Return the updated UserProfile document
+};
 
 
 module.exports = {
@@ -227,4 +293,6 @@ module.exports = {
   getAllLandlords,
   getAllOccupants,
   getAllUserRequests,
+  getAllUnverified,
+  updateRequestProfileStatus
 };

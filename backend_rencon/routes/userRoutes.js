@@ -13,6 +13,10 @@ const {
   deleteUserOccupant,
   deleteAdmin,
   deleteSelectedAdmin,
+  fetchAllUnverified,
+  deleteUser,
+  deleteUserSelected,
+  updateRequestProfileStatus,
 } = require("../controllers/userListController");
 const router = express.Router();
 
@@ -23,10 +27,12 @@ router.post("/admin/add", addAdminUser);
 router.get("/landlord", fetchAllLandlords);
 router.get("/occupant", fetchAllOccupants);
 router.get("/user-request", fetchAllUserRequest);
+router.get("/unverified-user", fetchAllUnverified);
 
 
 router.put('/user-edit/:id', updateUser);
 router.put('/admin-edit/:id', updateAdmin);
+router.put('/update-status/:id', updateRequestProfileStatus);
 
 router.delete("/admin-deletion", deleteAdmin);
 router.delete("/selected-admin-deletion", deleteSelectedAdmin);
@@ -37,5 +43,7 @@ router.delete("/selected-landlord-deletion", deleteUserSelectedLandlordsandCrede
 router.delete("/occupant-deletion", deleteUserOccupant);
 router.delete("/selected-occupant-deletion", deleteUserSelectedOccupants);
 
+router.delete("/unverified-deletion", deleteUser);
+router.delete("/selected-unverified-deletion", deleteUserSelected);
 
 module.exports = router;

@@ -4,20 +4,19 @@ import UserTabs from "./usertabs";
 import ListAllAdmin from "./Admin/ListAllAdmin";
 import ListAllLandlord from "./Landlord/ListAllLandlord";
 import ListAllOccupant from "./Occupant/ListAllOccupant";
-import ListAllUSerVerification from "./ListAllUSerVerification";
-import {
-  CardContent,
-} from "@/components/ui/card";
+import ListAllUSerVerification from "./UserRequest/ListAllUSerVerification";
+import ListAllUnverified from "./Unverified/ListAllUnverified";
+import { CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 function UserManagement() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Get tab name from URL
   const queryParams = new URLSearchParams(location.search);
   const initialTab = queryParams.get("tab") || "Landlords";
-  
+
   const [activeTab, setActiveTab] = useState(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -34,19 +33,23 @@ function UserManagement() {
       case "Landlords":
         return <ListAllLandlord />;
       case "Occupants":
-        return <ListAllOccupant  />;
+        return <ListAllOccupant />;
       case "Admins":
-        return <ListAllAdmin  />;
+        return <ListAllAdmin />;
       case "User Verification":
-        return <ListAllUSerVerification  />;
+        return <ListAllUSerVerification />;
+      case "Unverified":
+        return <ListAllUnverified />;
       default:
         return null;
     }
   };
 
   return (
-    <ScrollArea className="px-4 pt-14 sm:ml-60 h-full block gap-2 flex-col lg:flex-row translate-all
-    duration-300">
+    <ScrollArea
+      className="px-4 pt-14 sm:ml-60 h-full block gap-2 flex-col lg:flex-row translate-all
+    duration-300"
+    >
       <div className="flex justify-between items-center px-5 p-9">
         <h1 className="font-bold text-2xl">User Management</h1>
       </div>

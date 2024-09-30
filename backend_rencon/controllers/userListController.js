@@ -23,6 +23,28 @@ module.exports = {
   getAlluserProfileRequest,
 };*/
 
+//fetch all unverified
+async function fetchAllUnverified(req, res) {
+  try {
+    const unverified = await userListService.getAllUnverified();
+
+    if (unverified.length === 0) {
+      return res.json({ message: "No data available" });
+    }
+
+    //res.json(unverified);
+    res.json({
+      //message: "unverified fetched successfully",
+      count: unverified.length,
+      unverified: unverified,
+    });
+  } catch (error) {
+    console.error("Error fetching list of unverified:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+
 // Fetch all landlords users
 async function fetchAllLandlords(req, res) {
   try {
@@ -32,7 +54,12 @@ async function fetchAllLandlords(req, res) {
       return res.json({ message: "No data available" });
     }
 
-    res.json(landlords);
+   // res.json(landlords);
+    res.json({
+      //message: "Landlords fetched successfully",
+      count: landlords.length,
+      landlords: landlords,
+    });
   } catch (error) {
     console.error("Error fetching list of Landlords:", error);
     res.status(500).json({ message: "Server error" });
@@ -47,9 +74,14 @@ async function fetchAllOccupants(req, res) {
       return res.json({ message: "No data available" });
     }
 
-    res.json(occupants);
+    //res.json(occupants);
+    res.json({
+      //message: "Occupants fetched successfully",
+      count: occupants.length,
+      occupants: occupants,
+    });
   } catch (error) {
-    console.error("Error fetching list of Landlords:", error);
+    console.error("Error fetching list of occupants:", error);
     res.status(500).json({ message: "Server error" });
   }
 }
@@ -59,10 +91,15 @@ async function fetchAllUserRequest(req, res) {
     const UserRequest = await userListService.getAllUserRequests();
 
     if (UserRequest.length === 0) {
-      return res.json({ message: "No data available" });
+      return res.json({ message: "No data available", count: 0 });
     }
 
-    res.json(UserRequest);
+    //res.json(UserRequest);
+    res.json({
+      //message: "Occupants fetched successfully",
+      count: UserRequest.length,
+      UserRequestVerification: UserRequest,
+    });
   } catch (error) {
     console.error("Error fetching list of User Request:", error);
     res.status(500).json({ message: "Server error" });
@@ -75,7 +112,7 @@ const fetchAdmins = async (req, res) => {
     const admins = await userListService.getAllAdmins();
 
     if (admins.length === 0) {
-      return res.status(404).json({ message: "No admins found", count: 0 });
+      return res.json({ message: "No admins found", count: 0 });
     }
 
     // Map through the admins and concatenate first_name and last_name
@@ -299,7 +336,7 @@ const deleteUserOccupant = async (req, res) => {
 
 //deletion of Properties With Rooms
 const deleteUserSelectedOccupants = async (req, res) => {
-  const { ids } = req.body; // Get the landlord user ID from the request body
+  const { ids } = req.body; // Get the user ID from the request body
 
   if (!Array.isArray(ids) || ids.length === 0) {
     return res.status(400).json({ message: "No user IDs provided for deletion" });
@@ -315,6 +352,59 @@ const deleteUserSelectedOccupants = async (req, res) => {
     });
   } catch (error) {
     console.error("Error deleting occupant users, properties, rooms, and profiles:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
+//deletion of Properties With Rooms
+const deleteUser = async (req, res) => {
+  const { userId } = req.body; // Get the user ID from the request body
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json({ message: "No user ID provided for deletion" });
+  }
+
+  try {
+    await UserAccount.deleteOne({ _id: userId });
+    await UserProfile.deleteOne({ userId: userId });
+    return res
+      .status(200)
+      .json({
+        message:
+          "User Deleted Sucessfully",
+      });
+  } catch (error) {
+    console.error(
+      "Error deleting user",
+      error
+    );
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+//deletion of Properties With Rooms
+const deleteUserSelected = async (req, res) => {
+  const { ids } = req.body; // Get the user ID from the request body
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ message: "No user IDs provided for deletion" });
+  }
+
+  try {
+
+    await UserAccount.deleteMany({ _id: { $in: ids } });
+    await UserProfile.deleteMany({ userId: { $in: ids } });
+
+    return res.status(200).json({
+      message: "Selected Unverified user deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting users:", error);
     return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -371,6 +461,37 @@ const deleteSelectedAdmin = async (req, res) => {
 };
 
 
+const updateRequestProfileStatus = async (req, res) => {
+  const { id } = req.params; // userId passed as parameter
+  const { profileStatus, isProfileComplete } = req.body; // Extract from body
+
+  try {
+    // Call the service function to handle both profileStatus and isProfileComplete
+    const updatedRequest = await userListService.updateRequestProfileStatus(id, profileStatus, isProfileComplete);
+    
+    // Respond with the updated profile
+    res.json(updatedRequest);
+  } catch (error) {
+    console.error(`Error updating status for request with ID: ${id}`, error);
+
+    // Handle specific error messages
+    if (error.message === "Profile status is required") {
+      return res.status(400).json({ message: error.message });
+    }
+    if (error.message === "UserProfile not found") {
+      return res.status(404).json({ message: error.message });
+    }
+    if (error.message === "User not found") {
+      return res.status(404).json({ message: error.message });
+    }
+
+    // Handle other server errors
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
 module.exports = {
   fetchAdmins,
   addAdminUser,
@@ -385,4 +506,8 @@ module.exports = {
   deleteUserSelectedOccupants,
   deleteSelectedAdmin,
   deleteAdmin,
+  fetchAllUnverified,
+  deleteUser,
+  deleteUserSelected,
+  updateRequestProfileStatus,
 };

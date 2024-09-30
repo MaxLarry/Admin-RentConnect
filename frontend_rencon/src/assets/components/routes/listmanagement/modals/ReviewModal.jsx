@@ -5,6 +5,7 @@ import MapComponent from "../LocationMap";
 import LegalDocuments from "./LegalDocs";
 import { REVIEW_ISSUES } from "../../../../constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -51,22 +52,6 @@ function ReviewModal({
 
   const handleCommentsChange = (e) => {
     setAdditionalComments(e.target.value);
-  };
-
-  const handlePrev = () => {
-    setCurrentImageIndex((prev) =>
-      prev > 0 ? prev - 1 : selectedRequest.property_photo.length - 1
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentImageIndex((prev) =>
-      prev < selectedRequest.property_photo.length - 1 ? prev + 1 : 0
-    );
-  };
-
-  const handleDotClick = (index) => {
-    setCurrentImageIndex(index);
   };
 
   return (
@@ -258,12 +243,12 @@ function ReviewModal({
           </CardContent>
         </ScrollArea>
         <CardFooter className="flex justify-end mt-4 py-0">
-          <button
+          <Button
             className="px-5 py-2 border rounded hover:bg-gray-700"
             onClick={onClose}
           >
             Cancel
-          </button>
+          </Button>
         </CardFooter>
       </Card>
 

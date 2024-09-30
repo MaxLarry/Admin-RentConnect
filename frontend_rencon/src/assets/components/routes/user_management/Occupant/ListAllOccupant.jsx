@@ -226,11 +226,12 @@ function ListAllOccupant() {
       setLoading(true);
       try {
         const response = await axios.get("/user/occupant");
-        if (response.data && response.data.length > 0) {
-          setListOccupant(response.data);
+        if (response.data.occupants && response.data.occupants.length > 0) {
+          setListOccupant(response.data.occupants);
         } else {
           setListOccupant([]);
         }
+        setOccupantCount(response.data.count);
       } catch (error) {
         console.error("There was an error fetching the Occupants List!", error);
         setError("Failed to fetch Occupants List");
@@ -256,7 +257,7 @@ function ListAllOccupant() {
       <div className="flex flex-wrap gap-4 pb-5">
         <div className="flex space-x-2 text-xl font-bold justify-center items-center">
           <h1>Occupants</h1>
-          <h2></h2>
+          <h2>{occupantCount}</h2>
         </div>
         <div className="relative ml-auto">
           <SearchInput

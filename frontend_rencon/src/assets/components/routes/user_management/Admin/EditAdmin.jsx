@@ -95,7 +95,7 @@ function EditLandlordModal({ adminToEdit, title, closeModal }) {
       );
       toast({
         title: "Success",
-        description: "Landlord profile updated successfully.",
+        description: "Admin updated successfully.",
         status: "success",
         variant: "success",
       });

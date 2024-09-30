@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
-import CopyableText from "../../ui/CopyableText";
+import CopyableText from "../../../ui/CopyableText";
 import { FaUserCircle } from "react-icons/fa";
 import { SearchInput } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox"; // Import Shadcn checkbox
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import OptionEllipsis from "./OptionEllipsis";
-
+import ReviewModal from "./ReviewModal";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -23,14 +32,17 @@ function ListAllUSerVerification() {
   const [requestCount, setRequestCount] = useState(0); //store the count of request response
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedLandlord, setSelectedLandlord] = useState([]);
-  const [selectAll, setSelectAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [copiedId, setCopiedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [requestToView, setRequestToView] = useState(null);
 
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+
+  const { toast } = useToast();
   const itemsPerPage = 20;
-  const landlord_column = [
+  const userRequest_column = [
     "Name",
     "ID",
     "Date Register",
@@ -58,42 +70,86 @@ function ListAllUSerVerification() {
   const currentItems = filteredRequest.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredRequest.length / itemsPerPage);
 
-  const handleselectedLandlord = (id) => {
-    setSelectedLandlord((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((selectedId) => selectedId !== id)
-        : [...prevSelected, id]
-    );
+
+  // Handle modal opening
+  const handleReview = (request) => {
+    setRequestToView(request);
+    setShowReviewModal(true);
   };
 
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedLandlord([]);
-    } else {
-      setSelectedLandlord(currentItems.map((admin) => admin._id));
-    }
-    setSelectAll(!selectAll);
+  const handleApprove = () => {
+    setConfirmAction("approve");
+    setShowConfirmPopup(true);
   };
 
-  useEffect(() => {
-    if (selectedLandlord.length !== currentItems.length) {
-      setSelectAll(false);
-    } else if (
-      selectedLandlord.length === currentItems.length &&
-      currentItems.length > 0
-    ) {
-      setSelectAll(true);
-    }
-  }, [selectedLandlord, currentItems]);
+  const handleReject = () => {
+    setConfirmAction("decline");
+    setShowConfirmPopup(true);
+  };
 
+  const closeModal = () => {
+    setShowReviewModal(false); // Close the modal
+    setRequestToView(null); // Clear selected request
+  };
+
+  const confirmApprove = async () => {
+    try {
+      await updateRequestStatus(requestToView._id, "approved", true); // Mark profile as complete
+      setShowReviewModal(false); 
+      setRequestToView(null);
+      setShowConfirmPopup(false); 
+    } catch (error) {
+      console.error("Error approving request", error);
+    }
+  };
+  
+  const confirmDecline = async () => {
+    try {
+      await updateRequestStatus(requestToView._id, "rejected", false); // Mark profile as incomplete
+      setShowReviewModal(false);
+      setRequestToView(null);
+      setShowConfirmPopup(false);
+    } catch (error) {
+      console.error("Error rejecting request", error);
+    }
+  };
+
+  const cancelApprove = () => {
+    setShowConfirmPopup(false); // Hide the confirmation popup
+  };
+
+  const cancelDecline = () => {
+    setShowConfirmPopup(false); // Hide the confirmation popup
+  };
+
+  const updateRequestStatus = async (id, profileStatus, isProfileComplete) => {
+    try {
+      const response = await axios.put(`/user/update-status/${id}`, {
+        profileStatus,
+        isProfileComplete, // Update both fields
+      });
+      console.log(`Profile updated for request ID: ${id}`, response.data); // Log response
+      setListUserRequest((prevRequests) =>
+        prevRequests.map((request) =>
+          request._id === id
+            ? { ...request, profileStatus, isProfileComplete }
+            : request
+        )
+      );
+    } catch (error) {
+      console.error(`Error updating Profile Status for request with ID: ${id}`, error);
+    }
+  };
+  
   //api fetch all Landlord
   useEffect(() => {
     const fetchLandlords = async () => {
       setLoading(true);
       try {
         const response = await axios.get("/user/user-request");
-        if (response.data && response.data.length > 0) {
-          setListUserRequest(response.data);
+        if (response.data && response.data.UserRequestVerification?.length > 0) {
+          setListUserRequest(response.data.UserRequestVerification);
+          setRequestCount(response.data.count);
         } else {
           setListUserRequest([]);
         }
@@ -121,7 +177,7 @@ function ListAllUSerVerification() {
       <div className="flex flex-wrap gap-4 pb-5">
         <div className="flex space-x-2 text-xl font-bold justify-center items-center">
           <h1>User Request Verification</h1>
-          <h2></h2>
+          <h2>{requestCount}</h2>
         </div>
         <div className="relative ml-auto">
           <SearchInput
@@ -137,13 +193,7 @@ function ListAllUSerVerification() {
         <Table className="min-w-full dark:border-zinc-600">
           <TableHeader>
             <TableRow className="border-b dark:border-zinc-600">
-              <TableHead>
-                <Checkbox
-                  checked={selectAll}
-                  onCheckedChange={handleSelectAll} // Handle select all change
-                />
-              </TableHead>
-              {landlord_column.map((column, index) => (
+              {userRequest_column.map((column, index) => (
                 <TableHead
                   key={index}
                   className="text-zinc-900 dark:text-gray-200 font-bold"
@@ -157,21 +207,7 @@ function ListAllUSerVerification() {
           <TableBody>
             {currentItems.length > 0 ? (
               currentItems.map((request) => (
-                <TableRow
-                  key={request._id}
-                  className="cursor-pointer"
-                  data-state={
-                    selectedLandlord.includes(request._id) ? "selected" : ""
-                  }
-                >
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedLandlord.includes(request._id)}
-                      onCheckedChange={() =>
-                        handleselectedLandlord(request._id)
-                      }
-                    />
-                  </TableCell>
+                <TableRow key={request._id}>
                   <TableCell>
                     <div className="flex items-center">
                       <Avatar>
@@ -195,19 +231,25 @@ function ListAllUSerVerification() {
 
                   <TableCell>
                     <CopyableText
-                      text={request._id}    
+                      text={request._id}
                       onCopy={() => setCopiedId(request._id)}
                     />
                   </TableCell>
                   <TableCell>
                     {" "}
                     {request.registeredDate
-                      ? format(new Date(request.registeredDate), "yyyy-MM-dd HH:mm")
+                      ? format(
+                          new Date(request.registeredDate),
+                          "yyyy-MM-dd HH:mm"
+                        )
                       : "N/A"}
                   </TableCell>
                   <TableCell>
-                    {request.last_login
-                      ? format(new Date(request.last_login), "yyyy-MM-dd HH:mm")
+                    {request.dateRequest
+                      ? format(
+                          new Date(request.dateRequest),
+                          "yyyy-MM-dd HH:mm"
+                        )
                       : "N/A"}
                   </TableCell>
                   <TableCell>
@@ -230,6 +272,25 @@ function ListAllUSerVerification() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Review Modal */}
+      {showReviewModal && (
+        <ReviewModal
+          requestToView={requestToView}
+          isOpen={showReviewModal}
+          title={`Review Request - ${requestToView?._id}`}
+          closeModal={closeModal}
+          handleApprove={handleApprove}
+          handleReject={handleReject}
+          showConfirmPopup={showConfirmPopup}
+          confirmAction={confirmAction}
+          confirmApprove={confirmApprove}
+          confirmDecline={confirmDecline}
+          cancelApprove={cancelApprove}
+          cancelDecline={cancelDecline}
+
+        />
+      )}
 
       {filteredRequest.length > 0 && totalPages > 0 && (
         <div className="flex justify-end mt-4 space-x-2">
