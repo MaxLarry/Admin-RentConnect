@@ -71,7 +71,7 @@ function ActiveuserHistogram() {
   const [selectedValue, setSelectedValue] = useState("30d");
   const opt = [
     { value: "24h", label: "24h" },
-    { value: "30d", label: "30d" },
+    { value: "7d", label: "7d" },
     { value: "90d", label: "90d" },
     { value: "1y", label: "1y" },
     { value: "all", label: "All time" },

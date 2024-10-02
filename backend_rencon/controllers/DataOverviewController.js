@@ -28,8 +28,22 @@ async function getAllUserCount(req, res) {
         }
     }
 
+    async function userActiveCount(req, res) {
+      const { timeframe } = req.query; 
+
+      try {
+          const counts = await DataOverviewService.getActiveUserCount(timeframe);
+          res.json(counts); 
+      } catch (error) {
+          console.error(error);
+          res.status(400).json({ error: error.message }); // Send back a 400 error for invalid timeframe
+      }
+  }
+
+
 
 module.exports ={
     getAllUserCount,
     userRegCount,
+    userActiveCount,
 };

@@ -19,26 +19,23 @@ import {
 export const description = "A donut chart with text";
 
 const chartData = [
-  { category: "Boarding House", count: 150, fill: "var(--color-landlord)" },
-  { category: "Apartment", count: 300, fill: "var(--color-occupant)" },
+  { category: "Boarding House", count: 150, fill: "var(--color-boardinghouse)" },
+  { category: "Apartment", count: 300, fill: "var(--color-apartment)" },
 ];
 
 const chartConfig = {
   count: {
     label: "count",
   },
-  landlord: {
+  boardinghouse: {
     label: "Boarding House",
     color: "hsl(var(--chart-1))",
   },
-  occupant: {
-    label: "Apartment",
+  apartment: {
+    label: "Apartmentt",
     color: "hsl(var(--chart-2))",
   },
-  unverified: {
-    label: "Unverified Users",
-    color: "hsl(var(--chart-3))",
-  },
+
 };
 
 function PropertyListedCount() {
@@ -50,7 +47,7 @@ function PropertyListedCount() {
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-4 noselect">
       <CardHeader className="items-center pb-0">
         <CardTitle>Listed Property</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription>Current Total of Listed Properties</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -110,7 +107,7 @@ function PropertyListedCount() {
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total users for the last 6 months
+          Showing the total of properties listed in the app
         </div>
       </CardFooter>
     </Card>
