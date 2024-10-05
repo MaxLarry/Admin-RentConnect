@@ -1,4 +1,5 @@
 const { UserAccount } = require("../models/User.model");
+const { PropertyList } = require("../models/Property_list.model");
 
 const getAllUserCount = async () => {
   try {
@@ -196,7 +197,8 @@ const getActiveUserCount = async (timeframe) => {
 
   switch (timeframe) {
     case "24hr":
-      for (let i = 23; i >= 0; i -= 2) { // Every hour for the last 2 hours
+      for (let i = 23; i >= 0; i -= 2) {
+        // Every hour for the last 2 hours
         const startTime = new Date(currentDate);
         startTime.setHours(currentDate.getHours() - i, 0, 0, 0);
         const endTime = new Date(startTime);
@@ -206,12 +208,20 @@ const getActiveUserCount = async (timeframe) => {
           last_login: { $gte: startTime, $lt: endTime },
         });
 
-        counts.push({ hour: startTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }), count });
+        counts.push({
+          hour: startTime.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          }),
+          count,
+        });
       }
       break;
 
     case "7d":
-      for (let i = 6; i >= 0; i--) { // Daily counts for the last 7 days
+      for (let i = 6; i >= 0; i--) {
+        // Daily counts for the last 7 days
         const startDate = new Date(currentDate);
         startDate.setDate(currentDate.getDate() - i);
         startDate.setUTCHours(0, 0, 0, 0);
@@ -223,12 +233,20 @@ const getActiveUserCount = async (timeframe) => {
           },
         });
 
-        counts.push({ date: startDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }), count });
+        counts.push({
+          date: startDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }),
+          count,
+        });
       }
       break;
 
     case "30d":
-      for (let i = 29; i >= 0; i--) { // Daily counts for the last 30 days
+      for (let i = 29; i >= 0; i--) {
+        // Daily counts for the last 30 days
         const startDate = new Date(currentDate);
         startDate.setDate(currentDate.getDate() - i);
         startDate.setUTCHours(0, 0, 0, 0);
@@ -240,12 +258,20 @@ const getActiveUserCount = async (timeframe) => {
           },
         });
 
-        counts.push({ date: startDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }), count });
+        counts.push({
+          date: startDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }),
+          count,
+        });
       }
       break;
 
     case "90d":
-      for (let i = 89; i >= 0; i--) { // Daily counts for the last 90 days
+      for (let i = 89; i >= 0; i--) {
+        // Daily counts for the last 90 days
         const startDate = new Date(currentDate);
         startDate.setDate(currentDate.getDate() - i);
         startDate.setUTCHours(0, 0, 0, 0);
@@ -257,12 +283,20 @@ const getActiveUserCount = async (timeframe) => {
           },
         });
 
-        counts.push({ date: startDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }), count });
+        counts.push({
+          date: startDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }),
+          count,
+        });
       }
       break;
 
     case "1y":
-      for (let i = 11; i >= 0; i--) { // Monthly counts for the last 12 months
+      for (let i = 11; i >= 0; i--) {
+        // Monthly counts for the last 12 months
         const month = new Date(currentDate);
         month.setMonth(currentDate.getMonth() - i, 1); // First day of the month
         const nextMonth = new Date(month);
@@ -283,7 +317,10 @@ const getActiveUserCount = async (timeframe) => {
 
     case "all":
       // Retrieve the earliest login date from the UserAccount collection
-      const earliestUser = await UserAccount.findOne({}, { last_login: 1 }).sort({ last_login: 1 });
+      const earliestUser = await UserAccount.findOne(
+        {},
+        { last_login: 1 }
+      ).sort({ last_login: 1 });
       const startDate = earliestUser ? earliestUser.last_login : currentDate; // Use current date if no users exist
 
       // Iterate from the start date to the current date in 3-month increments
@@ -303,7 +340,9 @@ const getActiveUserCount = async (timeframe) => {
 
         // Push the counts for each three-month period
         counts.push({
-          date: `${currentStartDate.toLocaleString("default", { month: "long" })} ${currentStartDate.getFullYear()}`,
+          date: `${currentStartDate.toLocaleString("default", {
+            month: "long",
+          })} ${currentStartDate.getFullYear()}`,
           count,
         });
 
@@ -319,8 +358,343 @@ const getActiveUserCount = async (timeframe) => {
   return counts;
 };
 
+const getAllPropertyCount = async () => {
+  try {
+    const result = await PropertyList.aggregate([
+      {
+        // Match only Approved properties
+        $match: {
+          status: "Approved", // Adjust this value based on your actual status field
+        },
+      },
+      {
+        // Group by property type and count
+        $group: {
+          _id: "$typeOfProperty",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        // Project the final output format
+        $project: {
+          _id: 0,
+          type: "$_id",
+          count: 1,
+        },
+      },
+    ]);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getStatusCounts = async (timeframe) => {
+  const counts = [];
+  const currentDate = new Date();
+
+  switch (timeframe) {
+    case "24h":
+      for (let i = 23; i >= 0; i -= 2) {
+        // Every 2 hours
+        const startTime = new Date(currentDate);
+        startTime.setHours(currentDate.getHours() - i, 0, 0, 0);
+        const endTime = new Date(startTime);
+        endTime.setHours(endTime.getHours() + 2); // 2-hour window
+
+        // Query counts for each status
+        const approvedCount = await PropertyList.countDocuments({
+          status: "Approved",
+          approved_date: { $gte: startTime, $lt: endTime },
+        });
+
+        const rejectedCount = await PropertyList.countDocuments({
+          status: "Rejected",
+          rejected_date: { $gte: startTime, $lt: endTime },
+        });
+
+        const requestCount = await PropertyList.countDocuments({
+          status: { $in: ["Waiting", "Under Review"] },
+          created_at: { $gte: startTime, $lt: endTime },
+        });
+
+        const startHourLabel = startTime.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+
+        const endHourLabel = endTime.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+
+        counts.push({
+          hours: `${startHourLabel} - ${endHourLabel}`,
+          data: {
+            approved_count: approvedCount,
+            rejected_count: rejectedCount,
+            request_count: requestCount,
+          },
+        });
+      }
+      break;
+
+    // case "7d":
+    //   for (let i = 6; i >= 0; i--) { // Last 7 days
+    //     const startDate = new Date(currentDate);
+    //     startDate.setDate(currentDate.getDate() - i);
+    //     startDate.setUTCHours(0, 0, 0, 0);
+    //     const endDate = new Date(startDate);
+    //     endDate.setDate(startDate.getDate() + 1); // Next day
+
+    //     const approvedCount = await PropertyList.countDocuments({
+    //       status: "Approved",
+    //       approved_date: { $gte: startDate, $lt: endDate },
+    //     });
+
+    //     const rejectedCount = await PropertyList.countDocuments({
+    //       status: "Rejected",
+    //       rejected_date: { $gte: startDate, $lt: endDate },
+    //     });
+
+    //     const requestCount = await PropertyList.countDocuments({
+    //       status: { $in: ["Waiting", "Under Review"] },
+    //       created_at: { $gte: startDate, $lt: endDate },
+    //     });
+
+    //     counts.push({
+    //       date: startDate.toLocaleDateString("en-US", {
+    //         year: "numeric",
+    //         month: "short",
+    //         day: "numeric",
+    //       }),
+    //       data: [
+    //         { status: "Approved", count: approvedCount },
+    //         { status: "Rejected", count: rejectedCount },
+    //         { status: "Request", count: requestCount },
+    //       ],
+    //     });
+    //   }
+    //   break;
+
+    case "30d":
+      for (let i = 30; i >= 0; i--) {
+        // Last 30 days
+        const startDate = new Date(currentDate);
+        startDate.setDate(currentDate.getDate() - i);
+        startDate.setUTCHours(0, 0, 0, 0);
+
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 1); // Next day
+        endDate.setUTCHours(0, 0, 0, 0); // Ensure endDate is also at 00:00:00 UTC
+
+        const approvedCount = await PropertyList.countDocuments({
+          status: "Approved",
+          approved_date: { $gte: startDate, $lt: endDate },
+        });
+
+        const rejectedCount = await PropertyList.countDocuments({
+          status: "Rejected",
+          rejected_date: { $gte: startDate, $lt: endDate },
+        });
+
+        const requestCount = await PropertyList.countDocuments({
+          status: { $in: ["Waiting", "Under Review"] },
+          created_at: { $gte: startDate, $lt: endDate },
+        });
+
+        const dateLabel = startDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+
+        counts.push({
+          date: dateLabel,
+          data: {
+            approved_count: approvedCount,
+            rejected_count: rejectedCount,
+            request_count: requestCount,
+          },
+        });
+      }
+      break;
+
+    case "90d":
+      for (let i = 9; i >= 0; i--) {
+        // Last 90 days
+        const startDate = new Date(currentDate);
+        startDate.setDate(currentDate.getDate() - i * 10);
+        startDate.setUTCHours(0, 0, 0, 0);
+
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 10); // Next day
+
+        const approvedCount = await PropertyList.countDocuments({
+          status: "Approved",
+          approved_date: { $gte: startDate, $lt: endDate },
+        });
+
+        const rejectedCount = await PropertyList.countDocuments({
+          status: "Rejected",
+          rejected_date: { $gte: startDate, $lt: endDate },
+        });
+
+        const requestCount = await PropertyList.countDocuments({
+          status: { $in: ["Waiting", "Under Review"] },
+          created_at: { $gte: startDate, $lt: endDate },
+        });
+
+        const startLabel = startDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+
+        const endLabel = endDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+
+        counts.push({
+          days: `${startLabel} - ${endLabel}`,
+          data: {
+            approved_count: approvedCount,
+            rejected_count: rejectedCount,
+            request_count: requestCount,
+          },
+        });
+      }
+      break;
+
+    case "1y":
+      for (let i = 11; i >= 0; i--) {
+        // Last 12 months
+        const startMonth = new Date(currentDate);
+        startMonth.setMonth(currentDate.getMonth() - i, 1); // First day of the month
+        const nextMonth = new Date(startMonth);
+        nextMonth.setMonth(startMonth.getMonth() + 1); // Next month
+
+        const approvedCount = await PropertyList.countDocuments({
+          status: "Approved",
+          approved_date: { $gte: startMonth, $lt: nextMonth },
+        });
+
+        const rejectedCount = await PropertyList.countDocuments({
+          status: "Rejected",
+          rejected_date: { $gte: startMonth, $lt: nextMonth },
+        });
+
+        const requestCount = await PropertyList.countDocuments({
+          status: { $in: ["Waiting", "Under Review"] },
+          created_at: { $gte: startMonth, $lt: nextMonth },
+        });
+
+        const monthLabel = month.toLocaleString("en-US", { month: "long" });
+
+        counts.push({
+          month: monthLabel,
+          data: {
+            approved_count: approvedCount,
+            rejected_count: rejectedCount,
+            request_count: requestCount,
+          },
+        });
+      }
+      break;
+
+    case "all":
+      // Retrieve the earliest login date from the PropertyList collection
+      const earliestUser = await PropertyList.findOne(
+        {},
+        { created_at: 1 }
+      ).sort({ created_at: 1 });
+      const startDate = earliestUser ? earliestUser.created_at : currentDate; // Use current date if no users exist
+
+      // Iterate from the start date to the current date in 3-month increments
+      let currentStartDate = new Date(startDate);
+      const currentEndDate = new Date(currentDate);
+
+      while (currentStartDate < currentEndDate) {
+        const nextStartDate = new Date(currentStartDate);
+        nextStartDate.setMonth(currentStartDate.getMonth() + 3); // Increment by 3 months
+
+        const approvedCount = await PropertyList.countDocuments({
+          status: "Approved",
+          approved_date: { $gte: currentStartDate, $lt: nextStartDate },
+        });
+
+        const rejectedCount = await PropertyList.countDocuments({
+          status: "Rejected",
+          rejected_date: { $gte: currentStartDate, $lt: nextStartDate },
+        });
+
+        const requestCount = await PropertyList.countDocuments({
+          status: { $in: ["Waiting", "Under Review"] },
+          created_at: { $gte: currentStartDate, $lt: nextStartDate },
+        });
+
+        counts.push({
+          date: `${currentStartDate.toLocaleString("default", {
+            month: "long",
+          })} ${currentStartDate.getFullYear()}`,
+          data: {
+            approved_count: approvedCount,
+            rejected_count: rejectedCount,
+            request_count: requestCount,
+          },
+        });
+
+        currentStartDate = nextStartDate; // Move to the next 3-month period
+      }
+      break;
+  }
+
+  return counts;
+};
+
+const getPropertyCountByBarangay = async () => {
+  try {
+    const data = await PropertyList.aggregate([
+      {
+        $group: {
+          _id: "$barangay",
+          apartment: {
+            $sum: {
+              $cond: [{ $eq: ["$typeOfProperty", "Apartment"] }, 1, 0],
+            },
+          },
+          boardinghouse: {
+            $sum: {
+              $cond: [{ $eq: ["$typeOfProperty", "Boarding House"] }, 1, 0],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          barangay: "$_id",
+          apartment: 1,
+          boardinghouse: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getAllUserCount,
   userRegCountService,
-  getActiveUserCount
+  getActiveUserCount,
+  getAllPropertyCount,
+  getStatusCounts,
+  getPropertyCountByBarangay,
 };

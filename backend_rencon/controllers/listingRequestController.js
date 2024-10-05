@@ -60,20 +60,25 @@ const updateRequestStatus = async (req, res) => {
     return res.status(400).json({ message: "Valid status is required" });
   }
 
-  //console.log(status); //debugging
   let action;
+  let updateFields = {}; // To hold the fields that will be updated
+
   switch (status) {
     case "Approved":
       action = "Approved listing";
+      updateFields = { status, approved_date: new Date() }; // Set approved_date to current date
       break;
     case "Rejected":
       action = "Rejected listing";
+      updateFields = { status, rejected_date: new Date() }; // Set rejected_date to current date
       break;
     case "Waiting":
       action = "Cancel Review";
+      updateFields = { status }; // No date for Waiting
       break;
     case "Under Review":
       action = "Review Property";
+      updateFields = { status }; // No date for Under Review
       break;
     default:
       return res.status(400).json({ message: "Invalid status provided" });
@@ -81,12 +86,22 @@ const updateRequestStatus = async (req, res) => {
 
   try {
     // Fetch the current request to get its current status
-    const currentRequest = await PropertyList.findById(id);   // Adjusted to use `findById`
+    const currentRequest = await PropertyList.findById(id);
     
+    if (!currentRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
     const oldStatus = currentRequest.status;  // Get the current status of the request
 
-    // Update the request status
-    const updatedRequest = await PropertyListService.updateRequestStatus(id, status);
+    // Update the request status and add date fields only if they don't exist
+    await PropertyList.findByIdAndUpdate(
+      id,
+      { 
+        $set: updateFields 
+      },
+      { new: true } // Return the updated document
+    );
 
     // Log the activity (non-blocking)
     const changes = `Status changed from ${oldStatus} to ${status}`;
@@ -96,7 +111,7 @@ const updateRequestStatus = async (req, res) => {
 
     return res.json({
       message: "Request status updated successfully",
-      updatedRequest,
+      updatedRequest: currentRequest, // Return the original current request; you might fetch it again if needed
     });
   } catch (error) {
     console.error(`Error updating status for request with ID: ${id}`, error);

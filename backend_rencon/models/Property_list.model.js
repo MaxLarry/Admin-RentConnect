@@ -36,6 +36,8 @@ const PropertyListSchema = new Schema({
     enum: ["waiting", "passed", "failed", "under review"],
     default: "waiting",
   },
+  approved_date: { type: Date},
+  rejected_date: { type: Date},
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });

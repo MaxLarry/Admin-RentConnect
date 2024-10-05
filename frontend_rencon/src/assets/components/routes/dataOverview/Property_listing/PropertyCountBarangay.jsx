@@ -1,5 +1,7 @@
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
+import axios from "axios";
 import {
   CartesianGrid,
   LabelList,
@@ -24,15 +26,6 @@ import {
 
 export const description = "A stacked bar chart with labels";
 
-const chartData = [
-  { baranggay: "Maningning", apartment: 186, boardinghouse: 80 },
-  { baranggay: "Manggahan", apartment: 305, boardinghouse: 200 },
-  { baranggay: "Bancao-Bancao", apartment: 237, boardinghouse: 120 },
-  { baranggay: "Tiniguiban", apartment: 73, boardinghouse: 190 },
-  { baranggay: "San Jose", apartment: 209, boardinghouse: 130 },
-  { baranggay: "Irawan", apartment: 214, boardinghouse: 140 },
-];
-
 const chartConfig = {
   apartment: {
     label: "Apartment",
@@ -45,6 +38,36 @@ const chartConfig = {
 };
 
 function PropertyCountBarangay() {
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPropertyCountBarangay = async () => {
+      try {
+        // Fetching data from your backend API
+        const response = await axios.get("/data/property-count-barangay");
+        setChartData(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchPropertyCountBarangay();
+  }, []);
+
+  // Render loading state
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  // Render error state
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-10 noselect">
       <CardHeader>
@@ -67,7 +90,7 @@ function PropertyCountBarangay() {
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="baranggay"
+              dataKey="barangay"
               tickLine={false}
               axisLine={false}
               tickMargin={8}

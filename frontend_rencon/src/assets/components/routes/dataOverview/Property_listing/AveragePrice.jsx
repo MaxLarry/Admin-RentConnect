@@ -1,5 +1,7 @@
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
+import axios from "axios";
 import { Pie, PieChart, LabelList } from "recharts";
 
 import {
@@ -16,13 +18,50 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-export const description = "A donut chart with text";
 
-// Updated chart data to reflect Boarding House and Apartment
-const chartData = [
-  { category: "Boarding House", user: 150, fill: "var(--color-boardingHouse)" },
-  { category: "Apartment", user: 300, fill: "var(--color-apartment)" },
-];
+function AveragePrice() {
+
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      setLoading(true);
+
+      try {
+        const response = await axios.get("/data/property-average-price");
+
+        if (response.data && response.data.length > 0) {
+          const { boardingHouseAverageprice, apartmentAverageprice} = response.data[0];
+
+          // Map the response to the expected chartData format
+          setChartData([
+            { category: "Boarding House", averagePrice: boardingHouseAverageprice, fill: "var(--color-boardingHouse)" },
+            { category: "Apartment", averagePrice: apartmentAverageprice, fill: "var(--color-apartment)" },
+          ]);
+        } else {
+          setChartData([]);
+        }
+      } catch (error) {
+        console.error("There was an error fetching the Average!", error);
+        setError("Failed to fetch Average");
+        setChartData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserCount();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
 const chartConfig = {
   user: {
@@ -37,11 +76,6 @@ const chartConfig = {
     color: "hsl(var(--chart-3))",
   },
 };
-
-function AveragePrice() {
-  const totalUser = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.user, 0);
-  }, []);
 
   return (
     <Card className="rounded-md shadow-md block items-center col-start-7 md:col-end-3 lg:col-end-10 noselect">

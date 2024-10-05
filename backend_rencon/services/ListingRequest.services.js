@@ -202,6 +202,7 @@ const getAllApprovedListing = async () => {
           description: 1,
           status: 1,
           created_at: 1,
+          approved_date: 1,
           typeOfProperty: 1,
           location: 1,
           address: {
@@ -261,7 +262,7 @@ const getAllApprovedListing = async () => {
           amenities: { $first: "$amenities" },
           status: { $first: "$status" },
           location: { $first: "$location" },
-          created_at: { $first: "$created_at" },
+          approved_date: { $first: "$approved_date" },
           typeOfProperty: { $first: "$typeOfProperty" },
           property_photo: { $first: "$property_photo" },
           legal_docs: { $first: "$legal_docs" },
@@ -365,6 +366,7 @@ const getAllRejectedRequest = async () => {
           description: 1,
           status: 1,
           created_at: 1,
+          approved_date: 1,
           typeOfProperty: 1,
           location: 1,
           address: {
@@ -423,7 +425,7 @@ const getAllRejectedRequest = async () => {
           amenities: { $first: "$amenities" },
           status: { $first: "$status" },
           location: { $first: "$location" },
-          created_at: { $first: "$created_at" },
+          rejected_date: { $first: "$rejected_date" },
           typeOfProperty: { $first: "$typeOfProperty" },
           property_photo: { $first: "$property_photo" },
           legal_docs: { $first: "$legal_docs" },

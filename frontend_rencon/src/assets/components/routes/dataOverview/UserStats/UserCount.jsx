@@ -18,9 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-export const description = "A donut chart with text";
-
-
 function UserCount() {
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);

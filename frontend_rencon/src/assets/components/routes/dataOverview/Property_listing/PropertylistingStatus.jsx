@@ -1,5 +1,9 @@
+import * as React from "react";
+import { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import axios from "axios";
+import { Area, AreaChart, CartesianGrid,Tooltip, XAxis } from "recharts";
+import DropdownFilter from "../DropdownFilter";
 import {
   Card,
   CardContent,
@@ -16,36 +20,96 @@ import {
 
 export const description = "A stacked area chart with gradient fill";
 
-const chartData = [
-  { month: "January", approved: 120, request: 50, rejected: 16 },
-  { month: "February", approved: 200, request: 100, rejected: 5 },
-  { month: "March", approved: 150, request: 80, rejected: 7 },
-  { month: "April", approved: 30, request: 40, rejected: 3 },
-  { month: "May", approved: 180, request: 90, rejected: 20 },
-  { month: "June", approved: 200, request: 110, rejected: 15 },
-];
 
-const chartConfig = {
-  approved: {
-    label: "Approved",
-    color: "hsl(var(--chart-1))",
-  },
-  request: {
-    label: "Request",
-    color: "hsl(var(--chart-2))",
-  },
-  rejected: {
-    label: "Rejected",
-    color: "hsl(var(--chart-3))",
-  },
-};
 
 function PropertylistingStatus() {
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedValue, setSelectedValue] = useState("30d");
+
+  const opt = [
+    { value: "24h", label: "24h" },
+    { value: "30d", label: "30d" },
+    { value: "90d", label: "90d" },
+    { value: "1y", label: "1y" },
+    { value: "all", label: "All time" },
+  ];
+
+  const chartConfig = {
+    approved: {
+      label: "Approved",
+      color: "hsl(var(--chart-1))",
+    },
+    request: {
+      label: "Request",
+      color: "hsl(var(--chart-2))",
+    },
+    rejected: {
+      label: "Rejected",
+      color: "hsl(var(--chart-3))",
+    },
+  };
+  useEffect(() => {
+    const fetchNewRegister = async () => {
+      setLoading(true);
+
+      try {
+        // Fetching data from your backend with the selected timeframe
+        const response = await axios.get(`/data/property-listing-status`, {
+          params: { timeframe: selectedValue },
+        });
+
+        if (response.data && response.data.length > 0) {
+          const formattedData = response.data.map((item) => ({
+            time: item.days || item.hours || item.date || item.month,
+            approved: item.data.approved_count,
+            request: item.data.request_count,
+            rejected: item.data.rejected_count,
+            fullDate: item.date, // Optional for tooltip display
+          }));
+
+          setChartData(formattedData);
+        } else {
+          setChartData([]);
+        }
+      } catch (error) {
+        console.error("Error fetching newly registered users:", error);
+        setError("Failed to fetch Newly Register data");
+        setChartData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNewRegister();
+  }, [selectedValue]); 
+
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+  
   return (
     <Card className="rounded-md shadow-md block items-center col-start-4 md:col-end-3 lg:col-end-10 noselect">
-      <CardHeader>
+      <CardHeader className="flex flex-row justify-between pb-6">
+        <div>
         <CardTitle>Property Listing Status</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription className="mt-2">
+            Showing user registrations over {selectedValue}
+          </CardDescription>
+        </div>
+        <div>
+          <DropdownFilter
+            options={opt}
+            selectedValue={selectedValue}
+            setSelectedValue={setSelectedValue}
+          />
+        </div>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
@@ -55,11 +119,30 @@ function PropertylistingStatus() {
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="time"
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickMargin={10}
+              fontSize={10}
+                            tickFormatter={(time) => {
+                if (selectedValue === "90d") {
+                  const [startDate, endDate] = time.split(" - ");
+                  return new Date(startDate).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                } else if (selectedValue === "30d") {
+                  return new Date(time).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                } else if (selectedValue === "24h") {
+                  // Format for 24h
+                  const [startTime] = time.split(" - ");
+                  return startTime;
+                }
+                return time;
+              }}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <defs>

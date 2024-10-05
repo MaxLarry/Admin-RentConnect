@@ -151,9 +151,9 @@ function Approved({ searchQuery }) {
         ? property.profile.fullName.toLowerCase()
         : "";
       const address = property.address ? property.address.toLowerCase() : "";
-      const createdAt = property.created_at
+      const createdAt = property.approved_date
         ? format(
-            new Date(property.created_at),
+            new Date(property.approved_date),
             "yyyy-MM-dd HH:mm"
           ).toLowerCase()
         : "";
@@ -166,8 +166,8 @@ function Approved({ searchQuery }) {
       );
     })
     .sort((a, b) => {
-      // Sort by created_at in descending order (new to old)
-      return new Date(b.created_at) - new Date(a.created_at);
+      // Sort by approved_date in descending order (new to old)
+      return new Date(b.approved_date) - new Date(a.approved_date);
     });
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -206,12 +206,12 @@ function Approved({ searchQuery }) {
                       onCopy={() => handleCopy(property._id)}
                     />
                   </TableCell>
-                  <TableCell>{property.profile?.fullName}</TableCell>
-                  <TableCell>{property.typeOfProperty}</TableCell>
-                  <TableCell>{property.address}</TableCell>
-                  <TableCell>{property.roomCount}</TableCell>
+                  <TableCell>{property.profile?.fullName ? property.profile?.fullName  : "N/A"}</TableCell>
+                  <TableCell>{property.typeOfProperty  ? property.typeOfProperty  : "N/A"}</TableCell>
+                  <TableCell>{property.address ? property.address  : "N/A"}</TableCell>
+                  <TableCell>{property.roomCount ? property.roomCount  : "N/A"}</TableCell>
                   <TableCell>
-                    {format(new Date(property.created_at), "yyyy-MM-dd HH:mm")}
+                    {property.approved_date ? format(new Date(property.approved_date), "yyyy-MM-dd HH:mm") : "N/A"}
                   </TableCell>
                   <TableCell className="w-10 pl-0 text-center">
                     <OptionEllipsis

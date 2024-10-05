@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { TrendingUp } from "lucide-react";
 import { Label, Pie, PieChart } from "recharts";
 
@@ -16,32 +18,81 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-export const description = "A donut chart with text";
-
 const chartData = [
-  { category: "Boarding House", count: 150, fill: "var(--color-boardinghouse)" },
+  {
+    category: "Boarding House",
+    count: 150,
+    fill: "var(--color-boardinghouse)",
+  },
   { category: "Apartment", count: 300, fill: "var(--color-apartment)" },
 ];
 
-const chartConfig = {
-  count: {
-    label: "count",
-  },
-  boardinghouse: {
-    label: "Boarding House",
-    color: "hsl(var(--chart-1))",
-  },
-  apartment: {
-    label: "Apartmentt",
-    color: "hsl(var(--chart-2))",
-  },
-
-};
-
 function PropertyListedCount() {
-  const totalUser = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.count, 0);
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchListedPropertiesCount = async () => {
+      setLoading(true);
+
+      try {
+        const response = await axios.get("/data/property-count");
+
+        if (response.data && response.data.length > 0) {
+          const boardingHouseCount = response.data.find(item => item.type === 'Boarding House')?.count || 0;
+          const apartmentCount = response.data.find(item => item.type === 'Apartment')?.count || 0;
+
+          setChartData([
+            {
+              category: "Boarding House",
+              count: boardingHouseCount,
+              fill: "var(--color-boardinghouse)",
+            },
+            {
+              category: "Apartment",
+              count: apartmentCount,
+              fill: "var(--color-apartment)",
+            },
+          ]);
+        } else {
+          setChartData([]);
+        }
+      } catch (error) {
+        console.error("There was an error fetching the listed Properties Count!", error);
+        setError("Failed to fetch Properties Count");
+        setChartData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListedPropertiesCount();
   }, []);
+
+  const totalProperty = React.useMemo(() => {
+    return chartData.reduce((acc, curr) => acc + curr.count, 0); // Sum the count
+  }, [chartData]);
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+  const chartConfig = {
+    count: {
+      label: "count",
+    },
+    boardinghouse: {
+      label: "Boarding House",
+      color: "hsl(var(--chart-1))",
+    },
+    apartment: {
+      label: "Apartmentt",
+      color: "hsl(var(--chart-2))",
+    },
+  };
 
   return (
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-4 noselect">
@@ -60,14 +111,14 @@ function PropertyListedCount() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-             data={chartData}
-             dataKey="count"
-             label
-             nameKey="category"
-             innerRadius={50}
-             outerRadius={85}
-             stroke="none" // Set stroke to none to remove line between slices
-             strokeWidth={1} // Adjusted stroke width
+              data={chartData}
+              dataKey="count"
+              label
+              nameKey="category"
+              innerRadius={50}
+              outerRadius={85}
+              stroke="none" // Set stroke to none to remove line between slices
+              strokeWidth={1} // Adjusted stroke width
             >
               <Label
                 content={({ viewBox }) => {
@@ -84,7 +135,7 @@ function PropertyListedCount() {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalUser.toLocaleString()}
+                          {totalProperty.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
