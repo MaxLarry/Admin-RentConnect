@@ -71,8 +71,8 @@ function PropertyCountBarangay() {
   return (
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-10 noselect">
       <CardHeader>
-        <CardTitle>Number of Listed Properties per Barangay</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle className="text-xl font-bold">Number of Listed Properties per Barangay</CardTitle>
+        <CardDescription >January - June 2024</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer

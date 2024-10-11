@@ -1,5 +1,6 @@
 const { UserAccount } = require("../models/User.model");
-const { PropertyList } = require("../models/Property_list.model");
+const { PropertyList, Room } = require("../models/Property_list.model");
+
 
 const getAllUserCount = async () => {
   try {
@@ -593,7 +594,7 @@ const getStatusCounts = async (timeframe) => {
           created_at: { $gte: startMonth, $lt: nextMonth },
         });
 
-        const monthLabel = month.toLocaleString("en-US", { month: "long" });
+        const monthLabel = startMonth.toLocaleString("en-US", { month: "long" });
 
         counts.push({
           month: monthLabel,
@@ -660,6 +661,11 @@ const getPropertyCountByBarangay = async () => {
   try {
     const data = await PropertyList.aggregate([
       {
+        $match: {
+         status: "Approved",
+        },
+      },
+      {
         $group: {
           _id: "$barangay",
           apartment: {
@@ -690,6 +696,54 @@ const getPropertyCountByBarangay = async () => {
   }
 }
 
+
+const getAveragePriceByPropertyType = async (req, res) => {
+  try {
+    const averagePrices = await Room.aggregate([
+      {
+        $lookup: {
+          from: 'listing_properties', // Assuming 'listing_property' is your property collection
+          localField: 'propertyId',  // Field in Rooms collection
+          foreignField: '_id',       // Field in PropertyList collection
+          as: 'propertyDetails',     // Name of the array containing the joined property data
+        },
+      },
+      {
+        $unwind: '$propertyDetails',  // Unwind to convert the array into an object
+      },
+      {
+        // Group rooms by property ID and calculate the average price of rooms for each property
+        $group: {
+          _id: '$propertyId',         // Group by property ID
+          typeOfProperty: { $first: '$propertyDetails.typeOfProperty' },  // Get property type
+          averagePricePerProperty: { $avg: '$price' },  // Calculate average price of rooms for each property
+        },
+      },
+      {
+        // Now, group by typeOfProperty to calculate the overall average price per property type
+        $group: {
+          _id: '$typeOfProperty',                     // Group by property type (Apartment/Boarding House)
+          averagePrice: { $avg: '$averagePricePerProperty' },  // Average price across all properties of that type
+          totalProperties: { $sum: 1 },               // Count total number of properties per type
+        },
+      },
+      {
+        // Format the output
+        $project: {
+          _id: 0,
+          propertyType: '$_id',               // Property type (Apartment or Boarding House)
+          averagePrice: { $round: ['$averagePrice', 2] },  // Round to 2 decimal places
+          totalProperties: 1,
+        },
+      },
+    ]);
+
+    return averagePrices;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getAllUserCount,
   userRegCountService,
@@ -697,4 +751,5 @@ module.exports = {
   getAllPropertyCount,
   getStatusCounts,
   getPropertyCountByBarangay,
+  getAveragePriceByPropertyType,
 };

@@ -82,7 +82,7 @@ function ActiveuserHistogram() {
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-10 noselect">
       <CardHeader className="flex flex-row justify-between pb-6">
         <div>
-          <CardTitle>Active User</CardTitle>
+          <CardTitle className="text-xl font-bold">Active User</CardTitle>
           <CardDescription>January - June 2024</CardDescription>
           </div>
           <div>

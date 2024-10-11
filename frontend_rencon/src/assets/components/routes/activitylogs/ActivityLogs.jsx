@@ -200,8 +200,9 @@ function ActivityLogs() {
 
   return (
     <ScrollArea className="px-4 pt-14 h-full sm:ml-60 block gap-2 flex-col lg:flex-row translate-all duration-300 overflow-y-auto">
-      <div className="flex justify-between items-center p-5">
-        <h1 className="font-bold text-2xl p-4">Activity Logs</h1>
+      <div className="justify-between items-center p-9">
+        <h1 className="font-bold text-2xl">Activity Logs</h1>
+        <p className="font-thin text-sm">Review user actions and system changes for improved oversight.</p>
       </div>
 
       {/* Search, Role Filter, Action Filter, and Date Picker */}

@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { format } from "date-fns";
+import CopyableText from "../../ui/CopyableText";
 import { Button } from "@/components/ui/button";
-import Pagination from "../../ui/Pagination";
+import { parse, isAfter, isBefore, format } from "date-fns";
+import useAuth from "../../auth/useAuth";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   Table,
@@ -21,47 +18,59 @@ import {
 } from "@/components/ui/table";
 
 function ActivityLog() {
-  const itemsPerPage = 10;
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const { user } = useAuth();
+  const itemsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [activityLogs, setActivityLogs] = useState([]);
 
-  // Logs array
-  const logs = [
-    {
-      id: "09876w543210987654d321",
-      adminName: "John Doe",
-      action: "Added a listing",
-      timestamp: "2024-09-12 10:23:45",
-      ipAddress: "192.168.0.1",
-      target: "Listings",
-      role: "Super-Admin",
-    },
-    {
-      id: "09876w54321s0987654321",
-      adminName: "Jane Smith",
-      action: "Updated user info",
-      timestamp: "2024-09-12 11:05:22",
-      ipAddress: "192.168.0.2",
-      target: "User Management",
-      role: "Admin",
-    },
-    // More log entries
-  ];
-  const req_column = [
+  const logColumn = [
     "Log ID",
     "Admin Name",
+    "Role",
     "Action",
     "Timestamp",
     "IP Address",
     "Entity Affected",
-    "Role",
+    "Changes Made",
   ];
 
-  const truncateId = (id) => `${id.slice(0, 5)}...`;
+
+  // Filter logs based on search, role, action, and date range
+  const filteredLogs = activityLogs
+    
+    .sort((a, b) => {
+      return new Date(b.timestamp) - new Date(a.timestamp);
+    });
 
   // Pagination logic
   const indexOfLastLog = currentPage * itemsPerPage;
   const indexOfFirstLog = indexOfLastLog - itemsPerPage;
-  const currentLogs = logs.slice(indexOfFirstLog, indexOfLastLog);
+  const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog);
+  const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+
+
+  // Fetch all activity logs
+  useEffect(() => {
+    const fetchActivityLogs = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get("/logs/admin-activity-logs");
+        setActivityLogs(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("There was an error fetching the Activity Logs!", error);
+        setActivityLogs([]); // Fallback in case of error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivityLogs();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Card className="p-4 shadow-md col-start-1 lg:col-end-7 md:col-end-3">
@@ -69,61 +78,78 @@ function ActivityLog() {
         <h2 className="text-lg font-bold mb-2">Activity Logs</h2>
         <div className="overflow-auto rounded-md py-3">
           <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {req_column.map((column) => (
-                    <TableHead key={column} className="font-bold">
-                      {column}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentLogs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell>{truncateId(log.id)}</TableCell>
-                    {/*<TableCell className="px-6 py-2 ">
-                      <CopyableText
-                        text={request._id}
-                        onCopy={() => handleCopy(request._id)}
-                      />
-                    </TableCell> */}
-                    <TableCell>{log.adminName}</TableCell>
-                    <TableCell>{log.action}</TableCell>
-                    <TableCell>{log.timestamp}</TableCell>
-                    <TableCell>{log.ipAddress}</TableCell>
-                    <TableCell>{log.target}</TableCell>
-                    <TableCell>{log.role}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          {/*filteredRequests.length > 0 && totalPages >= 1 && (
-        <Pagination className="mt-4 cursor-pointer">
-          <PaginationContent>
-            <PaginationPrevious
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            />
-            {Array.from({ length: totalPages }, (_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  isActive={currentPage === index + 1}
-                  onClick={() => setCurrentPage(index + 1)}
+          <Table className="min-w-full dark:border-zinc-600">
+          <TableHeader>
+            <TableRow className="border-b dark:border-zinc-600">
+              {logColumn.map((column) => (
+                <TableHead
+                  key={column}
+                  className="text-zinc-900 dark:text-gray-200 font-bold"
                 >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationNext
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-            />
-          </PaginationContent>
-        </Pagination>
-      )*/}
+                  {column}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {currentLogs.length > 0 ? (
+              currentLogs.map((log) => (
+                <TableRow key={log._id} className="cursor-pointer">
+                  <TableCell>
+                    <CopyableText
+                      text={log._id}
+                      onCopy={() => console.log("Copying ID")}
+                    />
+                  </TableCell>
+                  <TableCell>{log.admin_name}</TableCell>
+                  <TableCell>{log.role}</TableCell>
+                  <TableCell>{log.action}</TableCell>
+                  <TableCell>
+                    {log.timestamp
+                      ? format(new Date(log.timestamp), "yyyy-MM-dd HH:mm")
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>{log.ip_address}</TableCell>
+                  <TableCell>{log.entity_affected}</TableCell>
+                  <TableCell>{log.changes ? log.changes : "N/A"}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={logColumn.length + 1}
+                  className="text-center"
+                >
+                  No logs found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+          </div>
+          {filteredLogs.length > 0 && totalPages > 0 && (
+        <div className="flex justify-end mt-4 space-x-2">
+          <Button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            className="text-xs"
+            variant="outline"
+          >
+            Previous
+          </Button>
+          <Button
+            disabled={currentPage === totalPages}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            className="text-xs"
+            variant="outline"
+          >
+            Next
+          </Button>
+        </div>
+      )}
         </div>
       </CardContent>
     </Card>

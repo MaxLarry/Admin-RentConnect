@@ -18,14 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartData = [
-  {
-    category: "Boarding House",
-    count: 150,
-    fill: "var(--color-boardinghouse)",
-  },
-  { category: "Apartment", count: 300, fill: "var(--color-apartment)" },
-];
 
 function PropertyListedCount() {
   const [chartData, setChartData] = useState([]);
@@ -72,7 +64,7 @@ function PropertyListedCount() {
   const totalProperty = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.count, 0); // Sum the count
   }, [chartData]);
-  
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -97,7 +89,7 @@ function PropertyListedCount() {
   return (
     <Card className="rounded-md shadow-md block items-center col-start-1 md:col-end-3 lg:col-end-4 noselect">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Listed Property</CardTitle>
+        <CardTitle className="text-xl font-bold">Listed Property</CardTitle>
         <CardDescription>Current Total of Listed Properties</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

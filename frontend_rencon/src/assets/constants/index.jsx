@@ -46,7 +46,7 @@ export const links = [
 
 export const support = [
     {
-        to: "#",
+        to: "/settings",
         icon: RiSettings3Fill,
         text: "Setting"
     },

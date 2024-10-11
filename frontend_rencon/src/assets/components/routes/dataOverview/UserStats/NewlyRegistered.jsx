@@ -110,8 +110,8 @@ function NewlyRegistered() {
     <Card className="rounded-md shadow-md block items-center col-start-4 md:col-end-3 lg:col-end-10 noselect">
       <CardHeader className="flex flex-row justify-between pb-6">
         <div>
-          <CardTitle>Newly Registered Users</CardTitle>
-          <CardDescription className="mt-2">
+          <CardTitle className="text-xl font-bold">Newly Registered Users</CardTitle>
+          <CardDescription >
             Showing user registrations over {selectedValue}
           </CardDescription>
         </div>

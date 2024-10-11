@@ -1,140 +1,160 @@
-// PropertyListedGraph.js
-import React, { useState } from "react";
+import * as React from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { TrendingUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis, Tooltip } from "recharts";
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import DropdownFilter from "./DropdownFilter";
+import { Label, Pie, PieChart } from "recharts";
 
-function PropertyListedGraph() {
-  const [selectedValue, setSelectedValue] = useState("30d");
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
+
+function PropertyListedCount() {
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchListedPropertiesCount = async () => {
+      setLoading(true);
+
+      try {
+        const response = await axios.get("/data/property-count");
+
+        if (response.data && response.data.length > 0) {
+          const boardingHouseCount = response.data.find(item => item.type === 'Boarding House')?.count || 0;
+          const apartmentCount = response.data.find(item => item.type === 'Apartment')?.count || 0;
+
+          setChartData([
+            {
+              category: "Boarding House",
+              count: boardingHouseCount,
+              fill: "var(--color-boardinghouse)",
+            },
+            {
+              category: "Apartment",
+              count: apartmentCount,
+              fill: "var(--color-apartment)",
+            },
+          ]);
+        } else {
+          setChartData([]);
+        }
+      } catch (error) {
+        console.error("There was an error fetching the listed Properties Count!", error);
+        setError("Failed to fetch Properties Count");
+        setChartData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListedPropertiesCount();
+  }, []);
+
+  const totalProperty = React.useMemo(() => {
+    return chartData.reduce((acc, curr) => acc + curr.count, 0); // Sum the count
+  }, [chartData]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
   const chartConfig = {
-    "Boarding House": {
+    count: {
+      label: "count",
+    },
+    boardinghouse: {
       label: "Boarding House",
       color: "hsl(var(--chart-1))",
     },
-    Apartment: {
-      label: "Apartment",
+    apartment: {
+      label: "Apartmentt",
       color: "hsl(var(--chart-2))",
     },
   };
 
-  const chartData = [
-    { month: "January", "Boarding House": 120, Apartment: 66 },
-    { month: "February", "Boarding House": 190, Apartment: 115 },
-    { month: "March", "Boarding House": 145, Apartment: 92 },
-    { month: "April", "Boarding House": 60, Apartment: 13 },
-    { month: "May", "Boarding House": 140, Apartment: 69 },
-    { month: "June", "Boarding House": 170, Apartment: 44 },
-  ];
-
-  const opt = [
-    { value: "24h", label: "24h" },
-    { value: "30d", label: "30d" },
-    { value: "90d", label: "90d" },
-    { value: "1y", label: "1y" },
-    { value: "all", label: "All time" },
-  ];
-
   return (
-    <Card className="px-10 py-5 rounded-md shadow-md block items-center lg:col-start-4 lg:col-end-7  md:col-start-1 md:col-end-3 relative">
-      <CardContent className="p-0">
-        <div className="flex justify-between pb-6">
-          <div>
-            <div className="text-lg font-bold">1230</div>
-            <span className="text-md font-normal">Listed Properties</span>
-          </div>
-          <DropdownFilter
-            options={opt}
-            selectedValue={selectedValue}
-            setSelectedValue={setSelectedValue}
-          />
-        </div>
-        <ChartContainer config={chartConfig} className="pb-6">
-          <AreaChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+    <Card className="px-10 py-5 rounded-md shadow-md block items-center lg:col-start-4 lg:col-end-7  md:col-start-1 md:col-end-3 relative no-select">
+      <CardHeader className="items-center pb-0">
+        <CardTitle className= "text-xl font-bold">Listed Property</CardTitle>
+        <CardDescription>Current Total of Listed Properties</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-1 pb-0">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[250px]"
+        >
+          <PieChart>
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
             />
-            <Tooltip cursor={false} content={<ChartTooltipContent />} />
-            <defs>
-              <linearGradient
-                id="fillBoardingHouse"
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
-                <stop
-                  offset="5%"
-                  stopColor="hsl(var(--chart-1))" // Updated to use the correct color
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="hsl(var(--chart-1))" // Updated to use the correct color
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id="fillApartment" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="hsl(var(--chart-2))" // Updated to use the correct color
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="hsl(var(--chart-2))" // Updated to use the correct color
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
-
-            <Area
-              dataKey="Boarding House"
-              type="natural"
-              fill="url(#fillBoardingHouse)"
-              stroke="hsl(var(--chart-1))" // Ensure stroke color matches the area
-              stackId="a"
-              dot={{ fill: "hsl(var(--chart-1))" }} // Set the dot color
-            />
-            <Area
-              dataKey="Apartment"
-              type="natural"
-              fill="url(#fillApartment)"
-              stroke="hsl(var(--chart-2))" // Ensure stroke color matches the area
-              stackId="a"
-              dot={{ fill: "hsl(var(--chart-2))" }} // Set the dot color
-            />
-          </AreaChart>
+            <Pie
+              data={chartData}
+              dataKey="count"
+              label
+              nameKey="category"
+              innerRadius={50}
+              outerRadius={85}
+              stroke="none" // Set stroke to none to remove line between slices
+              strokeWidth={1} // Adjusted stroke width
+            >
+              <Label
+                content={({ viewBox }) => {
+                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                    return (
+                      <text
+                        x={viewBox.cx}
+                        y={viewBox.cy}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                      >
+                        <tspan
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          className="fill-foreground text-3xl font-bold"
+                        >
+                          {totalProperty.toLocaleString()}
+                        </tspan>
+                        <tspan
+                          x={viewBox.cx}
+                          y={(viewBox.cy || 0) + 24}
+                          className="fill-muted-foreground"
+                        >
+                          All users
+                        </tspan>
+                      </text>
+                    );
+                  }
+                }}
+              />
+            </Pie>
+          </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="p-0">
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              January - June 2024
-            </div>
-          </div>
+      <CardFooter className="flex-col gap-2 text-sm">
+        <div className="flex items-center gap-2 font-medium leading-none">
+          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+        </div>
+        <div className="leading-none text-muted-foreground">
+          Showing the total of properties listed in the app
         </div>
       </CardFooter>
     </Card>
   );
 }
 
-export default PropertyListedGraph;
+export default PropertyListedCount;

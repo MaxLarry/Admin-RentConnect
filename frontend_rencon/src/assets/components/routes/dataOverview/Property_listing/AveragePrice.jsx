@@ -18,28 +18,27 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-
 function AveragePrice() {
-
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUserCount = async () => {
+    const fetchAveragePrices = async () => {
       setLoading(true);
 
       try {
         const response = await axios.get("/data/property-average-price");
 
         if (response.data && response.data.length > 0) {
-          const { boardingHouseAverageprice, apartmentAverageprice} = response.data[0];
+          // Assuming backend returns an array of propertyType, averagePrice, and totalProperties
+          const mappedData = response.data.map(item => ({
+            category: item.propertyType, 
+            averagePrice: item.averagePrice, 
+            fill: item.propertyType === "Boarding House" ? "var(--color-boardingHouse)" : "var(--color-apartment)"
+          }));
 
-          // Map the response to the expected chartData format
-          setChartData([
-            { category: "Boarding House", averagePrice: boardingHouseAverageprice, fill: "var(--color-boardingHouse)" },
-            { category: "Apartment", averagePrice: apartmentAverageprice, fill: "var(--color-apartment)" },
-          ]);
+          setChartData(mappedData);
         } else {
           setChartData([]);
         }
@@ -52,7 +51,7 @@ function AveragePrice() {
       }
     };
 
-    fetchUserCount();
+    fetchAveragePrices();
   }, []);
 
   if (loading) {
@@ -63,24 +62,21 @@ function AveragePrice() {
     return <div>{error}</div>;
   }
 
-const chartConfig = {
-  user: {
-    label: "User",
-  },
-  boardingHouse: {
-    label: "Boarding House",
-    color: "hsl(var(--chart-1))",
-  },
-  apartment: {
-    label: "Apartment",
-    color: "hsl(var(--chart-3))",
-  },
-};
+  const chartConfig = {
+    boardingHouse: {
+      label: "Boarding House",
+      color: "hsl(var(--chart-1))",
+    },
+    apartment: {
+      label: "Apartment",
+      color: "hsl(var(--chart-3))",
+    },
+  };
 
   return (
     <Card className="rounded-md shadow-md block items-center col-start-7 md:col-end-3 lg:col-end-10 noselect">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Average Price</CardTitle>
+        <CardTitle className="text-xl font-bold">Average Price</CardTitle>
         <CardDescription>Boarding House and Apartment</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -95,17 +91,19 @@ const chartConfig = {
             />
             <Pie
               data={chartData}
-              dataKey="user"
-              innerRadius={40}
+              dataKey="averagePrice" // Use averagePrice from backend
               nameKey="category"
+              innerRadius={30}
+              outerRadius={100}
+              fill="#8884d8"
               stroke="none"
               strokeWidth={1}
             >
               <LabelList
-                dataKey="user" // Use the 'user' value for labels
-                position="inside" // Position of the labels inside the pie slices
-                fill="#fff" // Set label color to white for contrast
-                fontSize={12} // Set font size
+                dataKey="averagePrice" // Display the category name inside the chart
+                position="inside"
+                fill="#fff"
+                fontSize={12}
               />
             </Pie>
           </PieChart>
@@ -113,10 +111,10 @@ const chartConfig = {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          Average Prices up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total users for the last 6 months
+        <div className="leading-none text-center text-muted-foreground">
+          Showing average prices for Boarding Houses and Apartments
         </div>
       </CardFooter>
     </Card>

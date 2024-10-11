@@ -82,6 +82,21 @@ async function getAllUserCount(req, res) {
     }
   }
 
+  async function averagePriceByPropertyType(req, res) {
+    try {
+      const requests = await DataOverviewService.getAveragePriceByPropertyType();
+  
+      if (!requests.length) {
+        return res.json({ message: "No data available" });
+      }
+  
+      res.status(200).json(requests);
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+
+
 module.exports ={
     getAllUserCount,
     userRegCount,
@@ -89,4 +104,5 @@ module.exports ={
     getAllPropertyCount,
     getStatusCounts,
     getPropertyCount,
+    averagePriceByPropertyType,
 };
